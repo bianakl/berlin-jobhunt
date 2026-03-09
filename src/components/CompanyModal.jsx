@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Star, ChevronDown } from 'lucide-react';
+import { X, Star, ChevronDown, Linkedin, Mail } from 'lucide-react';
 import { INDUSTRIES, COMPANY_SIZES } from '../data/seed';
 
 const inputStyle = {
@@ -14,10 +14,13 @@ const inputStyle = {
   transition: 'border-color 0.15s',
 };
 
-function Field({ label, children }) {
+function Field({ label, children, hint }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#374151' }}>{label}</label>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: '#374151' }}>
+        {label}
+        {hint && <span className="ml-1 font-normal" style={{ color: '#9ca3af' }}>{hint}</span>}
+      </label>
       {children}
     </div>
   );
@@ -33,6 +36,13 @@ export default function CompanyModal({ company, onSave, onClose }) {
     size: company?.size || '',
     notes: company?.notes || '',
     favorite: company?.favorite ?? false,
+    atsType: company?.atsType || '',
+    atsSlug: company?.atsSlug || '',
+    linkedinUrl: company?.linkedinUrl || '',
+    connections: company?.connections || '',
+    referral: company?.referral ?? false,
+    viaForm: company?.viaForm ?? false,
+    email: company?.email || '',
   });
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
@@ -43,6 +53,14 @@ export default function CompanyModal({ company, onSave, onClose }) {
     onSave(form);
   };
 
+  const atsHint = form.atsType === 'lever'
+    ? 'e.g. "company" from jobs.lever.co/company'
+    : form.atsType === 'greenhouse'
+    ? 'e.g. "n26" from boards.greenhouse.io/n26'
+    : form.atsType === 'ashby'
+    ? 'e.g. "DeepL" from jobs.ashbyhq.com/DeepL'
+    : '';
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -51,7 +69,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
     >
       <div
         className="w-full max-w-md rounded-2xl border flex flex-col fade-in"
-        style={{ background: '#fff', borderColor: '#e8e8f4', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}
+        style={{ background: '#fff', borderColor: '#e8e8f4', boxShadow: '0 24px 80px rgba(0,0,0,0.18)', maxHeight: '90vh' }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#f3f4f6' }}>
@@ -75,7 +93,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5">
+        <div className="px-6 py-5 overflow-y-auto flex-1">
           <form id="company-form" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <Field label="Company name *">
@@ -136,17 +154,120 @@ export default function CompanyModal({ company, onSave, onClose }) {
                 </Field>
               </div>
 
+              {/* ATS Integration */}
+              <div className="rounded-xl p-3.5 border" style={{ background: '#f9fafb', borderColor: '#e5e7eb' }}>
+                <p className="text-xs font-semibold mb-3" style={{ color: '#374151' }}>Job board integration</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="ATS type">
+                    <div className="relative">
+                      <select
+                        value={form.atsType}
+                        onChange={(e) => set('atsType', e.target.value)}
+                        style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer', background: '#fff' }}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      >
+                        <option value="">None</option>
+                        <option value="lever">Lever</option>
+                        <option value="greenhouse">Greenhouse</option>
+                        <option value="ashby">Ashby</option>
+                      </select>
+                      <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#9ca3af' }} />
+                    </div>
+                  </Field>
+
+                  <Field label="Slug" hint={atsHint ? `— ${atsHint}` : ''}>
+                    <input
+                      placeholder={form.atsType ? 'company-slug' : '—'}
+                      value={form.atsSlug}
+                      onChange={(e) => set('atsSlug', e.target.value)}
+                      disabled={!form.atsType}
+                      style={{ ...inputStyle, background: '#fff', opacity: form.atsType ? 1 : 0.5 }}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </Field>
+                </div>
+              </div>
+
               <Field label="Research notes">
                 <textarea
                   placeholder="Culture, tech stack, why you're interested, people to connect with..."
                   value={form.notes}
                   onChange={(e) => set('notes', e.target.value)}
-                  rows={4}
+                  rows={3}
                   style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
                 />
               </Field>
+
+              {/* Outreach tracking */}
+              <div className="rounded-xl p-3.5 border" style={{ background: '#f9fafb', borderColor: '#e5e7eb' }}>
+                <p className="text-xs font-semibold mb-3" style={{ color: '#374151' }}>Outreach tracking</p>
+                <div className="space-y-3">
+                  <Field label="Company LinkedIn URL">
+                    <input
+                      type="url"
+                      placeholder="https://linkedin.com/company/..."
+                      value={form.linkedinUrl}
+                      onChange={(e) => set('linkedinUrl', e.target.value)}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </Field>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="Connections" hint="— 1st, 2nd, name...">
+                      <input
+                        placeholder="e.g. 2nd degree"
+                        value={form.connections}
+                        onChange={(e) => set('connections', e.target.value)}
+                        style={inputStyle}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      />
+                    </Field>
+                    <Field label="Contact email">
+                      <input
+                        type="email"
+                        placeholder="hiring@company.com"
+                        value={form.email}
+                        onChange={(e) => set('email', e.target.value)}
+                        style={inputStyle}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      />
+                    </Field>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => set('referral', !form.referral)}
+                      className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all"
+                      style={{
+                        background: form.referral ? 'rgba(34,197,94,0.06)' : '#fff',
+                        borderColor: form.referral ? 'rgba(34,197,94,0.3)' : '#e5e7eb',
+                        color: form.referral ? '#22c55e' : '#6b7280',
+                      }}
+                    >
+                      <span>{form.referral ? '✅' : '⬜'}</span> Referral
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => set('viaForm', !form.viaForm)}
+                      className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all"
+                      style={{
+                        background: form.viaForm ? 'rgba(99,102,241,0.06)' : '#fff',
+                        borderColor: form.viaForm ? 'rgba(99,102,241,0.3)' : '#e5e7eb',
+                        color: form.viaForm ? '#6366f1' : '#6b7280',
+                      }}
+                    >
+                      <span>{form.viaForm ? '✅' : '⬜'}</span> Applied via form
+                    </button>
+                  </div>
+                </div>
+              </div>
 
               {/* Favorite toggle */}
               <button
