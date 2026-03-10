@@ -97,11 +97,13 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
     .sort((a, b) => {
       if (sort === 'az') return a.name.localeCompare(b.name);
       if (sort === 'most') return (b.positions?.length || 0) - (a.positions?.length || 0);
-      // tier 0: has roles  tier 1: unchecked / no ATS  tier 2: checked but empty → bottom
+      // tier 0: has roles  tier 1: checkable + never checked → top
+      // tier 2: no ATS configured  tier 3: checked but empty → bottom
       const tier = (c) => {
         if ((c.positions?.length || 0) > 0) return 0;
-        if (c.atsCheckedAt && (c.atsType && c.atsSlug)) return 2;
-        return 1;
+        if (c.atsType && c.atsSlug && !c.atsCheckedAt) return 1;
+        if (c.atsType && c.atsSlug && c.atsCheckedAt) return 3;
+        return 2;
       };
       const diff = tier(a) - tier(b);
       if (diff !== 0) return diff;
