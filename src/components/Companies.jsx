@@ -97,10 +97,11 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
     .sort((a, b) => {
       if (sort === 'az') return a.name.localeCompare(b.name);
       if (sort === 'most') return (b.positions?.length || 0) - (a.positions?.length || 0);
-      // tier 0: has roles  tier 1: checkable + never checked → top
-      // tier 2: no ATS configured  tier 3: checked but empty → bottom
+      // tier 0: has active (non-disqualified) roles  tier 1: checkable + never checked → top
+      // tier 2: no ATS configured  tier 3: checked but all empty/disqualified → bottom
       const tier = (c) => {
-        if ((c.positions?.length || 0) > 0) return 0;
+        const active = (c.positions || []).filter((p) => !p.disqualified).length;
+        if (active > 0) return 0;
         if (c.atsType && c.atsSlug && !c.atsCheckedAt) return 1;
         if (c.atsType && c.atsSlug && c.atsCheckedAt) return 3;
         return 2;
@@ -269,6 +270,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   const [analyses, setAnalyses] = useState({});
 
   const positions = company.positions || [];
+  const activePositions = positions.filter((p) => !p.disqualified);
   const canCheck = !!(company.atsType && company.atsSlug);
 
   const activeJobs = companyJobs.filter((j) => j.stage !== 'rejected');
@@ -304,11 +306,19 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       atsCheckedAt: new Date().toISOString(),
     });
     setChecking(false);
-    const found = autoFound.length > 0;
+    const found = autoFound.filter((p) => !p.disqualified).length > 0;
     setCheckDone(found ? 'found' : 'none');
     if (found) setShowInlineResults(true);
     setTimeout(() => setCheckDone(null), 3000);
   }, [company, canCheck, checking, positions, onUpdateCompany]);
+
+  const handleDisqualify = (posId) => {
+    onUpdateCompany(company.id, { positions: positions.map((p) => p.id === posId ? { ...p, disqualified: true } : p) });
+  };
+
+  const handleUndisqualify = (posId) => {
+    onUpdateCompany(company.id, { positions: positions.map((p) => p.id === posId ? { ...p, disqualified: false } : p) });
+  };
 
   const handleRemovePosition = (posId) => {
     onUpdateCompany(company.id, { positions: positions.filter((p) => p.id !== posId) });
@@ -405,7 +415,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   ? 'rgba(34,197,94,0.12)'
                   : checkDone === 'none'
                     ? '#f3f4f6'
-                    : positions.length > 0
+                    : activePositions.length > 0
                       ? 'rgba(34,197,94,0.08)'
                       : 'rgba(99,102,241,0.06)',
               color: checking
@@ -414,10 +424,10 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   ? '#16a34a'
                   : checkDone === 'none'
                     ? '#9ca3af'
-                    : positions.length > 0
+                    : activePositions.length > 0
                       ? '#16a34a'
                       : '#6366f1',
-              border: `1px solid ${checkDone === 'found' || positions.length > 0 ? 'rgba(34,197,94,0.2)' : checkDone === 'none' ? '#e5e7eb' : 'rgba(99,102,241,0.15)'}`,
+              border: `1px solid ${checkDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' : checkDone === 'none' ? '#e5e7eb' : 'rgba(99,102,241,0.15)'}`,
               transition: 'all 0.3s',
             }}
             title={checkedAt ? `Last checked ${checkedAt}` : 'Check for PM roles'}
@@ -432,11 +442,11 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
             {checking
               ? 'Checking…'
               : checkDone === 'found'
-                ? `${positions.length} role${positions.length > 1 ? 's' : ''} found!`
+                ? `${activePositions.length} role${activePositions.length > 1 ? 's' : ''} found!`
                 : checkDone === 'none'
                   ? 'None found'
-                  : positions.length > 0
-                    ? `${positions.length} role${positions.length > 1 ? 's' : ''}`
+                  : activePositions.length > 0
+                    ? `${activePositions.length} role${activePositions.length > 1 ? 's' : ''}`
                     : 'Check'}
           </button>
           </div>
@@ -455,11 +465,11 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       </div>
 
       {/* Inline results panel — shown after check, no click required */}
-      {showInlineResults && positions.length > 0 && !isExpanded && (
+      {showInlineResults && activePositions.filter((p) => p.source !== 'manual').length > 0 && !isExpanded && (
         <div className="px-4 py-3 fade-in" style={{ background: '#f6f6ff', borderTop: '1px solid #ebebf8' }}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#9ca3af' }}>
-              {positions.length} PM {positions.length === 1 ? 'role' : 'roles'} found
+              {activePositions.filter((p) => p.source !== 'manual').length} PM {activePositions.filter((p) => p.source !== 'manual').length === 1 ? 'role' : 'roles'} found
             </span>
             <button
               onClick={() => setShowInlineResults(false)}
@@ -472,10 +482,10 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
             </button>
           </div>
           <div className="flex flex-col gap-2">
-            {positions.filter((p) => p.source !== 'manual').map((pos) => (
+            {activePositions.filter((p) => p.source !== 'manual').map((pos) => (
               <div
                 key={pos.id}
-                className="flex items-start justify-between gap-3 rounded-lg px-3 py-2.5"
+                className="flex items-start gap-3 rounded-lg px-3 py-2.5"
                 style={{ background: '#fff', border: '1px solid #e8e8f4' }}
               >
                 <div className="flex-1 min-w-0">
@@ -486,20 +496,32 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     </p>
                   )}
                 </div>
-                {pos.url && (
-                  <a
-                    href={pos.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold shrink-0 transition-all"
-                    style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', textDecoration: 'none' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
-                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDisqualify(pos.id); }}
+                    className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all"
+                    style={{ background: '#f3f4f6', color: '#9ca3af', border: '1px solid #e5e7eb' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
+                    title="Mark as not a fit — hides this role"
                   >
-                    Apply <ExternalLink size={9} />
-                  </a>
-                )}
+                    Not a fit
+                  </button>
+                  {pos.url && (
+                    <a
+                      href={pos.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+                      style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', textDecoration: 'none' }}
+                      onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
+                      onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                    >
+                      Apply <ExternalLink size={9} />
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -526,6 +548,20 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   {positions.map((pos) => {
                     const analysis = analyses[pos.id];
                     const scoreColor = analysis?.score >= 80 ? '#22c55e' : analysis?.score >= 60 ? '#f59e0b' : analysis?.score >= 40 ? '#6366f1' : '#ef4444';
+                    if (pos.disqualified) {
+                      return (
+                        <div key={pos.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: '#fafafa', border: '1px solid #f0f0f0' }}>
+                          <span className="text-[11px] line-through flex-1 truncate" style={{ color: '#d1d5db' }}>{pos.title}</span>
+                          <button
+                            onClick={() => handleUndisqualify(pos.id)}
+                            className="text-[10px] shrink-0 transition-all"
+                            style={{ color: '#d1d5db' }}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = '#d1d5db')}
+                          >undo</button>
+                        </div>
+                      );
+                    }
                     return (
                       <div key={pos.id} className="rounded-lg p-2.5 group/pos" style={{ background: '#fff', border: '1px solid #ebebf8' }}>
                         <div className="flex items-start gap-1.5 mb-1">
@@ -575,6 +611,14 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                               {analysis?.loading ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
                               {analysis?.score != null ? `${analysis.score}%` : 'Analyze'}
                             </button>
+                            <button
+                              onClick={() => handleDisqualify(pos.id)}
+                              className="opacity-0 group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
+                              style={{ background: '#f3f4f6', color: '#9ca3af', border: '1px solid #e5e7eb' }}
+                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#9ca3af'; }}
+                              title="Not a fit"
+                            >Not a fit</button>
                             <button
                               onClick={() => handleRemovePosition(pos.id)}
                               className="opacity-0 group-hover/pos:opacity-100 transition-opacity"
