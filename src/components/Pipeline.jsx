@@ -143,7 +143,7 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
     const currentIdx = STAGES.findIndex((s) => s.id === job.stage);
     const newStage = STAGES[currentIdx + direction];
     if (!newStage) return;
-    const updates = { stage: newStage.id };
+    const updates = { stage: newStage.id, stageChangedAt: new Date().toISOString() };
     if (newStage.id === 'applied' && !job.appliedDate) {
       updates.appliedDate = new Date().toISOString();
     }
@@ -163,7 +163,7 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
     if (!job || job.stage === over.id) return;
     const targetStage = STAGES.find((s) => s.id === over.id);
     if (!targetStage) return;
-    const updates = { stage: targetStage.id };
+    const updates = { stage: targetStage.id, stageChangedAt: new Date().toISOString() };
     if (targetStage.id === 'applied' && !job.appliedDate) {
       updates.appliedDate = new Date().toISOString();
     }

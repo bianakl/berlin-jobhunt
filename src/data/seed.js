@@ -1,10 +1,10 @@
 export const STAGES = [
   { id: 'saved', label: 'Saved', emoji: '📌', color: '#6366f1', bg: 'rgba(99,102,241,0.08)', border: 'rgba(99,102,241,0.2)' },
-  { id: 'researching', label: 'Researching', emoji: '🔍', color: '#a855f7', bg: 'rgba(168,85,247,0.08)', border: 'rgba(168,85,247,0.2)' },
   { id: 'applied', label: 'Applied', emoji: '📬', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
   { id: 'interview', label: 'Interview', emoji: '💬', color: '#06b6d4', bg: 'rgba(6,182,212,0.08)', border: 'rgba(6,182,212,0.2)' },
   { id: 'offer', label: 'Offer', emoji: '🎉', color: '#22c55e', bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.2)' },
-  { id: 'rejected', label: 'Archived', emoji: '👋', color: '#9ca3af', bg: 'rgba(156,163,175,0.08)', border: 'rgba(156,163,175,0.2)' },
+  { id: 'company_rejected', label: 'They passed', emoji: '🚫', color: '#ef4444', bg: 'rgba(239,68,68,0.05)', border: 'rgba(239,68,68,0.15)', terminal: true },
+  { id: 'rejected', label: 'Archived', emoji: '👋', color: '#9ca3af', bg: 'rgba(156,163,175,0.08)', border: 'rgba(156,163,175,0.2)', terminal: true },
 ];
 
 export const INDUSTRIES = [

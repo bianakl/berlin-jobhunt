@@ -71,7 +71,23 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
   // For the Move to next stage menu item
   const stageList = stages || STAGES;
   const currentIdx = stageList.findIndex((s) => s.id === job.stage);
-  const nextStage = currentIdx >= 0 && currentIdx < stageList.length - 2 ? stageList[currentIdx + 1] : null;
+  const currentStageObj = stageList[currentIdx];
+  const nextStageCand = stageList[currentIdx + 1];
+  const nextStage = currentStageObj && !currentStageObj.terminal && nextStageCand && !nextStageCand.terminal
+    ? nextStageCand : null;
+  const companyRejectedIdx = stageList.findIndex((s) => s.id === 'company_rejected');
+  const canMarkRejected = job.stage !== 'company_rejected' && job.stage !== 'rejected' && companyRejectedIdx >= 0;
+
+  // 1-year reapply indicator for company_rejected stage
+  const reapplyChip = job.stage === 'company_rejected' ? (() => {
+    const ref = job.stageChangedAt || job.addedDate;
+    if (!ref) return null;
+    const reapplyDate = new Date(ref);
+    reapplyDate.setFullYear(reapplyDate.getFullYear() + 1);
+    const eligible = new Date() >= reapplyDate;
+    const label = reapplyDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    return { eligible, label };
+  })() : null;
 
   return (
     <div
@@ -150,11 +166,22 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
                     <ChevronRight size={11} /> Move to {nextStage.label}
                   </button>
                 )}
+                {canMarkRejected && (
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
+                    style={{ color: '#ef4444' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.05)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                    onClick={() => { onMove(job.id, companyRejectedIdx - currentIdx); setMenuOpen(false); }}
+                  >
+                    🚫 They rejected me
+                  </button>
+                )}
                 <div style={{ borderTop: '1px solid #e8e8f4', margin: '4px 0' }} />
                 <button
                   className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
-                  style={{ color: '#ef4444' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.05)')}
+                  style={{ color: '#9ca3af' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f9fafb')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   onClick={() => { onDelete(job.id); setMenuOpen(false); }}
                 >
@@ -165,7 +192,7 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
           </div>
         </div>
 
-        {/* Row 2: Stage badge + Aging chip */}
+        {/* Row 2: Stage badge + Aging chip / Reapply chip */}
         <div className="flex items-center gap-2 mb-2">
           <span
             className="text-[10px] font-medium px-1.5 py-0.5 rounded"
@@ -173,14 +200,21 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
           >
             {stage?.emoji} {stage?.label}
           </span>
-          {agingColor && days !== null && (
+          {reapplyChip ? (
+            <span
+              className="flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded"
+              style={{ background: reapplyChip.eligible ? 'rgba(34,197,94,0.08)' : 'rgba(239,68,68,0.06)', color: reapplyChip.eligible ? '#16a34a' : '#ef4444' }}
+            >
+              {reapplyChip.eligible ? '✓ Can reapply' : `Reapply after ${reapplyChip.label}`}
+            </span>
+          ) : agingColor && days !== null ? (
             <span
               className="flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded"
               style={{ background: `${agingColor}12`, color: agingColor }}
             >
               <Clock size={9} />{days}d in stage
             </span>
-          )}
+          ) : null}
         </div>
 
         {/* Row 3: Follow-up (only if set) */}

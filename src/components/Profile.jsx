@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw } from 'lucide-react';
+import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2 } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
 
 const inputStyle = {
@@ -183,6 +183,8 @@ export default function Profile({ profile, onUpdate }) {
         // Store CV as text representation for job analysis
         if (body.cvText) localStorage.setItem('scout-cv-text', body.cvText);
         else localStorage.setItem('scout-cv-text', JSON.stringify(data)); // fallback: use extracted JSON as context
+        // Clean up base64 blob — no longer needed after extraction
+        localStorage.removeItem('scout-cv-b64');
         setExtractMsg('Profile extracted! Review the fields below and save.');
       }
     } catch (err) {
@@ -224,12 +226,21 @@ export default function Profile({ profile, onUpdate }) {
           bio: data.bio || prev.bio,
         }));
         if (!text) localStorage.setItem('scout-cv-text', JSON.stringify(data));
+        localStorage.removeItem('scout-cv-b64');
         setExtractMsg('Profile extracted! Review the fields below and save.');
       }
     } catch (err) {
       setExtractMsg(`Error: ${err.message}`);
     }
     setExtracting(false);
+  };
+
+  const handleClearData = () => {
+    if (!window.confirm('This will permanently delete all your Scout data: jobs, companies, profile, and API key. Continue?')) return;
+    Object.keys(localStorage).forEach((k) => {
+      if (k.startsWith('scout-')) localStorage.removeItem(k);
+    });
+    window.location.reload();
   };
 
   return (
@@ -617,6 +628,23 @@ export default function Profile({ profile, onUpdate }) {
               </p>
             )}
           </div>
+        </div>
+
+        {/* Danger zone */}
+        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#fde8e8' }}>
+          <h2 className="text-sm font-semibold mb-1" style={{ color: '#991b1b' }}>Danger zone</h2>
+          <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
+            Permanently deletes all data stored in this browser — jobs, companies, profile, API key, and CV. This cannot be undone.
+          </p>
+          <button
+            onClick={handleClearData}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+            style={{ background: 'rgba(239,68,68,0.06)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.12)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; }}
+          >
+            <Trash2 size={13} /> Clear all my data
+          </button>
         </div>
 
       </div>

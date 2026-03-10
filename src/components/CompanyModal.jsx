@@ -44,12 +44,20 @@ export default function CompanyModal({ company, onSave, onClose }) {
     viaForm: company?.viaForm ?? false,
     email: company?.email || '',
   });
+  const [slugError, setSlugError] = useState('');
 
-  const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
+  const set = (key, val) => {
+    if (key === 'atsSlug') setSlugError('');
+    setForm((f) => ({ ...f, [key]: val }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.name.trim()) return;
+    if (form.atsSlug && !/^[a-zA-Z0-9_-]{1,100}$/.test(form.atsSlug)) {
+      setSlugError('Slug can only contain letters, numbers, hyphens, and underscores');
+      return;
+    }
     onSave(form);
   };
 
@@ -182,10 +190,11 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       value={form.atsSlug}
                       onChange={(e) => set('atsSlug', e.target.value)}
                       disabled={!form.atsType}
-                      style={{ ...inputStyle, background: '#fff', opacity: form.atsType ? 1 : 0.5 }}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      style={{ ...inputStyle, background: '#fff', opacity: form.atsType ? 1 : 0.5, borderColor: slugError ? '#ef4444' : undefined }}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : '#6366f1')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : '#e5e7eb')}
                     />
+                    {slugError && <p className="text-[10px] mt-1" style={{ color: '#ef4444' }}>{slugError}</p>}
                   </Field>
                 </div>
               </div>

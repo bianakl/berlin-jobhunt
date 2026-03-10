@@ -35,7 +35,7 @@ function daysUntil(dateStr) {
 }
 
 export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak, achievements, onUnlockAchievement }) {
-  const activeJobs = jobs.filter((j) => j.stage !== 'rejected');
+  const activeJobs = jobs.filter((j) => j.stage !== 'rejected' && j.stage !== 'company_rejected');
   const applied = jobs.filter((j) => ['applied', 'interview', 'offer'].includes(j.stage));
   const interviews = jobs.filter((j) => j.stage === 'interview');
   const offers = jobs.filter((j) => j.stage === 'offer');
@@ -49,7 +49,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
     : 0;
 
   const followUps = jobs
-    .filter((j) => j.followUpDate && j.stage !== 'rejected' && j.stage !== 'offer')
+    .filter((j) => j.followUpDate && j.stage !== 'rejected' && j.stage !== 'company_rejected' && j.stage !== 'offer')
     .sort((a, b) => new Date(a.followUpDate) - new Date(b.followUpDate))
     .slice(0, 5);
 

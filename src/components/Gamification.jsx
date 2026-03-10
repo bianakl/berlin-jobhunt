@@ -20,7 +20,7 @@ const BADGE_DEFS = [
   { id: 'offer_received', emoji: '🎉', label: 'Offer Received', desc: 'Received an offer', check: (jobs) => jobs.some((j) => j.stage === 'offer') },
   { id: 'ten_companies', emoji: '🏢', label: '10 Companies Tracked', desc: 'Tracking 10+ companies', check: (_jobs, companies) => companies.length >= 10 },
   { id: 'pipeline_starter', emoji: '🚀', label: 'Pipeline Starter', desc: 'Added 5 jobs to your pipeline', check: (jobs) => jobs.length >= 5 },
-  { id: 'researcher', emoji: '🔍', label: 'Researcher', desc: 'Put 3+ jobs in Researching', check: (jobs) => jobs.filter((j) => j.stage === 'researching').length >= 3 },
+  { id: 'researcher', emoji: '🔍', label: 'Researcher', desc: 'Tracked 5+ companies', check: (_jobs, companies) => companies.length >= 5 },
   { id: 'week_streak', emoji: '🔥', label: 'On Fire', desc: '7-day streak', check: (_j, _c, streak) => streak >= 7 },
 ];
 

@@ -34,10 +34,17 @@ Confirmed data points:
 - Startup avg: €88,272 vs non-startup avg: €94,779
 `.trim();
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+function setCors(req, res) {
+  const allowed = process.env.ALLOWED_ORIGIN || null;
+  const origin = req.headers.origin || '';
+  res.setHeader('Access-Control-Allow-Origin', allowed || origin || '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
+  if (allowed) res.setHeader('Vary', 'Origin');
+}
+
+export default async function handler(req, res) {
+  setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -46,6 +53,7 @@ export default async function handler(req, res) {
 
   const { cvText, jobTitle, companyName, companyIndustry, mode } = req.body || {};
   if (!cvText) return res.status(400).json({ error: 'Missing cvText.' });
+  if (cvText.length > 50000) return res.status(400).json({ error: 'CV text too large.' });
 
   const client = new Anthropic({ apiKey });
 
@@ -114,6 +122,7 @@ Be realistic and grounded in the market data. Return ONLY JSON.`;
     const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
     return res.status(200).json(JSON.parse(jsonStr));
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to generate estimate.', detail: err.message });
+    console.error('salary-estimate error:', err);
+    return res.status(500).json({ error: 'Failed to generate estimate. Please try again.' });
   }
 }

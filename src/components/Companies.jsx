@@ -295,7 +295,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
 
   const activeJobs = companyJobs.filter((j) => j.stage !== 'rejected');
   const highestStage = (() => {
-    const priority = ['offer', 'interview', 'applied', 'researching', 'saved'];
+    const priority = ['offer', 'interview', 'applied', 'saved'];
     for (const s of priority) {
       if (activeJobs.some((j) => j.stage === s)) return STAGES.find((st) => st.id === s);
     }
