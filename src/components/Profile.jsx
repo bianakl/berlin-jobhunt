@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle } from 'lucide-react';
+import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
 
 const inputStyle = {
@@ -31,6 +31,13 @@ export default function Profile({ profile, onUpdate }) {
   const [skillInput, setSkillInput] = useState('');
   const [saved, setSaved] = useState(false);
 
+  // Market value state
+  const [marketValue, setMarketValue] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('scout-market-value') || 'null'); } catch { return null; }
+  });
+  const [marketLoading, setMarketLoading] = useState(false);
+  const [marketError, setMarketError] = useState('');
+
   // AI / CV state
   const [apiKey, setApiKey] = useState(() => localStorage.getItem('scout-claude-key') || '');
   const [cvFileName, setCvFileName] = useState(() => localStorage.getItem('scout-cv-name') || '');
@@ -57,6 +64,31 @@ export default function Profile({ profile, onUpdate }) {
     } else {
       set('preferredIndustries', [...current, ind]);
     }
+  };
+
+  const handleAnalyzeWorth = async () => {
+    const key = localStorage.getItem('scout-claude-key') || apiKey;
+    const cvText = localStorage.getItem('scout-cv-text');
+    if (!key) { setMarketError('Add your Anthropic API key first.'); return; }
+    if (!cvText) { setMarketError('Upload your CV first (AI profile extraction section below).'); return; }
+    setMarketLoading(true);
+    setMarketError('');
+    try {
+      const res = await fetch('/api/salary-estimate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': key },
+        body: JSON.stringify({ cvText, mode: 'profile' }),
+      });
+      const data = await res.json();
+      if (data.error) { setMarketError(data.error); }
+      else {
+        setMarketValue(data);
+        localStorage.setItem('scout-market-value', JSON.stringify(data));
+      }
+    } catch (err) {
+      setMarketError(err.message);
+    }
+    setMarketLoading(false);
   };
 
   const handleSave = () => {
@@ -354,6 +386,90 @@ export default function Profile({ profile, onUpdate }) {
               <Plus size={12} /> Add
             </button>
           </div>
+        </div>
+
+        {/* Market Value card */}
+        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <TrendingUp size={14} style={{ color: '#6366f1' }} />
+              <h2 className="text-sm font-semibold" style={{ color: '#111827' }}>Your market value</h2>
+            </div>
+            <button
+              onClick={handleAnalyzeWorth}
+              disabled={marketLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{ background: marketLoading ? '#f3f4f6' : 'rgba(99,102,241,0.08)', color: marketLoading ? '#9ca3af' : '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+            >
+              {marketLoading ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
+              {marketLoading ? 'Analyzing…' : marketValue ? 'Re-analyze' : 'Analyze my worth'}
+            </button>
+          </div>
+          <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
+            Based on your CV and current Berlin PM market data (Glassdoor, Levels.fyi, Handpickedberlin 2026)
+          </p>
+
+          {marketError && <p className="text-xs mb-3" style={{ color: '#ef4444' }}>{marketError}</p>}
+
+          {marketValue && !marketLoading && (
+            <div className="rounded-xl p-4 fade-in" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.05))', border: '1px solid rgba(99,102,241,0.12)' }}>
+              {/* Range + level */}
+              <div className="flex items-end justify-between mb-3">
+                <div>
+                  <div className="text-2xl font-bold" style={{ color: '#111827' }}>
+                    €{Math.round(marketValue.rangeMin / 1000)}k–€{Math.round(marketValue.rangeMax / 1000)}k
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: '#6b7280' }}>gross annual · Berlin market</div>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(99,102,241,0.12)', color: '#6366f1' }}>
+                    {marketValue.level}
+                  </span>
+                  {marketValue.confidence && (
+                    <div className="text-[10px] mt-1" style={{ color: '#9ca3af' }}>{marketValue.confidence} confidence</div>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-1.5 rounded-full mb-3 overflow-hidden" style={{ background: 'rgba(99,102,241,0.12)' }}>
+                <div className="h-full rounded-full" style={{ width: `${Math.min(100, Math.round((marketValue.midpoint - 40000) / (220000 - 40000) * 100))}%`, background: 'linear-gradient(90deg, #6366f1, #8b5cf6)' }} />
+              </div>
+
+              {/* Headline */}
+              {marketValue.headline && (
+                <p className="text-xs italic mb-3" style={{ color: '#374151' }}>"{marketValue.headline}"</p>
+              )}
+
+              {/* Strengths + limiting factors */}
+              <div className="flex flex-col gap-1 mb-3">
+                {marketValue.strengths?.map((s, i) => (
+                  <div key={i} className="flex items-start gap-1.5 text-xs" style={{ color: '#374151' }}>
+                    <span style={{ color: '#22c55e', flexShrink: 0 }}>✓</span>{s}
+                  </div>
+                ))}
+                {marketValue.limitingFactors?.map((f, i) => (
+                  <div key={i} className="flex items-start gap-1.5 text-xs" style={{ color: '#9ca3af' }}>
+                    <span style={{ flexShrink: 0 }}>↑</span>{f}
+                  </div>
+                ))}
+              </div>
+
+              {/* Tip */}
+              {marketValue.tip && (
+                <div className="rounded-lg px-3 py-2.5 text-xs" style={{ background: 'rgba(245,158,11,0.07)', color: '#92400e', border: '1px solid rgba(245,158,11,0.15)' }}>
+                  <span className="font-semibold">Tip: </span>{marketValue.tip}
+                </div>
+              )}
+            </div>
+          )}
+
+          {!marketValue && !marketLoading && (
+            <div className="rounded-xl border-2 border-dashed p-6 text-center" style={{ borderColor: 'rgba(99,102,241,0.15)' }}>
+              <TrendingUp size={24} style={{ color: '#e8e8f4', margin: '0 auto 8px' }} />
+              <p className="text-xs" style={{ color: '#9ca3af' }}>Upload your CV and click "Analyze my worth" to see your Berlin market value</p>
+            </div>
+          )}
         </div>
 
         {/* Salary + Industries */}

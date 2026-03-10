@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MoreHorizontal, ExternalLink, Pencil, Clock, CalendarClock, AlertCircle, Banknote, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MoreHorizontal, ExternalLink, Pencil, Clock, CalendarClock, AlertCircle, Banknote, ChevronRight, TrendingUp, Loader2 } from 'lucide-react';
 import { STAGES } from '../data/seed';
 import { CompatRing } from './Dashboard';
 
@@ -26,8 +26,41 @@ function formatFollowUp(dateStr) {
   return { label: `Follow up in ${d}d`, overdue: false };
 }
 
+function salaryEstCacheKey(title, company) {
+  return `salary-est::${(title || '').toLowerCase()}::${(company || '').toLowerCase()}`;
+}
+
+async function fetchSalaryEst(title, company) {
+  const apiKey = localStorage.getItem('scout-claude-key');
+  const cvText = localStorage.getItem('scout-cv-text');
+  if (!apiKey || !cvText) return null;
+  const res = await fetch('/api/salary-estimate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+    body: JSON.stringify({ cvText, jobTitle: title, companyName: company }),
+  });
+  if (!res.ok) return null;
+  return await res.json();
+}
+
 export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [salaryEst, setSalaryEst] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(salaryEstCacheKey(job.title, job.company)) || 'null'); } catch { return null; }
+  });
+  const [salaryLoading, setSalaryLoading] = useState(false);
+
+  const handleGetEstimate = async (e) => {
+    e.stopPropagation();
+    if (salaryLoading) return;
+    setSalaryLoading(true);
+    const data = await fetchSalaryEst(job.title, job.company);
+    if (data && !data.error) {
+      setSalaryEst(data);
+      localStorage.setItem(salaryEstCacheKey(job.title, job.company), JSON.stringify(data));
+    }
+    setSalaryLoading(false);
+  };
   const score = compatScore(job.compatibility);
   const stage = STAGES.find((s) => s.id === job.stage);
   const followUp = formatFollowUp(job.followUpDate);
@@ -164,14 +197,38 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
           </div>
         )}
 
-        {/* Row 4: Compat ring + Salary */}
-        <div className="flex items-center justify-between">
+        {/* Row 4: Compat ring + Salary + Market estimate */}
+        <div className="flex items-center justify-between gap-2">
           <CompatRing score={score} size={28} />
-          {job.salary && (
-            <span className="flex items-center gap-1 text-[11px]" style={{ color: '#9ca3af' }}>
-              <Banknote size={10} />{job.salary}
-            </span>
-          )}
+          <div className="flex items-center gap-1.5 min-w-0">
+            {job.salary && (
+              <span className="flex items-center gap-1 text-[11px] shrink-0" style={{ color: '#9ca3af' }}>
+                <Banknote size={10} />{job.salary}
+              </span>
+            )}
+            {salaryEst && !salaryEst.error ? (
+              <span
+                className="flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0"
+                style={{ background: 'rgba(99,102,241,0.07)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+                title={salaryEst.note || ''}
+              >
+                <TrendingUp size={9} />{salaryEst.label}
+              </span>
+            ) : (
+              <button
+                onClick={handleGetEstimate}
+                disabled={salaryLoading}
+                className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded transition-all shrink-0"
+                style={{ color: '#d1d5db', border: '1px solid transparent' }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#6366f1'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; e.currentTarget.style.background = 'rgba(99,102,241,0.05)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
+                title="Get salary estimate for this role"
+              >
+                {salaryLoading ? <Loader2 size={9} className="animate-spin" /> : <TrendingUp size={9} />}
+                {salaryLoading ? '' : '€?'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

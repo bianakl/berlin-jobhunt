@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Star, ExternalLink, Pencil, Trash2, Plus, Building2, Search, RefreshCw, X,
   CheckSquare, Loader2, Link2, Mail, Users, Kanban, Sparkles, ChevronRight,
@@ -264,6 +264,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   const [checking, setChecking] = useState(false);
   const [checkDone, setCheckDone] = useState(null); // null | 'found' | 'none'
   const [showInlineResults, setShowInlineResults] = useState(false);
+  const [salaryEstimates, setSalaryEstimates] = useState({});
   const [addingManual, setAddingManual] = useState(false);
   const [manualTitle, setManualTitle] = useState('');
   const [manualUrl, setManualUrl] = useState('');
@@ -319,6 +320,29 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   const handleUndisqualify = (posId) => {
     onUpdateCompany(company.id, { positions: positions.map((p) => p.id === posId ? { ...p, disqualified: false } : p) });
   };
+
+  // Auto-fetch salary estimates when inline panel opens
+  useEffect(() => {
+    if (!showInlineResults) return;
+    const apiKey = localStorage.getItem('scout-claude-key');
+    const cvText = localStorage.getItem('scout-cv-text');
+    if (!apiKey || !cvText) return;
+    const toFetch = activePositions.filter((p) => p.source !== 'manual' && !salaryEstimates[p.id]);
+    toFetch.forEach(async (pos) => {
+      setSalaryEstimates((prev) => ({ ...prev, [pos.id]: { loading: true } }));
+      try {
+        const res = await fetch('/api/salary-estimate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+          body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name }),
+        });
+        const data = await res.json();
+        setSalaryEstimates((prev) => ({ ...prev, [pos.id]: data.error ? null : data }));
+      } catch {
+        setSalaryEstimates((prev) => ({ ...prev, [pos.id]: null }));
+      }
+    });
+  }, [showInlineResults]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRemovePosition = (posId) => {
     onUpdateCompany(company.id, { positions: positions.filter((p) => p.id !== posId) });
@@ -489,7 +513,21 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                 style={{ background: '#fff', border: '1px solid #e8e8f4' }}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-semibold mb-0.5 truncate" style={{ color: '#111827' }}>{pos.title}</div>
+                  <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                    <span className="text-xs font-semibold truncate" style={{ color: '#111827' }}>{pos.title}</span>
+                    {salaryEstimates[pos.id]?.loading && (
+                      <Loader2 size={9} className="animate-spin shrink-0" style={{ color: '#d1d5db' }} />
+                    )}
+                    {salaryEstimates[pos.id] && !salaryEstimates[pos.id].loading && salaryEstimates[pos.id].label && (
+                      <span
+                        className="text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0"
+                        style={{ background: 'rgba(99,102,241,0.07)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+                        title={salaryEstimates[pos.id].note || ''}
+                      >
+                        ~{salaryEstimates[pos.id].label}
+                      </span>
+                    )}
+                  </div>
                   {(pos.snippet || pos.team || pos.location) && (
                     <p className="text-[11px] leading-relaxed line-clamp-2" style={{ color: '#6b7280' }}>
                       {[pos.team, pos.location].filter(Boolean).join(' · ') || pos.snippet}
