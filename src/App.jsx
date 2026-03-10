@@ -41,7 +41,7 @@ export default function App() {
   const [profile, setProfile] = useLocalStorage('scout-profile-v4', defaultProfile);
   const [streakData, setStreakData] = useLocalStorage('scout-streak-v4', null);
   const [achievements, setAchievements] = useLocalStorage('scout-achievements-v4', []);
-  const [activeView, setActiveView] = useState('pipeline');
+  const [activeView, setActiveView] = useState('companies');
   const [jobModal, setJobModal] = useState({ open: false, job: null });
   const [companyModal, setCompanyModal] = useState({ open: false, company: null });
 
