@@ -374,14 +374,22 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
           </span>
         )}
 
-        {/* PM count chip */}
-        {positions.length > 0 && (
-          <span
-            className="text-[10px] font-semibold px-1.5 py-0.5 rounded shrink-0"
-            style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }}
+        {/* Inline Check button */}
+        {canCheck && (
+          <button
+            onClick={(e) => { e.stopPropagation(); handleCheck(); }}
+            disabled={checking}
+            className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all shrink-0"
+            style={{
+              background: checking ? '#f3f4f6' : positions.length > 0 ? 'rgba(34,197,94,0.08)' : 'rgba(99,102,241,0.06)',
+              color: checking ? '#9ca3af' : positions.length > 0 ? '#16a34a' : '#6366f1',
+              border: `1px solid ${positions.length > 0 ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.15)'}`,
+            }}
+            title={checkedAt ? `Last checked ${checkedAt}` : 'Check for PM roles'}
           >
-            {positions.length} PM {positions.length === 1 ? 'role' : 'roles'}
-          </span>
+            {checking ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
+            {checking ? 'Checking…' : positions.length > 0 ? `${positions.length} role${positions.length > 1 ? 's' : ''}` : 'Check'}
+          </button>
         )}
 
         {/* Chevron */}
@@ -402,27 +410,12 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
           <div className="grid grid-cols-2 gap-5 pt-4">
             {/* Left col: Positions + ATS + Add manually */}
             <div>
-              {/* ATS check */}
+              {/* ATS source + last checked (info only) */}
               {canCheck && (
-                <div className="flex items-center gap-2 mb-3">
-                  <button
-                    onClick={handleCheck}
-                    disabled={checking}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium transition-all"
-                    style={{
-                      background: checking ? '#f3f4f6' : 'rgba(99,102,241,0.06)',
-                      color: checking ? '#9ca3af' : '#6366f1',
-                      border: '1px solid rgba(99,102,241,0.15)',
-                    }}
-                  >
-                    {checking ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-                    {checking ? 'Checking...' : 'Check ATS'}
-                  </button>
-                  <span className="text-[10px]" style={{ color: '#9ca3af' }}>
-                    {company.atsType === 'lever' ? 'Lever' : company.atsType === 'ashby' ? 'Ashby' : 'Greenhouse'}
-                    {checkedAt ? ` · checked ${checkedAt}` : ''}
-                  </span>
-                </div>
+                <p className="text-[10px] mb-3" style={{ color: '#9ca3af' }}>
+                  {company.atsType === 'lever' ? 'Lever' : company.atsType === 'ashby' ? 'Ashby' : 'Greenhouse'}
+                  {checkedAt ? ` · checked ${checkedAt}` : ' · never checked'}
+                </p>
               )}
 
               {/* Positions list */}
