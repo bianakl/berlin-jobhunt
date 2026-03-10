@@ -224,87 +224,6 @@ export default function Profile({ profile, onUpdate }) {
 
       <div className="grid grid-cols-1 gap-6">
 
-        {/* AI + CV Upload card */}
-        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Sparkles size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: '#111827' }}>AI profile extraction</h2>
-          </div>
-
-          {/* API Key */}
-          <div className="mb-4">
-            <Field label="Anthropic API key" hint="— stored locally, never sent anywhere else">
-              <div className="relative">
-                <Key size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9ca3af' }} />
-                <input
-                  type="password"
-                  placeholder="sk-ant-..."
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  style={{ ...inputStyle, paddingLeft: 28 }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#e5e7eb';
-                    localStorage.setItem('scout-claude-key', apiKey);
-                  }}
-                />
-              </div>
-              <p className="text-[10px] mt-1" style={{ color: '#9ca3af' }}>
-                Get a key at console.anthropic.com. Used for CV extraction and job compatibility analysis.
-              </p>
-            </Field>
-          </div>
-
-          {/* CV Upload */}
-          <div
-            className="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-all"
-            style={{ borderColor: dragging ? '#6366f1' : '#e8e8f4', background: dragging ? 'rgba(99,102,241,0.04)' : '#fafafa' }}
-            onClick={() => fileRef.current?.click()}
-            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(e) => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]); }}
-          >
-            <input
-              ref={fileRef}
-              type="file"
-              accept=".pdf,.txt"
-              className="hidden"
-              onChange={(e) => handleFile(e.target.files[0])}
-            />
-            <Upload size={20} style={{ color: '#d1d5db', margin: '0 auto 8px' }} />
-            {cvFileName ? (
-              <div>
-                <p className="text-xs font-medium" style={{ color: '#6366f1' }}>{cvFileName}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>Click to replace</p>
-              </div>
-            ) : (
-              <div>
-                <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Drop your CV here or click to upload</p>
-                <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>PDF or TXT · max 5 MB</p>
-              </div>
-            )}
-          </div>
-
-          {/* Extract button + message */}
-          <div className="flex items-center gap-3 mt-3">
-            <button
-              onClick={handleExtractClick}
-              disabled={extracting}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-              style={{ background: extracting ? '#9ca3af' : 'linear-gradient(135deg, #6366f1, #8b5cf6)', cursor: extracting ? 'not-allowed' : 'pointer' }}
-            >
-              {extracting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
-              {extracting ? 'Extracting...' : 'Extract profile from CV'}
-            </button>
-            {extractMsg && (
-              <p className="text-xs flex-1" style={{ color: extractMsg.startsWith('Error') ? '#ef4444' : extractMsg.includes('extracted') ? '#22c55e' : '#6b7280' }}>
-                {extractMsg.includes('extracted') && <CheckCircle size={11} style={{ display: 'inline', marginRight: 4 }} />}
-                {extractMsg}
-              </p>
-            )}
-          </div>
-        </div>
-
         {/* Basic info card */}
         <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
           <div className="flex items-center gap-2 mb-4">
@@ -499,6 +418,91 @@ export default function Profile({ profile, onUpdate }) {
             </div>
           </div>
         </div>
+
+        {/* AI + CV Upload card — advanced, lives at the bottom */}
+        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <Sparkles size={14} style={{ color: '#6366f1' }} />
+            <h2 className="text-sm font-semibold" style={{ color: '#111827' }}>AI profile extraction</h2>
+          </div>
+          <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
+            Upload your CV and let Claude fill in your profile automatically. Also powers job compatibility analysis.
+          </p>
+
+          {/* API Key */}
+          <div className="mb-4">
+            <Field label="Anthropic API key" hint="— stored locally, never sent anywhere else">
+              <div className="relative">
+                <Key size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9ca3af' }} />
+                <input
+                  type="password"
+                  placeholder="sk-ant-..."
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  style={{ ...inputStyle, paddingLeft: 28 }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '#e5e7eb';
+                    localStorage.setItem('scout-claude-key', apiKey);
+                  }}
+                />
+              </div>
+              <p className="text-[10px] mt-1" style={{ color: '#9ca3af' }}>
+                Get a key at console.anthropic.com.
+              </p>
+            </Field>
+          </div>
+
+          {/* CV Upload */}
+          <div
+            className="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-all mb-3"
+            style={{ borderColor: dragging ? '#6366f1' : '#e8e8f4', background: dragging ? 'rgba(99,102,241,0.04)' : '#fafafa' }}
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+            onDragLeave={() => setDragging(false)}
+            onDrop={(e) => { e.preventDefault(); setDragging(false); handleFile(e.dataTransfer.files[0]); }}
+          >
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf,.txt"
+              className="hidden"
+              onChange={(e) => handleFile(e.target.files[0])}
+            />
+            <Upload size={20} style={{ color: '#d1d5db', margin: '0 auto 8px' }} />
+            {cvFileName ? (
+              <div>
+                <p className="text-xs font-medium" style={{ color: '#6366f1' }}>{cvFileName}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>Click to replace</p>
+              </div>
+            ) : (
+              <div>
+                <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Drop your CV here or click to upload</p>
+                <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>PDF or TXT · max 5 MB</p>
+              </div>
+            )}
+          </div>
+
+          {/* Extract button + message */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleExtractClick}
+              disabled={extracting}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
+              style={{ background: extracting ? '#9ca3af' : 'linear-gradient(135deg, #6366f1, #8b5cf6)', cursor: extracting ? 'not-allowed' : 'pointer' }}
+            >
+              {extracting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+              {extracting ? 'Extracting...' : 'Extract profile from CV'}
+            </button>
+            {extractMsg && (
+              <p className="text-xs flex-1" style={{ color: extractMsg.startsWith('Error') ? '#ef4444' : extractMsg.includes('extracted') ? '#22c55e' : '#6b7280' }}>
+                {extractMsg.includes('extracted') && <CheckCircle size={11} style={{ display: 'inline', marginRight: 4 }} />}
+                {extractMsg}
+              </p>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );
