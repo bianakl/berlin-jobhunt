@@ -1,20 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
-import { LayoutDashboard, Kanban, Building2, Plus, User } from 'lucide-react';
 import useLocalStorage from './hooks/useLocalStorage';
 import { seedJobs, seedCompanies } from './data/seed';
 import Dashboard from './components/Dashboard';
 import Pipeline from './components/Pipeline';
 import Companies from './components/Companies';
 import Profile from './components/Profile';
+import Sidebar from './components/Sidebar';
 import JobModal from './components/JobModal';
 import CompanyModal from './components/CompanyModal';
-
-const NAV = [
-  { id: 'dashboard', label: 'Overview', Icon: LayoutDashboard },
-  { id: 'pipeline', label: 'Pipeline', Icon: Kanban },
-  { id: 'companies', label: 'Companies', Icon: Building2 },
-  { id: 'profile', label: 'Profile', Icon: User },
-];
 
 const defaultProfile = {
   name: '',
@@ -81,7 +74,15 @@ export default function App() {
   };
 
   const updateJob = (id, updates) => {
-    setJobs((prev) => prev.map((j) => (j.id === id ? { ...j, ...updates } : j)));
+    setJobs((prev) => prev.map((j) => {
+      if (j.id !== id) return j;
+      const stageChanged = updates.stage && updates.stage !== j.stage;
+      return {
+        ...j,
+        ...updates,
+        ...(stageChanged ? { stageChangedAt: new Date().toISOString() } : {}),
+      };
+    }));
     touchStreak();
   };
 
@@ -111,88 +112,19 @@ export default function App() {
   const streak = streakData?.count || 0;
 
   return (
-    <div className="min-h-screen" style={{ background: '#f5f5fb' }}>
-      {/* Header */}
-      <header
-        className="sticky top-0 z-40 flex items-center justify-between px-6 h-14 border-b"
-        style={{ background: 'rgba(255,255,255,0.95)', borderColor: '#e8e8f4', backdropFilter: 'blur(12px)' }}
-      >
-        {/* Logo */}
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}
-          >
-            S
-          </div>
-          <span className="font-semibold text-sm tracking-tight" style={{ color: '#111827' }}>
-            Scout
-          </span>
-          <span
-            className="text-xs font-medium px-1.5 py-0.5 rounded"
-            style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }}
-          >
-            Berlin
-          </span>
-          {streak > 0 && (
-            <span
-              className="text-xs font-medium px-1.5 py-0.5 rounded"
-              style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)' }}
-            >
-              🔥 {streak}d
-            </span>
-          )}
-        </div>
-
-        {/* Nav */}
-        <nav className="flex items-center gap-1">
-          {NAV.map(({ id, label, Icon }) => {
-            const active = activeView === id;
-            return (
-              <button
-                key={id}
-                onClick={() => setActiveView(id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                style={{
-                  background: active ? 'rgba(99,102,241,0.1)' : 'transparent',
-                  color: active ? '#6366f1' : '#6b7280',
-                  border: active ? '1px solid rgba(99,102,241,0.2)' : '1px solid transparent',
-                }}
-              >
-                <Icon size={14} />
-                {label}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={openAddCompany}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-            style={{ background: '#f3f4f6', color: '#6b7280', border: '1px solid #e5e7eb' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#111827')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = '#6b7280')}
-          >
-            <Building2 size={13} />
-            Add company
-          </button>
-          <button
-            onClick={() => openAddJob()}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold text-white transition-all"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-          >
-            <Plus size={14} />
-            Add job
-          </button>
-        </div>
-      </header>
+    <div className="flex min-h-screen" style={{ background: '#f5f5fb' }}>
+      <Sidebar
+        activeView={activeView}
+        onNavigate={setActiveView}
+        onAddJob={openAddJob}
+        streak={streak}
+        achievements={achievements}
+        jobs={jobs}
+        companies={companies}
+      />
 
       {/* Main content */}
-      <main>
+      <main className="flex-1" style={{ marginLeft: 220 }}>
         {activeView === 'dashboard' && (
           <Dashboard
             jobs={jobs}

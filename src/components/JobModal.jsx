@@ -55,7 +55,7 @@ const inputStyle = {
   transition: 'border-color 0.15s',
 };
 
-export default function JobModal({ job, defaults = {}, companies, onSave, onClose }) {
+export default function JobModal({ job, defaults = {}, companies, profile, onSave, onClose }) {
   const isEdit = !!job;
 
   const [form, setForm] = useState({
@@ -73,6 +73,9 @@ export default function JobModal({ job, defaults = {}, companies, onSave, onClos
     appliedDate: job?.appliedDate ? job.appliedDate.split('T')[0] : '',
     compatibility: job?.compatibility || { roleMatch: 0, skillsMatch: 0, culture: 0, compensation: 0, growth: 0 },
   });
+
+  // Details accordion: expanded by default for edits, collapsed for new jobs
+  const [detailsOpen, setDetailsOpen] = useState(isEdit);
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
   const setCompat = (key, val) => setForm((f) => ({ ...f, compatibility: { ...f.compatibility, [key]: val } }));
@@ -103,7 +106,7 @@ export default function JobModal({ job, defaults = {}, companies, onSave, onClos
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="w-full max-w-2xl rounded-2xl border flex flex-col fade-in"
+        className="w-full max-w-lg rounded-2xl border flex flex-col fade-in"
         style={{ background: '#fff', borderColor: '#e8e8f4', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}
       >
         {/* Header */}
@@ -113,7 +116,7 @@ export default function JobModal({ job, defaults = {}, companies, onSave, onClos
               {isEdit ? 'Edit job' : 'Add job'}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: '#9ca3af' }}>
-              {isEdit ? `Editing ${job.title}` : 'Track a new opportunity in your pipeline'}
+              {isEdit ? `Editing ${job.title}` : 'Track a new opportunity'}
             </p>
           </div>
           <button
@@ -130,6 +133,8 @@ export default function JobModal({ job, defaults = {}, companies, onSave, onClos
         {/* Body */}
         <div className="overflow-y-auto flex-1 px-6 py-5">
           <form id="job-form" onSubmit={handleSubmit}>
+
+            {/* Required section — always visible */}
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div className="col-span-2">
                 <Field label="Job title *">
@@ -179,136 +184,160 @@ export default function JobModal({ job, defaults = {}, companies, onSave, onClos
                   <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#9ca3af' }} />
                 </div>
               </Field>
+            </div>
 
-              <Field label="Location">
-                <input
-                  placeholder="Berlin (Hybrid)"
-                  value={form.location}
-                  onChange={(e) => set('location', e.target.value)}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+            {/* Details accordion */}
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: '#e5e7eb' }}>
+              <button
+                type="button"
+                onClick={() => setDetailsOpen((v) => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 text-left transition-all"
+                style={{ background: detailsOpen ? '#f9fafb' : '#f9fafb' }}
+              >
+                <span className="text-xs font-semibold" style={{ color: '#374151' }}>Details</span>
+                <ChevronDown
+                  size={14}
+                  style={{
+                    color: '#9ca3af',
+                    transform: detailsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s',
+                  }}
                 />
-              </Field>
+              </button>
 
-              <Field label="Salary range">
-                <input
-                  placeholder="80–100k EUR"
-                  value={form.salary}
-                  onChange={(e) => set('salary', e.target.value)}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
-                />
-              </Field>
+              {detailsOpen && (
+                <div className="px-4 pb-4 pt-3 grid grid-cols-2 gap-4" style={{ borderTop: '1px solid #f3f4f6' }}>
+                  <div className="col-span-2">
+                    <Field label="Job posting URL">
+                      <div className="relative">
+                        <input
+                          type="url"
+                          placeholder="https://..."
+                          value={form.url}
+                          onChange={(e) => set('url', e.target.value)}
+                          style={{ ...inputStyle, paddingRight: form.url ? 36 : 12 }}
+                          onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                          onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                        />
+                        {form.url && (
+                          <a href={form.url} target="_blank" rel="noreferrer" className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#6366f1' }}>
+                            <ExternalLink size={13} />
+                          </a>
+                        )}
+                      </div>
+                    </Field>
+                  </div>
 
-              <div className="col-span-2">
-                <Field label="Job posting URL">
-                  <div className="relative">
+                  <Field label="Salary range">
                     <input
-                      type="url"
-                      placeholder="https://..."
-                      value={form.url}
-                      onChange={(e) => set('url', e.target.value)}
-                      style={{ ...inputStyle, paddingRight: form.url ? 36 : 12 }}
+                      placeholder="80–100k EUR"
+                      value={form.salary}
+                      onChange={(e) => set('salary', e.target.value)}
+                      style={inputStyle}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
                     />
-                    {form.url && (
-                      <a href={form.url} target="_blank" rel="noreferrer" className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#6366f1' }}>
-                        <ExternalLink size={13} />
-                      </a>
-                    )}
-                  </div>
-                </Field>
-              </div>
+                  </Field>
 
-              <Field label="Tags" hint="comma-separated">
-                <input
-                  placeholder="ai, b2b, remote"
-                  value={form.tags}
-                  onChange={(e) => set('tags', e.target.value)}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
-                />
-              </Field>
-
-              <Field label="Remote">
-                <div className="flex items-center gap-2 h-9">
-                  <button
-                    type="button"
-                    onClick={() => set('remote', !form.remote)}
-                    className="relative w-10 h-5 rounded-full transition-all"
-                    style={{ background: form.remote ? '#6366f1' : '#e5e7eb' }}
-                  >
-                    <span
-                      className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform shadow-sm"
-                      style={{ transform: form.remote ? 'translateX(20px)' : 'translateX(0)' }}
+                  <Field label="Location">
+                    <input
+                      placeholder="Berlin (Hybrid)"
+                      value={form.location}
+                      onChange={(e) => set('location', e.target.value)}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
                     />
-                  </button>
-                  <span className="text-sm" style={{ color: form.remote ? '#6366f1' : '#9ca3af' }}>
-                    {form.remote ? 'Remote / Hybrid' : 'On-site only'}
-                  </span>
-                </div>
-              </Field>
+                  </Field>
 
-              <Field label="Applied date">
-                <input
-                  type="date"
-                  value={form.appliedDate}
-                  onChange={(e) => set('appliedDate', e.target.value)}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
-                />
-              </Field>
-
-              <Field label="Follow-up date">
-                <input
-                  type="date"
-                  value={form.followUpDate}
-                  onChange={(e) => set('followUpDate', e.target.value)}
-                  style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
-                />
-              </Field>
-
-              <div className="col-span-2">
-                <Field label="Notes">
-                  <textarea
-                    placeholder="Research notes, interview prep, anything relevant..."
-                    value={form.notes}
-                    onChange={(e) => set('notes', e.target.value)}
-                    rows={3}
-                    style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
-                  />
-                </Field>
-              </div>
-            </div>
-
-            {/* Compatibility */}
-            <div className="rounded-xl p-4 border" style={{ background: '#f9fafb', borderColor: '#e5e7eb' }}>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-semibold" style={{ color: '#374151' }}>Compatibility rating</h3>
-                {compatScore > 0 && (
-                  <span className="text-sm font-bold" style={{ color: scoreColor }}>{compatScore}% match</span>
-                )}
-              </div>
-              <div className="space-y-3">
-                {COMPAT_FACTORS.map(({ key, label, hint }) => (
-                  <div key={key} className="flex items-center gap-3">
-                    <div className="w-32 shrink-0">
-                      <div className="text-xs font-medium" style={{ color: '#374151' }}>{label}</div>
-                      <div className="text-[10px]" style={{ color: '#9ca3af' }}>{hint}</div>
+                  <Field label="Remote">
+                    <div className="flex items-center gap-2 h-9">
+                      <button
+                        type="button"
+                        onClick={() => set('remote', !form.remote)}
+                        className="relative w-10 h-5 rounded-full transition-all"
+                        style={{ background: form.remote ? '#6366f1' : '#e5e7eb' }}
+                      >
+                        <span
+                          className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform shadow-sm"
+                          style={{ transform: form.remote ? 'translateX(20px)' : 'translateX(0)' }}
+                        />
+                      </button>
+                      <span className="text-sm" style={{ color: form.remote ? '#6366f1' : '#9ca3af' }}>
+                        {form.remote ? 'Remote / Hybrid' : 'On-site only'}
+                      </span>
                     </div>
-                    <StarRow value={form.compatibility[key]} onChange={(v) => setCompat(key, v)} />
+                  </Field>
+
+                  <Field label="Applied date">
+                    <input
+                      type="date"
+                      value={form.appliedDate}
+                      onChange={(e) => set('appliedDate', e.target.value)}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </Field>
+
+                  <Field label="Follow-up date">
+                    <input
+                      type="date"
+                      value={form.followUpDate}
+                      onChange={(e) => set('followUpDate', e.target.value)}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </Field>
+
+                  <Field label="Tags" hint="comma-separated">
+                    <input
+                      placeholder="ai, b2b, remote"
+                      value={form.tags}
+                      onChange={(e) => set('tags', e.target.value)}
+                      style={inputStyle}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    />
+                  </Field>
+
+                  <div className="col-span-2">
+                    <Field label="Notes">
+                      <textarea
+                        placeholder="Research notes, interview prep, anything relevant..."
+                        value={form.notes}
+                        onChange={(e) => set('notes', e.target.value)}
+                        rows={3}
+                        style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      />
+                    </Field>
                   </div>
-                ))}
-              </div>
+
+                  {/* Compatibility */}
+                  <div className="col-span-2 rounded-xl p-4 border" style={{ background: '#f9fafb', borderColor: '#e5e7eb' }}>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-xs font-semibold" style={{ color: '#374151' }}>Compatibility rating</h3>
+                      {compatScore > 0 && (
+                        <span className="text-sm font-bold" style={{ color: scoreColor }}>{compatScore}% match</span>
+                      )}
+                    </div>
+                    <div className="space-y-3">
+                      {COMPAT_FACTORS.map(({ key, label, hint }) => (
+                        <div key={key} className="flex items-center gap-3">
+                          <div className="w-32 shrink-0">
+                            <div className="text-xs font-medium" style={{ color: '#374151' }}>{label}</div>
+                            <div className="text-[10px]" style={{ color: '#9ca3af' }}>{hint}</div>
+                          </div>
+                          <StarRow value={form.compatibility[key]} onChange={(v) => setCompat(key, v)} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </form>
         </div>

@@ -1,0 +1,179 @@
+import { useState } from 'react';
+import { MoreHorizontal, ExternalLink, Pencil, Clock, CalendarClock, AlertCircle, Banknote, ChevronRight } from 'lucide-react';
+import { STAGES } from '../data/seed';
+import { CompatRing } from './Dashboard';
+
+function compatScore(compatibility) {
+  if (!compatibility) return 0;
+  const vals = Object.values(compatibility);
+  if (!vals.length) return 0;
+  return Math.round((vals.reduce((a, b) => a + b, 0) / (vals.length * 5)) * 100);
+}
+
+function agingDays(job) {
+  const ref = job.stageChangedAt || job.addedDate;
+  if (!ref) return null;
+  return Math.floor((Date.now() - new Date(ref).getTime()) / 86400000);
+}
+
+function formatFollowUp(dateStr) {
+  if (!dateStr) return null;
+  const diff = new Date(dateStr).getTime() - Date.now();
+  const d = Math.ceil(diff / 86400000);
+  if (d < 0) return { label: `${Math.abs(d)}d overdue`, overdue: true };
+  if (d === 0) return { label: 'Follow up today', overdue: false };
+  if (d === 1) return { label: 'Follow up tomorrow', overdue: false };
+  return { label: `Follow up in ${d}d`, overdue: false };
+}
+
+export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const score = compatScore(job.compatibility);
+  const stage = STAGES.find((s) => s.id === job.stage);
+  const followUp = formatFollowUp(job.followUpDate);
+  const days = agingDays(job);
+
+  const agingColor = days === null ? null : days >= 14 ? '#ef4444' : days >= 7 ? '#f59e0b' : null;
+
+  // For the Move to next stage menu item
+  const stageList = stages || STAGES;
+  const currentIdx = stageList.findIndex((s) => s.id === job.stage);
+  const nextStage = currentIdx >= 0 && currentIdx < stageList.length - 2 ? stageList[currentIdx + 1] : null;
+
+  return (
+    <div
+      className="rounded-xl border fade-in"
+      style={{
+        background: '#fff',
+        borderColor: '#e8e8f4',
+        borderLeft: `3px solid ${stage?.color || '#e8e8f4'}`,
+        transition: 'box-shadow 0.15s',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(99,102,241,0.08)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
+    >
+      {/* Clickable body */}
+      <div
+        className="px-3.5 pt-3.5 pb-2 cursor-pointer"
+        onClick={() => onEdit(job)}
+      >
+        {/* Row 1: Avatar + Title + Company + Menu */}
+        <div className="flex items-center gap-2.5 mb-2">
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
+            style={{ background: `${stage?.color}15`, color: stage?.color }}
+          >
+            {job.company?.[0] || '?'}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold leading-tight truncate" style={{ color: '#111827' }}>{job.title}</div>
+            <div className="text-xs mt-0.5 truncate" style={{ color: '#9ca3af' }}>{job.company}</div>
+          </div>
+          {/* Menu — always visible, stop propagation so click doesn't open modal */}
+          <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setMenuOpen((v) => !v)}
+              className="w-6 h-6 rounded flex items-center justify-center transition-all"
+              style={{ background: menuOpen ? '#e5e7eb' : '#f3f4f6', color: '#9ca3af' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#e5e7eb')}
+              onMouseLeave={(e) => !menuOpen && (e.currentTarget.style.background = '#f3f4f6')}
+            >
+              <MoreHorizontal size={13} />
+            </button>
+            {menuOpen && (
+              <div
+                className="absolute right-0 top-8 z-20 rounded-xl border py-1 min-w-[160px] fade-in"
+                style={{ background: '#fff', borderColor: '#e8e8f4', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
+              >
+                {job.url && (
+                  <a
+                    href={job.url} target="_blank" rel="noreferrer"
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
+                    style={{ color: '#6b7280' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.color = '#111827'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#6b7280'; }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <ExternalLink size={11} /> View posting
+                  </a>
+                )}
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
+                  style={{ color: '#6b7280' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.color = '#111827'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#6b7280'; }}
+                  onClick={() => { onEdit(job); setMenuOpen(false); }}
+                >
+                  <Pencil size={11} /> Edit
+                </button>
+                {nextStage && (
+                  <button
+                    className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
+                    style={{ color: '#6b7280' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.color = '#111827'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#6b7280'; }}
+                    onClick={() => { onMove(job.id, 1); setMenuOpen(false); }}
+                  >
+                    <ChevronRight size={11} /> Move to {nextStage.label}
+                  </button>
+                )}
+                <div style={{ borderTop: '1px solid #e8e8f4', margin: '4px 0' }} />
+                <button
+                  className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
+                  style={{ color: '#ef4444' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.05)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                  onClick={() => { onDelete(job.id); setMenuOpen(false); }}
+                >
+                  Archive
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Row 2: Stage badge + Aging chip */}
+        <div className="flex items-center gap-2 mb-2">
+          <span
+            className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+            style={{ background: stage?.bg, color: stage?.color, border: `1px solid ${stage?.border}` }}
+          >
+            {stage?.emoji} {stage?.label}
+          </span>
+          {agingColor && days !== null && (
+            <span
+              className="flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded"
+              style={{ background: `${agingColor}12`, color: agingColor }}
+            >
+              <Clock size={9} />{days}d in stage
+            </span>
+          )}
+        </div>
+
+        {/* Row 3: Follow-up (only if set) */}
+        {followUp && (
+          <div
+            className="flex items-center gap-1 text-[11px] mb-2 px-2 py-1 rounded"
+            style={{
+              background: followUp.overdue ? 'rgba(239,68,68,0.06)' : 'rgba(99,102,241,0.06)',
+              color: followUp.overdue ? '#ef4444' : '#6366f1',
+            }}
+          >
+            {followUp.overdue ? <AlertCircle size={10} /> : <CalendarClock size={10} />}
+            {followUp.label}
+          </div>
+        )}
+
+        {/* Row 4: Compat ring + Salary */}
+        <div className="flex items-center justify-between">
+          <CompatRing score={score} size={28} />
+          {job.salary && (
+            <span className="flex items-center gap-1 text-[11px]" style={{ color: '#9ca3af' }}>
+              <Banknote size={10} />{job.salary}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,5 +1,7 @@
+import { useCallback } from 'react';
 import { STAGES } from '../data/seed';
-import { CalendarClock, TrendingUp, Briefcase, Building2, Star, AlertCircle } from 'lucide-react';
+import { CalendarClock, TrendingUp, Briefcase, Star, AlertCircle } from 'lucide-react';
+import Gamification from './Gamification';
 
 function compatScore(compatibility) {
   if (!compatibility) return 0;
@@ -32,13 +34,18 @@ function daysUntil(dateStr) {
   return `in ${d}d`;
 }
 
-export default function Dashboard({ jobs, companies, onEditJob, onAddJob }) {
+export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak, achievements, onUnlockAchievement }) {
   const activeJobs = jobs.filter((j) => j.stage !== 'rejected');
   const applied = jobs.filter((j) => ['applied', 'interview', 'offer'].includes(j.stage));
   const interviews = jobs.filter((j) => j.stage === 'interview');
   const offers = jobs.filter((j) => j.stage === 'offer');
-  const avgCompat = activeJobs.length
-    ? Math.round(activeJobs.reduce((sum, j) => sum + compatScore(j.compatibility), 0) / activeJobs.length)
+
+  // This week
+  const weekAgo = Date.now() - 7 * 86400000;
+  const addedThisWeek = activeJobs.filter((j) => j.addedDate && new Date(j.addedDate).getTime() > weekAgo).length;
+
+  const conversionRate = applied.length > 0
+    ? Math.round((interviews.length / applied.length) * 100)
     : 0;
 
   const followUps = jobs
@@ -55,17 +62,36 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob }) {
     ...s,
     count: jobs.filter((j) => j.stage === s.id).length,
   }));
+  const maxCount = Math.max(...stageCounts.map((s) => s.count), 1);
 
   const statCards = [
-    { label: 'Tracking', value: activeJobs.length, sub: `${jobs.length} total`, icon: Briefcase, color: '#6366f1' },
-    { label: 'Applied', value: applied.length, sub: `${interviews.length} in interview`, icon: TrendingUp, color: '#f59e0b' },
-    { label: 'Offers', value: offers.length, sub: offers.length === 0 ? 'Keep going!' : 'Nice work!', icon: Star, color: '#22c55e' },
-    { label: 'Avg match', value: `${avgCompat}%`, sub: avgCompat >= 70 ? 'Strong fits' : 'Explore more', icon: TrendingUp, color: '#a855f7' },
-    { label: 'Companies', value: companies.length, sub: `${companies.filter((c) => c.favorite).length} favorited`, icon: Building2, color: '#06b6d4' },
+    {
+      label: 'Active pipeline',
+      value: activeJobs.length,
+      sub: addedThisWeek > 0 ? `+${addedThisWeek} this week` : 'No new this week',
+      icon: Briefcase,
+      color: '#6366f1',
+    },
+    {
+      label: 'Applied',
+      value: applied.length,
+      sub: `${conversionRate}% interview rate`,
+      icon: TrendingUp,
+      color: '#f59e0b',
+    },
+    {
+      label: 'Interviews',
+      value: interviews.length,
+      sub: offers.length > 0 ? `${offers.length} offer${offers.length > 1 ? 's' : ''} received` : 'Keep going!',
+      icon: Star,
+      color: '#22c55e',
+    },
   ];
 
+  const stableUnlock = useCallback(onUnlockAchievement, [onUnlockAchievement]);
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8 fade-in">
+    <div className="max-w-5xl mx-auto px-6 py-8 fade-in">
       {/* Greeting */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold mb-1" style={{ color: '#111827' }}>Your Berlin Job Search</h1>
@@ -76,8 +102,8 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob }) {
         </p>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-5 gap-3 mb-8">
+      {/* Row 1: 3 stat cards + funnel */}
+      <div className="grid gap-3 mb-5" style={{ gridTemplateColumns: '1fr 1fr 1fr 1.4fr' }}>
         {statCards.map(({ label, value, sub, icon: Icon, color }) => (
           <div
             key={label}
@@ -94,75 +120,85 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob }) {
             <div className="text-xs" style={{ color: '#d1d5db' }}>{sub}</div>
           </div>
         ))}
-      </div>
 
-      <div className="grid grid-cols-3 gap-5">
-        {/* Pipeline mini view */}
-        <div className="col-span-2 rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
-          <h2 className="text-sm font-semibold mb-4" style={{ color: '#111827' }}>Pipeline</h2>
+        {/* Funnel */}
+        <div
+          className="rounded-xl p-4 border"
+          style={{ background: '#fff', borderColor: '#e8e8f4' }}
+        >
+          <span className="text-xs font-medium block mb-3" style={{ color: '#9ca3af' }}>Stage funnel</span>
           <div className="space-y-2">
             {stageCounts.map((s) => {
-              const pct = jobs.length ? (s.count / jobs.length) * 100 : 0;
+              const pct = (s.count / maxCount) * 100;
               return (
-                <div key={s.id} className="flex items-center gap-3">
-                  <span className="text-xs w-24 shrink-0" style={{ color: '#9ca3af' }}>
-                    {s.emoji} {s.label}
-                  </span>
+                <div key={s.id} className="flex items-center gap-2">
+                  <span className="text-[10px] w-16 shrink-0" style={{ color: '#9ca3af' }}>{s.emoji} {s.label}</span>
                   <div className="flex-1 h-1.5 rounded-full" style={{ background: '#f3f4f6' }}>
-                    <div className="h-1.5 rounded-full transition-all" style={{ width: `${pct}%`, background: s.color }} />
+                    <div
+                      className="h-1.5 rounded-full transition-all"
+                      style={{ width: `${pct}%`, background: s.color }}
+                    />
                   </div>
-                  <span className="text-xs w-4 text-right font-medium" style={{ color: s.count ? s.color : '#d1d5db' }}>
+                  <span className="text-[10px] w-3 text-right font-medium shrink-0" style={{ color: s.count ? s.color : '#d1d5db' }}>
                     {s.count}
                   </span>
                 </div>
               );
             })}
           </div>
+        </div>
+      </div>
 
-          {recentJobs.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-xs font-medium mb-3" style={{ color: '#d1d5db' }}>Recently added</h3>
-              <div className="space-y-1">
-                {recentJobs.map((job) => {
-                  const score = compatScore(job.compatibility);
-                  const stage = STAGES.find((s) => s.id === job.stage);
-                  return (
-                    <button
-                      key={job.id}
-                      onClick={() => onEditJob(job)}
-                      className="w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-all"
-                      style={{ background: 'transparent', border: '1px solid transparent' }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = '#f9f9ff'; e.currentTarget.style.borderColor = '#e8e8f4'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+      {/* Row 2: Pipeline mini + Follow-ups */}
+      <div className="grid grid-cols-3 gap-5 mb-5">
+        {/* Pipeline mini */}
+        <div className="col-span-2 rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
+          <h2 className="text-sm font-semibold mb-4" style={{ color: '#111827' }}>Recently added</h2>
+          {recentJobs.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-xs" style={{ color: '#d1d5db' }}>No jobs tracked yet</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {recentJobs.map((job) => {
+                const score = compatScore(job.compatibility);
+                const stage = STAGES.find((s) => s.id === job.stage);
+                return (
+                  <button
+                    key={job.id}
+                    onClick={() => onEditJob(job)}
+                    className="w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-all"
+                    style={{ background: 'transparent', border: '1px solid transparent' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f9f9ff'; e.currentTarget.style.borderColor = '#e8e8f4'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
+                  >
+                    <div
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
+                      style={{ background: `${stage?.color}15`, color: stage?.color }}
                     >
-                      <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
-                        style={{ background: `${stage?.color}15`, color: stage?.color }}
+                      {job.company?.[0] || '?'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate" style={{ color: '#111827' }}>{job.title}</div>
+                      <div className="text-xs" style={{ color: '#9ca3af' }}>{job.company} · {daysAgo(job.addedDate)}</div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className="text-xs font-medium px-1.5 py-0.5 rounded"
+                        style={{ background: stage?.bg, color: stage?.color, border: `1px solid ${stage?.border}` }}
                       >
-                        {job.company?.[0] || '?'}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate" style={{ color: '#111827' }}>{job.title}</div>
-                        <div className="text-xs" style={{ color: '#9ca3af' }}>{job.company} · {daysAgo(job.addedDate)}</div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span
-                          className="text-xs font-medium px-1.5 py-0.5 rounded"
-                          style={{ background: stage?.bg, color: stage?.color, border: `1px solid ${stage?.border}` }}
-                        >
-                          {stage?.emoji} {stage?.label}
-                        </span>
-                        <CompatRing score={score} size={28} />
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+                        {stage?.emoji} {stage?.label}
+                      </span>
+                      <CompatRing score={score} size={28} />
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
 
-        {/* Follow-up sidebar */}
+        {/* Follow-ups */}
         <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
           <div className="flex items-center gap-2 mb-4">
             <CalendarClock size={14} style={{ color: '#6366f1' }} />
@@ -218,6 +254,15 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob }) {
           </div>
         </div>
       </div>
+
+      {/* Gamification (badges only, no streak/level — those are in Sidebar) */}
+      <Gamification
+        jobs={jobs}
+        companies={companies}
+        streak={streak}
+        achievements={achievements}
+        onUnlockAchievement={stableUnlock}
+      />
     </div>
   );
 }
