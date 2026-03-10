@@ -254,6 +254,8 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
 
 function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDelete, onAddJob, onUpdateCompany, isLast }) {
   const [checking, setChecking] = useState(false);
+  const [checkDone, setCheckDone] = useState(null); // null | 'found' | 'none'
+  const [showInlineResults, setShowInlineResults] = useState(false);
   const [addingManual, setAddingManual] = useState(false);
   const [manualTitle, setManualTitle] = useState('');
   const [manualUrl, setManualUrl] = useState('');
@@ -287,6 +289,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   const handleCheck = useCallback(async () => {
     if (!canCheck || checking) return;
     setChecking(true);
+    setCheckDone(null);
     const autoFound = await fetchPositionsForCompany(company);
     const manualPositions = positions.filter((p) => p.source === 'manual');
     onUpdateCompany(company.id, {
@@ -294,6 +297,10 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       atsCheckedAt: new Date().toISOString(),
     });
     setChecking(false);
+    const found = autoFound.length > 0;
+    setCheckDone(found ? 'found' : 'none');
+    if (found) setShowInlineResults(true);
+    setTimeout(() => setCheckDone(null), 3000);
   }, [company, canCheck, checking, positions, onUpdateCompany]);
 
   const handleRemovePosition = (posId) => {
@@ -381,14 +388,45 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
             disabled={checking}
             className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all shrink-0"
             style={{
-              background: checking ? '#f3f4f6' : positions.length > 0 ? 'rgba(34,197,94,0.08)' : 'rgba(99,102,241,0.06)',
-              color: checking ? '#9ca3af' : positions.length > 0 ? '#16a34a' : '#6366f1',
-              border: `1px solid ${positions.length > 0 ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.15)'}`,
+              background: checking
+                ? '#f3f4f6'
+                : checkDone === 'found'
+                  ? 'rgba(34,197,94,0.12)'
+                  : checkDone === 'none'
+                    ? '#f3f4f6'
+                    : positions.length > 0
+                      ? 'rgba(34,197,94,0.08)'
+                      : 'rgba(99,102,241,0.06)',
+              color: checking
+                ? '#9ca3af'
+                : checkDone === 'found'
+                  ? '#16a34a'
+                  : checkDone === 'none'
+                    ? '#9ca3af'
+                    : positions.length > 0
+                      ? '#16a34a'
+                      : '#6366f1',
+              border: `1px solid ${checkDone === 'found' || positions.length > 0 ? 'rgba(34,197,94,0.2)' : checkDone === 'none' ? '#e5e7eb' : 'rgba(99,102,241,0.15)'}`,
+              transition: 'all 0.3s',
             }}
             title={checkedAt ? `Last checked ${checkedAt}` : 'Check for PM roles'}
           >
-            {checking ? <Loader2 size={10} className="animate-spin" /> : <RefreshCw size={10} />}
-            {checking ? 'Checking…' : positions.length > 0 ? `${positions.length} role${positions.length > 1 ? 's' : ''}` : 'Check'}
+            {checking
+              ? <Loader2 size={10} className="animate-spin" />
+              : checkDone === 'found'
+                ? <span style={{ fontSize: 10 }}>✓</span>
+                : checkDone === 'none'
+                  ? <span style={{ fontSize: 10 }}>–</span>
+                  : <RefreshCw size={10} />}
+            {checking
+              ? 'Checking…'
+              : checkDone === 'found'
+                ? `${positions.length} role${positions.length > 1 ? 's' : ''} found!`
+                : checkDone === 'none'
+                  ? 'None found'
+                  : positions.length > 0
+                    ? `${positions.length} role${positions.length > 1 ? 's' : ''}`
+                    : 'Check'}
           </button>
         )}
 
@@ -403,6 +441,58 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
           }}
         />
       </div>
+
+      {/* Inline results panel — shown after check, no click required */}
+      {showInlineResults && positions.length > 0 && !isExpanded && (
+        <div className="px-4 py-3 fade-in" style={{ background: '#f6f6ff', borderTop: '1px solid #ebebf8' }}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#9ca3af' }}>
+              {positions.length} PM {positions.length === 1 ? 'role' : 'roles'} found
+            </span>
+            <button
+              onClick={() => setShowInlineResults(false)}
+              className="text-[10px]"
+              style={{ color: '#c4b5fd' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#7c3aed')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#c4b5fd')}
+            >
+              ✕ dismiss
+            </button>
+          </div>
+          <div className="flex flex-col gap-2">
+            {positions.filter((p) => p.source !== 'manual').map((pos) => (
+              <div
+                key={pos.id}
+                className="flex items-start justify-between gap-3 rounded-lg px-3 py-2.5"
+                style={{ background: '#fff', border: '1px solid #e8e8f4' }}
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-semibold mb-0.5 truncate" style={{ color: '#111827' }}>{pos.title}</div>
+                  {(pos.snippet || pos.team || pos.location) && (
+                    <p className="text-[11px] leading-relaxed line-clamp-2" style={{ color: '#6b7280' }}>
+                      {[pos.team, pos.location].filter(Boolean).join(' · ') || pos.snippet}
+                    </p>
+                  )}
+                </div>
+                {pos.url && (
+                  <a
+                    href={pos.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold shrink-0 transition-all"
+                    style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', textDecoration: 'none' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
+                  >
+                    Apply <ExternalLink size={9} />
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Expanded content */}
       {isExpanded && (
