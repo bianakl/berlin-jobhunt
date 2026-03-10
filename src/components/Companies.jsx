@@ -79,7 +79,7 @@ async function fetchPositionsForCompany(company) {
   return [];
 }
 
-export default function Companies({ companies, jobs, onAddCompany, onEditCompany, onDeleteCompany, onAddJob, onUpdateCompany }) {
+export default function Companies({ companies, jobs, onAddCompany, onEditCompany, onDeleteCompany, onAddJob, onQuickAddJob, onUpdateCompany }) {
   const [search, setSearch] = useState('');
   const [favOnly, setFavOnly] = useState(false);
   const [hasPmOnly, setHasPmOnly] = useState(false);
@@ -250,6 +250,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
               onEdit={onEditCompany}
               onDelete={onDeleteCompany}
               onAddJob={onAddJob}
+              onQuickAddJob={onQuickAddJob}
               onUpdateCompany={onUpdateCompany}
               isLast={idx === filtered.length - 1}
             />
@@ -260,11 +261,29 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
   );
 }
 
-function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDelete, onAddJob, onUpdateCompany, isLast }) {
+function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDelete, onAddJob, onQuickAddJob, onUpdateCompany, isLast }) {
   const [checking, setChecking] = useState(false);
   const [checkDone, setCheckDone] = useState(null); // null | 'found' | 'none'
   const [showInlineResults, setShowInlineResults] = useState(false);
   const [salaryEstimates, setSalaryEstimates] = useState({});
+  const [addedIds, setAddedIds] = useState(new Set());
+
+  const quickAddToPipeline = (pos) => {
+    onQuickAddJob({
+      title: pos.title,
+      company: company.name,
+      companyId: company.id,
+      url: pos.url || '',
+      stage: 'saved',
+      notes: pos.snippet || '',
+      location: 'Berlin',
+      remote: true,
+      tags: [],
+      salary: '',
+      compatibility: { roleMatch: 0, skillsMatch: 0, culture: 0, compensation: 0, growth: 0 },
+    });
+    setAddedIds((prev) => new Set([...prev, pos.id]));
+  };
   const [addingManual, setAddingManual] = useState(false);
   const [manualTitle, setManualTitle] = useState('');
   const [manualUrl, setManualUrl] = useState('');
@@ -545,6 +564,19 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   >
                     Not a fit
                   </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); quickAddToPipeline(pos); }}
+                    disabled={addedIds.has(pos.id)}
+                    className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all"
+                    style={{
+                      background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.08)',
+                      color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
+                      border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.2)'}`,
+                    }}
+                    title="Add this specific role to your pipeline"
+                  >
+                    {addedIds.has(pos.id) ? '✓ Added' : '+ Pipeline'}
+                  </button>
                   {pos.url && (
                     <a
                       href={pos.url}
@@ -649,6 +681,17 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                               {analysis?.loading ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
                               {analysis?.score != null ? `${analysis.score}%` : 'Analyze'}
                             </button>
+                            <button
+                              onClick={() => quickAddToPipeline(pos)}
+                              disabled={addedIds.has(pos.id)}
+                              className="opacity-0 group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
+                              style={{
+                                background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.08)',
+                                color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
+                                border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.2)'}`,
+                              }}
+                              title="Add this role to pipeline"
+                            >{addedIds.has(pos.id) ? '✓' : '+ Pipeline'}</button>
                             <button
                               onClick={() => handleDisqualify(pos.id)}
                               className="opacity-0 group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
@@ -782,11 +825,12 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                 <button
                   onClick={() => onAddJob({ companyId: company.id, company: company.name })}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
-                  style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(99,102,241,0.14)')}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(99,102,241,0.08)')}
+                  style={{ color: '#9ca3af' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
+                  title="Add a job manually (opens form)"
                 >
-                  <Kanban size={11} /> Add to pipeline
+                  <Kanban size={11} /> Add job manually
                 </button>
                 {company.website && (
                   <a href={company.website} target="_blank" rel="noreferrer"

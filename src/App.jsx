@@ -154,6 +154,7 @@ export default function App() {
             onEditCompany={openEditCompany}
             onDeleteCompany={deleteCompany}
             onAddJob={openAddJob}
+            onQuickAddJob={addJob}
             onUpdateCompany={updateCompany}
           />
         )}
