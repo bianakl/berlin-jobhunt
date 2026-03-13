@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2 } from 'lucide-react';
+import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
 
 const inputStyle = {
@@ -26,7 +26,7 @@ function Field({ label, children, hint }) {
   );
 }
 
-export default function Profile({ profile, onUpdate }) {
+export default function Profile({ profile, onUpdate, dark, onToggleDark }) {
   const [form, setForm] = useState({ ...profile });
   const [skillInput, setSkillInput] = useState('');
   const [saved, setSaved] = useState(false);
@@ -244,9 +244,9 @@ export default function Profile({ profile, onUpdate }) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8 fade-in">
+    <div className="max-w-3xl mx-auto px-4 md:px-6 py-4 md:py-8 fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6 md:mb-8">
         <div>
           <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Profile</h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
@@ -627,6 +627,25 @@ export default function Profile({ profile, onUpdate }) {
                 {extractMsg}
               </p>
             )}
+          </div>
+        </div>
+
+        {/* Appearance */}
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+          <h2 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-1)' }}>Appearance</h2>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium" style={{ color: 'var(--text-2)' }}>{dark ? 'Dark mode' : 'Light mode'}</p>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>Applies to all views</p>
+            </div>
+            <button
+              onClick={onToggleDark}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+              style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border-2)' }}
+            >
+              {dark ? <Sun size={14} /> : <Moon size={14} />}
+              {dark ? 'Switch to light' : 'Switch to dark'}
+            </button>
           </div>
         </div>
 

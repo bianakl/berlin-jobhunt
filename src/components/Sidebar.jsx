@@ -142,7 +142,8 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
         className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center"
         style={{ height: 60, background: 'var(--surface)', borderTop: '2px solid var(--border-2)' }}
       >
-        {NAV.map(({ id, Icon }) => {
+        {/* Left 2: Overview, Pipeline */}
+        {NAV.slice(0, 2).map(({ id, Icon }) => {
           const active = activeView === id;
           return (
             <button
@@ -153,20 +154,30 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             >
               <Icon size={18} />
               <span className="text-[9px] font-medium">
-                {id === 'dashboard' ? 'Overview' : id === 'pipeline' ? 'Pipeline' : id === 'companies' ? 'Companies' : 'Profile'}
+                {id === 'dashboard' ? 'Overview' : 'Pipeline'}
               </span>
             </button>
           );
         })}
-        {/* Dark mode toggle */}
-        <button
-          onClick={onToggleDark}
-          className="flex-1 flex flex-col items-center justify-center gap-0.5 h-full transition-all"
-          style={{ color: 'var(--text-3)' }}
-        >
-          {dark ? <Sun size={18} /> : <Moon size={18} />}
-          <span className="text-[9px] font-medium">{dark ? 'Light' : 'Dark'}</span>
-        </button>
+        {/* Center gap for floating + button */}
+        <div className="w-14 shrink-0" />
+        {/* Right 2: Companies, Profile */}
+        {NAV.slice(2).map(({ id, Icon }) => {
+          const active = activeView === id;
+          return (
+            <button
+              key={id}
+              onClick={() => onNavigate(id)}
+              className="flex-1 flex flex-col items-center justify-center gap-0.5 h-full transition-all"
+              style={{ color: active ? 'var(--accent)' : 'var(--text-3)' }}
+            >
+              <Icon size={18} />
+              <span className="text-[9px] font-medium">
+                {id === 'companies' ? 'Companies' : 'Profile'}
+              </span>
+            </button>
+          );
+        })}
         {/* Center add button */}
         <button
           onClick={() => onAddJob()}

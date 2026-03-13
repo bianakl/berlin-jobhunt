@@ -170,6 +170,8 @@ export default function App() {
           <Profile
             profile={profile}
             onUpdate={setProfile}
+            dark={dark}
+            onToggleDark={() => setDark((d) => !d)}
           />
         )}
       </main>
