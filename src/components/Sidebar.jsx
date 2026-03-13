@@ -158,6 +158,15 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             </button>
           );
         })}
+        {/* Dark mode toggle */}
+        <button
+          onClick={onToggleDark}
+          className="flex-1 flex flex-col items-center justify-center gap-0.5 h-full transition-all"
+          style={{ color: 'var(--text-4)' }}
+        >
+          {dark ? <Sun size={18} /> : <Moon size={18} />}
+          <span className="text-[9px] font-medium">{dark ? 'Light' : 'Dark'}</span>
+        </button>
         {/* Center add button */}
         <button
           onClick={() => onAddJob()}
