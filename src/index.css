@@ -95,7 +95,7 @@ body {
 .animate-spin { animation: spin 1s linear infinite; }
 
 /* ─── Pipeline horizontal scroll ──────────────────────────── */
-.pipeline-scroll { overflow-x: auto; scrollbar-width: thin; }
+.pipeline-scroll { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
 
 /* ─── Form controls ────────────────────────────────────────── */
 input, textarea, select { outline: none; }

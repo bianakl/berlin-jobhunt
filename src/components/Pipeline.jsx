@@ -63,7 +63,7 @@ function DroppableColumn({ stage, children }) {
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col flex-1 min-h-[120px] rounded-xl transition-all"
+      className="flex flex-col flex-1 min-h-[120px] rounded-xl transition-all overflow-y-auto"
       style={{
         border: isOver ? `2px dashed ${stage.color}` : '2px solid transparent',
         background: isOver ? `${stage.color}06` : 'transparent',
@@ -79,7 +79,7 @@ function StageColumn({ stage, jobs, activeId, onEdit, onDelete, onMove, onAddJob
   const stageJobs = jobs.filter((j) => j.stage === stage.id);
 
   return (
-    <div className="flex flex-col shrink-0" style={{ width: 272 }}>
+    <div className="flex flex-col shrink-0 h-full" style={{ width: 272 }}>
       {/* Column header */}
       <div
         className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-3 border"
@@ -175,11 +175,11 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
   };
 
   return (
-    <div className="px-4 md:px-6 py-4 md:py-6">
+    <div className="flex flex-col px-4 md:px-6 py-4 md:py-6" style={{ height: 'calc(100dvh - 60px)' }}>
       <Confetti active={confetti} />
 
       {/* Content header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-4 shrink-0">
         <div>
           <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Pipeline</h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
@@ -193,8 +193,8 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
-        <div className="pipeline-scroll pb-6">
-          <div className="flex gap-4" style={{ minWidth: 'max-content' }}>
+        <div className="pipeline-scroll flex-1 min-h-0 pb-4">
+          <div className="flex gap-4 h-full" style={{ minWidth: 'max-content' }}>
             {STAGES.map((stage) => (
               <StageColumn
                 key={stage.id}
