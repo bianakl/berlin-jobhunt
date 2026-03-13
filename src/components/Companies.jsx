@@ -156,10 +156,10 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           )}
           <button
             onClick={onAddCompany}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
             style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
           >
-            <Plus size={13} />Add company
+            <Plus size={13} /><span className="hidden sm:inline">Add company</span><span className="sm:hidden">Add</span>
           </button>
         </div>
       </div>
@@ -205,12 +205,12 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           <Link2 size={13} />
           Has PM roles
         </button>
-        <div className="flex items-center gap-1 ml-auto">
+        <div className="flex items-center gap-1">
           {['default', 'az', 'most'].map((s) => (
             <button
               key={s}
               onClick={() => setSort(s)}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+              className="px-2 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={{
                 background: sort === s ? 'rgba(99,102,241,0.1)' : 'transparent',
                 color: sort === s ? '#6366f1' : 'var(--text-4)',
