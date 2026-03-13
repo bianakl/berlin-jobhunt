@@ -93,9 +93,9 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
     <div
       className="rounded-xl border fade-in"
       style={{
-        background: '#fff',
-        borderColor: '#e8e8f4',
-        borderLeft: `3px solid ${stage?.color || '#e8e8f4'}`,
+        background: 'var(--surface)',
+        borderColor: 'var(--border)',
+        borderLeft: `3px solid ${stage?.color || 'var(--border)'}`,
         transition: 'box-shadow 0.15s',
       }}
       onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(99,102,241,0.08)'; }}
@@ -115,32 +115,32 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
             {job.company?.[0] || '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold leading-tight truncate" style={{ color: '#111827' }}>{job.title}</div>
-            <div className="text-xs mt-0.5 truncate" style={{ color: '#9ca3af' }}>{job.company}</div>
+            <div className="text-sm font-semibold leading-tight truncate" style={{ color: 'var(--text-1)' }}>{job.title}</div>
+            <div className="text-xs mt-0.5 truncate" style={{ color: 'var(--text-4)' }}>{job.company}</div>
           </div>
           {/* Menu — always visible, stop propagation so click doesn't open modal */}
           <div className="relative shrink-0" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setMenuOpen((v) => !v)}
               className="w-6 h-6 rounded flex items-center justify-center transition-all"
-              style={{ background: menuOpen ? '#e5e7eb' : '#f3f4f6', color: '#9ca3af' }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = '#e5e7eb')}
-              onMouseLeave={(e) => !menuOpen && (e.currentTarget.style.background = '#f3f4f6')}
+              style={{ background: menuOpen ? 'var(--border-2)' : 'var(--surface-5)', color: 'var(--text-4)' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--border-2)')}
+              onMouseLeave={(e) => !menuOpen && (e.currentTarget.style.background = 'var(--surface-5)')}
             >
               <MoreHorizontal size={13} />
             </button>
             {menuOpen && (
               <div
                 className="absolute right-0 top-8 z-20 rounded-xl border py-1 min-w-[160px] fade-in"
-                style={{ background: '#fff', borderColor: '#e8e8f4', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
+                style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: '0 8px 32px rgba(0,0,0,0.12)' }}
               >
                 {job.url && (
                   <a
                     href={job.url} target="_blank" rel="noreferrer"
                     className="flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
-                    style={{ color: '#6b7280' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.color = '#111827'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#6b7280'; }}
+                    style={{ color: 'var(--text-3)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-1)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-3)'; }}
                     onClick={() => setMenuOpen(false)}
                   >
                     <ExternalLink size={11} /> View posting
@@ -148,9 +148,9 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
                 )}
                 <button
                   className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
-                  style={{ color: '#6b7280' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.color = '#111827'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#6b7280'; }}
+                  style={{ color: 'var(--text-3)' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-1)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-3)'; }}
                   onClick={() => { onEdit(job); setMenuOpen(false); }}
                 >
                   <Pencil size={11} /> Edit
@@ -158,9 +158,9 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
                 {nextStage && (
                   <button
                     className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
-                    style={{ color: '#6b7280' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.color = '#111827'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#6b7280'; }}
+                    style={{ color: 'var(--text-3)' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-1)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-3)'; }}
                     onClick={() => { onMove(job.id, 1); setMenuOpen(false); }}
                   >
                     <ChevronRight size={11} /> Move to {nextStage.label}
@@ -177,11 +177,11 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
                     🚫 They rejected me
                   </button>
                 )}
-                <div style={{ borderTop: '1px solid #e8e8f4', margin: '4px 0' }} />
+                <div style={{ borderTop: '1px solid var(--border)', margin: '4px 0' }} />
                 <button
                   className="w-full flex items-center gap-2 px-3 py-1.5 text-xs transition-all"
-                  style={{ color: '#9ca3af' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = '#f9fafb')}
+                  style={{ color: 'var(--text-4)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--surface-2)')}
                   onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                   onClick={() => { onDelete(job.id); setMenuOpen(false); }}
                 >
@@ -236,7 +236,7 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
           <CompatRing score={score} size={28} />
           <div className="flex items-center gap-1.5 min-w-0">
             {job.salary && (
-              <span className="flex items-center gap-1 text-[11px] shrink-0" style={{ color: '#9ca3af' }}>
+              <span className="flex items-center gap-1 text-[11px] shrink-0" style={{ color: 'var(--text-4)' }}>
                 <Banknote size={10} />{job.salary}
               </span>
             )}
@@ -253,9 +253,9 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
                 onClick={handleGetEstimate}
                 disabled={salaryLoading}
                 className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded transition-all shrink-0"
-                style={{ color: '#d1d5db', border: '1px solid transparent' }}
+                style={{ color: 'var(--text-5)', border: '1px solid transparent' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#6366f1'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; e.currentTarget.style.background = 'rgba(99,102,241,0.05)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-5)'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
                 title="Get salary estimate for this role"
               >
                 {salaryLoading ? <Loader2 size={9} className="animate-spin" /> : <TrendingUp size={9} />}

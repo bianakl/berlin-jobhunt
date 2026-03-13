@@ -4,10 +4,10 @@ import { INDUSTRIES } from '../data/seed';
 
 const inputStyle = {
   width: '100%',
-  background: '#fff',
-  border: '1px solid #e5e7eb',
+  background: 'var(--surface)',
+  border: '1px solid var(--border-2)',
   borderRadius: 8,
-  color: '#111827',
+  color: 'var(--text-1)',
   padding: '8px 12px',
   fontSize: 13,
   outline: 'none',
@@ -17,9 +17,9 @@ const inputStyle = {
 function Field({ label, children, hint }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#374151' }}>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-2)' }}>
         {label}
-        {hint && <span className="ml-1 font-normal" style={{ color: '#9ca3af' }}>{hint}</span>}
+        {hint && <span className="ml-1 font-normal" style={{ color: 'var(--text-4)' }}>{hint}</span>}
       </label>
       {children}
     </div>
@@ -248,8 +248,8 @@ export default function Profile({ profile, onUpdate }) {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-base font-semibold" style={{ color: '#111827' }}>Profile</h1>
-          <p className="text-xs mt-0.5" style={{ color: '#9ca3af' }}>
+          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Profile</h1>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
             Your profile powers compatibility scoring on job cards
           </p>
         </div>
@@ -268,10 +268,10 @@ export default function Profile({ profile, onUpdate }) {
       <div className="grid grid-cols-1 gap-6">
 
         {/* Basic info card */}
-        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
             <User size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: '#111827' }}>Basic info</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Basic info</h2>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <Field label="Your name">
@@ -281,7 +281,7 @@ export default function Profile({ profile, onUpdate }) {
                 onChange={(e) => set('name', e.target.value)}
                 style={inputStyle}
                 onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
             <Field label="Current role">
@@ -291,7 +291,7 @@ export default function Profile({ profile, onUpdate }) {
                 onChange={(e) => set('currentRole', e.target.value)}
                 style={inputStyle}
                 onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
             <Field label="LinkedIn URL">
@@ -302,7 +302,7 @@ export default function Profile({ profile, onUpdate }) {
                 onChange={(e) => set('linkedinUrl', e.target.value)}
                 style={inputStyle}
                 onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
             <Field label="CV / Portfolio URL">
@@ -313,7 +313,7 @@ export default function Profile({ profile, onUpdate }) {
                 onChange={(e) => set('cvUrl', e.target.value)}
                 style={inputStyle}
                 onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
             <Field label="Years of experience">
@@ -326,7 +326,7 @@ export default function Profile({ profile, onUpdate }) {
                 onChange={(e) => set('yearsExperience', e.target.value)}
                 style={inputStyle}
                 onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
             <Field label="Preferred locations" hint="— comma-separated">
@@ -336,7 +336,7 @@ export default function Profile({ profile, onUpdate }) {
                 onChange={(e) => set('preferredLocations', e.target.value)}
                 style={inputStyle}
                 onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
             <div className="col-span-2">
@@ -348,7 +348,7 @@ export default function Profile({ profile, onUpdate }) {
                   rows={3}
                   style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
             </div>
@@ -356,9 +356,9 @@ export default function Profile({ profile, onUpdate }) {
         </div>
 
         {/* Skills card */}
-        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
-          <h2 className="text-sm font-semibold mb-4" style={{ color: '#111827' }}>Skills</h2>
-          <p className="text-xs mb-3" style={{ color: '#9ca3af' }}>
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+          <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Skills</h2>
+          <p className="text-xs mb-3" style={{ color: 'var(--text-4)' }}>
             Add skills that match job tags for compatibility scoring
           </p>
           <div className="flex flex-wrap gap-2 mb-3">
@@ -375,7 +375,7 @@ export default function Profile({ profile, onUpdate }) {
               </span>
             ))}
             {form.skills.length === 0 && (
-              <span className="text-xs" style={{ color: '#d1d5db' }}>No skills added yet</span>
+              <span className="text-xs" style={{ color: 'var(--text-5)' }}>No skills added yet</span>
             )}
           </div>
           <div className="flex gap-2">
@@ -385,9 +385,9 @@ export default function Profile({ profile, onUpdate }) {
               onChange={(e) => setSkillInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
               className="flex-1 text-xs px-3 py-2 rounded-lg"
-              style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827', outline: 'none' }}
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-1)', outline: 'none' }}
               onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-              onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+              onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
             />
             <button
               onClick={addSkill}
@@ -400,23 +400,23 @@ export default function Profile({ profile, onUpdate }) {
         </div>
 
         {/* Market Value card */}
-        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <TrendingUp size={14} style={{ color: '#6366f1' }} />
-              <h2 className="text-sm font-semibold" style={{ color: '#111827' }}>Your market value</h2>
+              <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Your market value</h2>
             </div>
             <button
               onClick={handleAnalyzeWorth}
               disabled={marketLoading}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: marketLoading ? '#f3f4f6' : 'rgba(99,102,241,0.08)', color: marketLoading ? '#9ca3af' : '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+              style={{ background: marketLoading ? 'var(--surface-5)' : 'rgba(99,102,241,0.08)', color: marketLoading ? 'var(--text-4)' : '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
             >
               {marketLoading ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
               {marketLoading ? 'Analyzing…' : marketValue ? 'Re-analyze' : 'Analyze my worth'}
             </button>
           </div>
-          <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
             Based on your CV and current Berlin PM market data (Glassdoor, Levels.fyi, Handpickedberlin 2026)
           </p>
 
@@ -427,17 +427,17 @@ export default function Profile({ profile, onUpdate }) {
               {/* Range + level */}
               <div className="flex items-end justify-between mb-3">
                 <div>
-                  <div className="text-2xl font-bold" style={{ color: '#111827' }}>
+                  <div className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>
                     €{Math.round(marketValue.rangeMin / 1000)}k–€{Math.round(marketValue.rangeMax / 1000)}k
                   </div>
-                  <div className="text-xs mt-0.5" style={{ color: '#6b7280' }}>gross annual · Berlin market</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>gross annual · Berlin market</div>
                 </div>
                 <div className="text-right">
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(99,102,241,0.12)', color: '#6366f1' }}>
                     {marketValue.level}
                   </span>
                   {marketValue.confidence && (
-                    <div className="text-[10px] mt-1" style={{ color: '#9ca3af' }}>{marketValue.confidence} confidence</div>
+                    <div className="text-[10px] mt-1" style={{ color: 'var(--text-4)' }}>{marketValue.confidence} confidence</div>
                   )}
                 </div>
               </div>
@@ -449,18 +449,18 @@ export default function Profile({ profile, onUpdate }) {
 
               {/* Headline */}
               {marketValue.headline && (
-                <p className="text-xs italic mb-3" style={{ color: '#374151' }}>"{marketValue.headline}"</p>
+                <p className="text-xs italic mb-3" style={{ color: 'var(--text-2)' }}>"{marketValue.headline}"</p>
               )}
 
               {/* Strengths + limiting factors */}
               <div className="flex flex-col gap-1 mb-3">
                 {marketValue.strengths?.map((s, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-xs" style={{ color: '#374151' }}>
+                  <div key={i} className="flex items-start gap-1.5 text-xs" style={{ color: 'var(--text-2)' }}>
                     <span style={{ color: '#22c55e', flexShrink: 0 }}>✓</span>{s}
                   </div>
                 ))}
                 {marketValue.limitingFactors?.map((f, i) => (
-                  <div key={i} className="flex items-start gap-1.5 text-xs" style={{ color: '#9ca3af' }}>
+                  <div key={i} className="flex items-start gap-1.5 text-xs" style={{ color: 'var(--text-4)' }}>
                     <span style={{ flexShrink: 0 }}>↑</span>{f}
                   </div>
                 ))}
@@ -477,8 +477,8 @@ export default function Profile({ profile, onUpdate }) {
 
           {!marketValue && !marketLoading && (
             <div className="rounded-xl border-2 border-dashed p-6 text-center" style={{ borderColor: 'rgba(99,102,241,0.15)' }}>
-              <TrendingUp size={24} style={{ color: '#e8e8f4', margin: '0 auto 8px' }} />
-              <p className="text-xs" style={{ color: '#9ca3af' }}>Upload your CV and click "Analyze my worth" to see your Berlin market value</p>
+              <TrendingUp size={24} style={{ color: 'var(--border)', margin: '0 auto 8px' }} />
+              <p className="text-xs" style={{ color: 'var(--text-4)' }}>Upload your CV and click "Analyze my worth" to see your Berlin market value</p>
             </div>
           )}
         </div>
@@ -486,8 +486,8 @@ export default function Profile({ profile, onUpdate }) {
         {/* Salary + Industries */}
         <div className="grid grid-cols-2 gap-5">
           {/* Salary */}
-          <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
-            <h2 className="text-sm font-semibold mb-4" style={{ color: '#111827' }}>Salary expectations</h2>
+          <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+            <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Salary expectations</h2>
             <div className="flex flex-col gap-3">
               <Field label="Minimum (EUR/yr)">
                 <input
@@ -499,7 +499,7 @@ export default function Profile({ profile, onUpdate }) {
                   onChange={(e) => set('salaryMin', e.target.value)}
                   style={inputStyle}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
               <Field label="Maximum (EUR/yr)">
@@ -512,16 +512,16 @@ export default function Profile({ profile, onUpdate }) {
                   onChange={(e) => set('salaryMax', e.target.value)}
                   style={inputStyle}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
             </div>
           </div>
 
           {/* Preferred industries */}
-          <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
-            <h2 className="text-sm font-semibold mb-1" style={{ color: '#111827' }}>Preferred industries</h2>
-            <p className="text-xs mb-3" style={{ color: '#9ca3af' }}>Select all that interest you</p>
+          <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+            <h2 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Preferred industries</h2>
+            <p className="text-xs mb-3" style={{ color: 'var(--text-4)' }}>Select all that interest you</p>
             <div className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto">
               {INDUSTRIES.map((ind) => {
                 const active = (form.preferredIndustries || []).includes(ind);
@@ -532,8 +532,8 @@ export default function Profile({ profile, onUpdate }) {
                     onClick={() => toggleIndustry(ind)}
                     className="text-xs px-2.5 py-1 rounded-full transition-all"
                     style={{
-                      background: active ? 'rgba(99,102,241,0.1)' : '#f3f4f6',
-                      color: active ? '#6366f1' : '#6b7280',
+                      background: active ? 'rgba(99,102,241,0.1)' : 'var(--surface-5)',
+                      color: active ? '#6366f1' : 'var(--text-3)',
                       border: `1px solid ${active ? 'rgba(99,102,241,0.3)' : 'transparent'}`,
                       fontWeight: active ? 600 : 400,
                     }}
@@ -547,12 +547,12 @@ export default function Profile({ profile, onUpdate }) {
         </div>
 
         {/* AI + CV Upload card — advanced, lives at the bottom */}
-        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
             <Sparkles size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: '#111827' }}>AI profile extraction</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>AI profile extraction</h2>
           </div>
-          <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
             Upload your CV and let Claude fill in your profile automatically. Also powers job compatibility analysis.
           </p>
 
@@ -560,7 +560,7 @@ export default function Profile({ profile, onUpdate }) {
           <div className="mb-4">
             <Field label="Anthropic API key" hint="— stored locally, never sent anywhere else">
               <div className="relative">
-                <Key size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9ca3af' }} />
+                <Key size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-4)' }} />
                 <input
                   type="password"
                   placeholder="sk-ant-..."
@@ -569,12 +569,12 @@ export default function Profile({ profile, onUpdate }) {
                   style={{ ...inputStyle, paddingLeft: 28 }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                   onBlur={(e) => {
-                    e.currentTarget.style.borderColor = '#e5e7eb';
+                    e.currentTarget.style.borderColor = 'var(--border-2)';
                     localStorage.setItem('scout-claude-key', apiKey);
                   }}
                 />
               </div>
-              <p className="text-[10px] mt-1" style={{ color: '#9ca3af' }}>
+              <p className="text-[10px] mt-1" style={{ color: 'var(--text-4)' }}>
                 Get a key at console.anthropic.com.
               </p>
             </Field>
@@ -583,7 +583,7 @@ export default function Profile({ profile, onUpdate }) {
           {/* CV Upload */}
           <div
             className="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-all mb-3"
-            style={{ borderColor: dragging ? '#6366f1' : '#e8e8f4', background: dragging ? 'rgba(99,102,241,0.04)' : '#fafafa' }}
+            style={{ borderColor: dragging ? '#6366f1' : 'var(--border)', background: dragging ? 'rgba(99,102,241,0.04)' : 'var(--surface-2)' }}
             onClick={() => fileRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
@@ -596,16 +596,16 @@ export default function Profile({ profile, onUpdate }) {
               className="hidden"
               onChange={(e) => handleFile(e.target.files[0])}
             />
-            <Upload size={20} style={{ color: '#d1d5db', margin: '0 auto 8px' }} />
+            <Upload size={20} style={{ color: 'var(--text-5)', margin: '0 auto 8px' }} />
             {cvFileName ? (
               <div>
                 <p className="text-xs font-medium" style={{ color: '#6366f1' }}>{cvFileName}</p>
-                <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>Click to replace</p>
+                <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-4)' }}>Click to replace</p>
               </div>
             ) : (
               <div>
-                <p className="text-xs font-medium" style={{ color: '#6b7280' }}>Drop your CV here or click to upload</p>
-                <p className="text-[10px] mt-0.5" style={{ color: '#9ca3af' }}>PDF or TXT · max 5 MB</p>
+                <p className="text-xs font-medium" style={{ color: 'var(--text-3)' }}>Drop your CV here or click to upload</p>
+                <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-4)' }}>PDF or TXT · max 5 MB</p>
               </div>
             )}
           </div>
@@ -616,13 +616,13 @@ export default function Profile({ profile, onUpdate }) {
               onClick={handleExtractClick}
               disabled={extracting}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-              style={{ background: extracting ? '#9ca3af' : 'linear-gradient(135deg, #6366f1, #8b5cf6)', cursor: extracting ? 'not-allowed' : 'pointer' }}
+              style={{ background: extracting ? 'var(--text-4)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)', cursor: extracting ? 'not-allowed' : 'pointer' }}
             >
               {extracting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
               {extracting ? 'Extracting...' : 'Extract profile from CV'}
             </button>
             {extractMsg && (
-              <p className="text-xs flex-1" style={{ color: extractMsg.startsWith('Error') ? '#ef4444' : extractMsg.includes('extracted') ? '#22c55e' : '#6b7280' }}>
+              <p className="text-xs flex-1" style={{ color: extractMsg.startsWith('Error') ? '#ef4444' : extractMsg.includes('extracted') ? '#22c55e' : 'var(--text-3)' }}>
                 {extractMsg.includes('extracted') && <CheckCircle size={11} style={{ display: 'inline', marginRight: 4 }} />}
                 {extractMsg}
               </p>
@@ -631,9 +631,9 @@ export default function Profile({ profile, onUpdate }) {
         </div>
 
         {/* Danger zone */}
-        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#fde8e8' }}>
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: '#fde8e8' }}>
           <h2 className="text-sm font-semibold mb-1" style={{ color: '#991b1b' }}>Danger zone</h2>
-          <p className="text-xs mb-4" style={{ color: '#9ca3af' }}>
+          <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
             Permanently deletes all data stored in this browser — jobs, companies, profile, API key, and CV. This cannot be undone.
           </p>
           <button

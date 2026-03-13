@@ -45,6 +45,12 @@ export default function App() {
   const [jobModal, setJobModal] = useState({ open: false, job: null });
   const [companyModal, setCompanyModal] = useState({ open: false, company: null });
 
+  // Dark mode
+  const [dark, setDark] = useLocalStorage('scout-dark-mode', false);
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', !!dark);
+  }, [dark]);
+
   const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
   // One-time migration: fix ATS slugs that were pointing to wrong platforms
@@ -112,7 +118,7 @@ export default function App() {
   const streak = streakData?.count || 0;
 
   return (
-    <div className="flex min-h-screen" style={{ background: '#f5f5fb' }}>
+    <div className="flex min-h-screen" style={{ background: 'var(--bg)' }}>
       <Sidebar
         activeView={activeView}
         onNavigate={setActiveView}
@@ -121,10 +127,12 @@ export default function App() {
         achievements={achievements}
         jobs={jobs}
         companies={companies}
+        dark={dark}
+        onToggleDark={() => setDark((d) => !d)}
       />
 
-      {/* Main content */}
-      <main className="flex-1" style={{ marginLeft: 220 }}>
+      {/* Main content — desktop gets left margin for sidebar, mobile gets bottom padding for nav */}
+      <main className="flex-1 main-content md:ml-[220px]">
         {activeView === 'dashboard' && (
           <Dashboard
             jobs={jobs}

@@ -133,8 +133,8 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-base font-semibold" style={{ color: '#111827' }}>Companies</h1>
-          <p className="text-xs mt-0.5" style={{ color: '#9ca3af' }}>
+          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Companies</h1>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
             {companies.length} companies tracked · {filtered.length} shown
           </p>
         </div>
@@ -145,8 +145,8 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
               disabled={checkingAll}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
               style={{
-                background: checkingAll ? '#f3f4f6' : 'rgba(99,102,241,0.06)',
-                color: checkingAll ? '#9ca3af' : '#6366f1',
+                background: checkingAll ? 'var(--surface-5)' : 'rgba(99,102,241,0.06)',
+                color: checkingAll ? 'var(--text-4)' : '#6366f1',
                 border: '1px solid rgba(99,102,241,0.15)',
               }}
             >
@@ -167,25 +167,25 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
       {/* Filters + Sort */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-[200px] max-w-xs">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9ca3af' }} />
+          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-4)' }} />
           <input
             type="text"
             placeholder="Search companies or industry..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-8 pr-3 py-2 rounded-lg text-sm"
-            style={{ background: '#fff', border: '1px solid #e8e8f4', color: '#111827' }}
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-1)' }}
             onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = '#e8e8f4')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
           />
         </div>
         <button
           onClick={() => setFavOnly((v) => !v)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all"
           style={{
-            background: favOnly ? 'rgba(245,158,11,0.08)' : '#fff',
-            color: favOnly ? '#f59e0b' : '#6b7280',
-            border: `1px solid ${favOnly ? 'rgba(245,158,11,0.25)' : '#e8e8f4'}`,
+            background: favOnly ? 'rgba(245,158,11,0.08)' : 'var(--surface)',
+            color: favOnly ? '#f59e0b' : 'var(--text-3)',
+            border: `1px solid ${favOnly ? 'rgba(245,158,11,0.25)' : 'var(--border)'}`,
           }}
         >
           <Star size={13} fill={favOnly ? '#f59e0b' : 'none'} />
@@ -195,9 +195,9 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           onClick={() => setHasPmOnly((v) => !v)}
           className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all"
           style={{
-            background: hasPmOnly ? 'rgba(99,102,241,0.08)' : '#fff',
-            color: hasPmOnly ? '#6366f1' : '#6b7280',
-            border: `1px solid ${hasPmOnly ? 'rgba(99,102,241,0.25)' : '#e8e8f4'}`,
+            background: hasPmOnly ? 'rgba(99,102,241,0.08)' : 'var(--surface)',
+            color: hasPmOnly ? '#6366f1' : 'var(--text-3)',
+            border: `1px solid ${hasPmOnly ? 'rgba(99,102,241,0.25)' : 'var(--border)'}`,
           }}
         >
           <Link2 size={13} />
@@ -211,7 +211,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
               className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={{
                 background: sort === s ? 'rgba(99,102,241,0.1)' : 'transparent',
-                color: sort === s ? '#6366f1' : '#9ca3af',
+                color: sort === s ? '#6366f1' : 'var(--text-4)',
                 border: `1px solid ${sort === s ? 'rgba(99,102,241,0.2)' : 'transparent'}`,
               }}
             >
@@ -224,8 +224,8 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
       {/* List */}
       {filtered.length === 0 ? (
         <div className="text-center py-20">
-          <Building2 size={32} style={{ color: '#e8e8f4', margin: '0 auto 12px' }} />
-          <p className="text-sm mb-4" style={{ color: '#9ca3af' }}>
+          <Building2 size={32} style={{ color: 'var(--border)', margin: '0 auto 12px' }} />
+          <p className="text-sm mb-4" style={{ color: 'var(--text-4)' }}>
             {companies.length === 0 ? 'No companies yet.' : 'Nothing matches your filter.'}
           </p>
           {companies.length === 0 && (
@@ -239,7 +239,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           )}
         </div>
       ) : (
-        <div className="rounded-xl border overflow-hidden" style={{ borderColor: '#e8e8f4' }}>
+        <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border)' }}>
           {filtered.map((company, idx) => (
             <CompanyRow
               key={company.id}
@@ -440,14 +440,14 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   };
 
   return (
-    <div style={{ borderBottom: isLast ? 'none' : '1px solid #f0f0f8' }}>
+    <div style={{ borderBottom: isLast ? 'none' : '1px solid var(--border-3)' }}>
       {/* Collapsed row — 56px */}
       <div
         className="flex items-center gap-3 px-4 cursor-pointer transition-all"
-        style={{ height: 56, background: isExpanded ? '#fafaff' : '#fff' }}
+        style={{ height: 56, background: isExpanded ? 'var(--surface-3)' : 'var(--surface)' }}
         onClick={onToggle}
-        onMouseEnter={(e) => !isExpanded && (e.currentTarget.style.background = '#f9f9ff')}
-        onMouseLeave={(e) => !isExpanded && (e.currentTarget.style.background = '#fff')}
+        onMouseEnter={(e) => !isExpanded && (e.currentTarget.style.background = 'var(--surface-3)')}
+        onMouseLeave={(e) => !isExpanded && (e.currentTarget.style.background = 'var(--surface)')}
       >
         {/* Avatar */}
         <div
@@ -460,10 +460,10 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         {/* Name + subtitle */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold truncate" style={{ color: '#111827' }}>{company.name}</span>
+            <span className="text-sm font-semibold truncate" style={{ color: 'var(--text-1)' }}>{company.name}</span>
             {company.favorite && <Star size={11} fill="#f59e0b" style={{ color: '#f59e0b', flexShrink: 0 }} />}
           </div>
-          <div className="text-xs" style={{ color: '#9ca3af' }}>
+          <div className="text-xs" style={{ color: 'var(--text-4)' }}>
             {[company.industry, company.size].filter(Boolean).join(' · ')}
           </div>
         </div>
@@ -482,7 +482,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         {!canCheck && (
           <div className="flex items-center gap-1.5 shrink-0">
             {company.atsCheckedAt && positions.filter((p) => p.source !== 'manual').length === 0 && (
-              <span className="text-[10px]" style={{ color: '#d1d5db' }}>{checkedAt}</span>
+              <span className="text-[10px]" style={{ color: 'var(--text-5)' }}>{checkedAt}</span>
             )}
             <button
               onClick={(e) => { e.stopPropagation(); handleCrawl(); }}
@@ -490,26 +490,26 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
               className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
               style={{
                 background: crawling
-                  ? '#f3f4f6'
+                  ? 'var(--surface-5)'
                   : crawlDone === 'found'
                     ? 'rgba(34,197,94,0.12)'
                     : crawlDone === 'none' || crawlDone === 'error'
-                      ? '#f3f4f6'
+                      ? 'var(--surface-5)'
                       : activePositions.length > 0
                         ? 'rgba(34,197,94,0.08)'
                         : 'rgba(99,102,241,0.06)',
                 color: crawling
-                  ? '#9ca3af'
+                  ? 'var(--text-4)'
                   : crawlDone === 'found'
                     ? '#16a34a'
                     : crawlDone === 'none' || crawlDone === 'error'
-                      ? '#9ca3af'
+                      ? 'var(--text-4)'
                       : activePositions.length > 0
                         ? '#16a34a'
                         : '#6366f1',
                 border: `1px solid ${
                   crawlDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' :
-                  crawlDone === 'none' || crawlDone === 'error' ? '#e5e7eb' : 'rgba(99,102,241,0.15)'
+                  crawlDone === 'none' || crawlDone === 'error' ? 'var(--border-2)' : 'rgba(99,102,241,0.15)'
                 }`,
               }}
               title="Search for open PM roles at this company"
@@ -542,7 +542,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         {canCheck && (
           <div className="flex items-center gap-1.5 shrink-0">
           {checkedAt && positions.length === 0 && (
-            <span className="text-[10px]" style={{ color: '#d1d5db' }}>{checkedAt}</span>
+            <span className="text-[10px]" style={{ color: 'var(--text-5)' }}>{checkedAt}</span>
           )}
           <button
             onClick={(e) => { e.stopPropagation(); handleCheck(); }}
@@ -550,24 +550,24 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
             className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
             style={{
               background: checking
-                ? '#f3f4f6'
+                ? 'var(--surface-5)'
                 : checkDone === 'found'
                   ? 'rgba(34,197,94,0.12)'
                   : checkDone === 'none'
-                    ? '#f3f4f6'
+                    ? 'var(--surface-5)'
                     : activePositions.length > 0
                       ? 'rgba(34,197,94,0.08)'
                       : 'rgba(99,102,241,0.06)',
               color: checking
-                ? '#9ca3af'
+                ? 'var(--text-4)'
                 : checkDone === 'found'
                   ? '#16a34a'
                   : checkDone === 'none'
-                    ? '#9ca3af'
+                    ? 'var(--text-4)'
                     : activePositions.length > 0
                       ? '#16a34a'
                       : '#6366f1',
-              border: `1px solid ${checkDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' : checkDone === 'none' ? '#e5e7eb' : 'rgba(99,102,241,0.15)'}`,
+              border: `1px solid ${checkDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' : checkDone === 'none' ? 'var(--border-2)' : 'rgba(99,102,241,0.15)'}`,
               transition: 'all 0.3s',
             }}
             title={checkedAt ? `Last checked ${checkedAt}` : 'Check for PM roles'}
@@ -596,7 +596,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         <ChevronRight
           size={15}
           style={{
-            color: '#9ca3af',
+            color: 'var(--text-4)',
             transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
             transition: 'transform 0.2s',
             flexShrink: 0,
@@ -606,9 +606,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
 
       {/* Inline results panel — shown after check, no click required */}
       {showInlineResults && activePositions.filter((p) => p.source !== 'manual').length > 0 && !isExpanded && (
-        <div className="px-4 py-3 fade-in" style={{ background: '#f6f6ff', borderTop: '1px solid #ebebf8' }}>
+        <div className="px-4 py-3 fade-in" style={{ background: 'var(--surface-3)', borderTop: '1px solid var(--border-3)' }}>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#9ca3af' }}>
+            <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--text-4)' }}>
               {activePositions.filter((p) => p.source !== 'manual').length} PM {activePositions.filter((p) => p.source !== 'manual').length === 1 ? 'role' : 'roles'} found
             </span>
             <button
@@ -626,13 +626,13 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
               <div
                 key={pos.id}
                 className="flex items-start gap-3 rounded-lg px-3 py-2.5"
-                style={{ background: '#fff', border: '1px solid #e8e8f4' }}
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <span className="text-xs font-semibold truncate" style={{ color: '#111827' }}>{pos.title}</span>
+                    <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-1)' }}>{pos.title}</span>
                     {salaryEstimates[pos.id]?.loading && (
-                      <Loader2 size={9} className="animate-spin shrink-0" style={{ color: '#d1d5db' }} />
+                      <Loader2 size={9} className="animate-spin shrink-0" style={{ color: 'var(--text-5)' }} />
                     )}
                     {salaryEstimates[pos.id] && !salaryEstimates[pos.id].loading && salaryEstimates[pos.id].label && (
                       <span
@@ -645,7 +645,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     )}
                   </div>
                   {(pos.snippet || pos.team || pos.location) && (
-                    <p className="text-[11px] leading-relaxed line-clamp-2" style={{ color: '#6b7280' }}>
+                    <p className="text-[11px] leading-relaxed line-clamp-2" style={{ color: 'var(--text-3)' }}>
                       {[pos.team, pos.location].filter(Boolean).join(' · ') || pos.snippet}
                     </p>
                   )}
@@ -654,9 +654,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDisqualify(pos.id); }}
                     className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all"
-                    style={{ background: '#f3f4f6', color: '#9ca3af', border: '1px solid #e5e7eb' }}
+                    style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)' }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-4)'; e.currentTarget.style.borderColor = 'var(--border-2)'; }}
                     title="Mark as not a fit — hides this role"
                   >
                     Not a fit
@@ -681,7 +681,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       rel="noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
-                      style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: '#fff', textDecoration: 'none' }}
+                      style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', color: 'var(--surface)', textDecoration: 'none' }}
                       onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
                       onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
                     >
@@ -697,13 +697,13 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
 
       {/* Expanded content */}
       {isExpanded && (
-        <div className="px-4 pb-4" style={{ background: '#fafaff', borderTop: '1px solid #f0f0f8' }}>
+        <div className="px-4 pb-4" style={{ background: 'var(--surface-3)', borderTop: '1px solid var(--border-3)' }}>
           <div className="grid grid-cols-2 gap-5 pt-4">
             {/* Left col: Positions + ATS + Add manually */}
             <div>
               {/* ATS source + last checked (info only) */}
               {canCheck && (
-                <p className="text-[10px] mb-3" style={{ color: '#9ca3af' }}>
+                <p className="text-[10px] mb-3" style={{ color: 'var(--text-4)' }}>
                   {company.atsType === 'lever' ? 'Lever' : company.atsType === 'ashby' ? 'Ashby' : 'Greenhouse'}
                   {checkedAt ? ` · checked ${checkedAt}` : ' · never checked'}
                 </p>
@@ -717,20 +717,20 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     const scoreColor = analysis?.score >= 80 ? '#22c55e' : analysis?.score >= 60 ? '#f59e0b' : analysis?.score >= 40 ? '#6366f1' : '#ef4444';
                     if (pos.disqualified) {
                       return (
-                        <div key={pos.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: '#fafafa', border: '1px solid #f0f0f0' }}>
-                          <span className="text-[11px] line-through flex-1 truncate" style={{ color: '#d1d5db' }}>{pos.title}</span>
+                        <div key={pos.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-3)' }}>
+                          <span className="text-[11px] line-through flex-1 truncate" style={{ color: 'var(--text-5)' }}>{pos.title}</span>
                           <button
                             onClick={() => handleUndisqualify(pos.id)}
                             className="text-[10px] shrink-0 transition-all"
-                            style={{ color: '#d1d5db' }}
+                            style={{ color: 'var(--text-5)' }}
                             onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
-                            onMouseLeave={(e) => (e.currentTarget.style.color = '#d1d5db')}
+                            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
                           >undo</button>
                         </div>
                       );
                     }
                     return (
-                      <div key={pos.id} className="rounded-lg p-2.5 group/pos" style={{ background: '#fff', border: '1px solid #ebebf8' }}>
+                      <div key={pos.id} className="rounded-lg p-2.5 group/pos" style={{ background: 'var(--surface)', border: '1px solid var(--border-3)' }}>
                         <div className="flex items-start gap-1.5 mb-1">
                           <span
                             className="text-[9px] px-1.5 py-0.5 rounded shrink-0 font-semibold mt-0.5"
@@ -745,13 +745,13 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             {pos.url ? (
                               <a href={pos.url} target="_blank" rel="noreferrer"
                                 className="text-xs font-semibold leading-tight hover:underline block"
-                                style={{ color: '#111827' }} title={pos.title}
+                                style={{ color: 'var(--text-1)' }} title={pos.title}
                               >{pos.title}</a>
                             ) : (
-                              <span className="text-xs font-semibold leading-tight block" style={{ color: '#111827' }}>{pos.title}</span>
+                              <span className="text-xs font-semibold leading-tight block" style={{ color: 'var(--text-1)' }}>{pos.title}</span>
                             )}
                             {(pos.team || pos.location || pos.snippet) && (
-                              <p className="text-[10px] mt-0.5 leading-relaxed line-clamp-2" style={{ color: '#9ca3af' }}>
+                              <p className="text-[10px] mt-0.5 leading-relaxed line-clamp-2" style={{ color: 'var(--text-4)' }}>
                                 {pos.team || pos.location
                                   ? [pos.team, pos.location].filter(Boolean).join(' · ')
                                   : pos.snippet}
@@ -760,9 +760,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
                             {pos.url && (
-                              <a href={pos.url} target="_blank" rel="noreferrer" style={{ color: '#d1d5db' }}
+                              <a href={pos.url} target="_blank" rel="noreferrer" style={{ color: 'var(--text-5)' }}
                                 onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = '#d1d5db')}
+                                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
                               ><ExternalLink size={10} /></a>
                             )}
                             <button
@@ -792,9 +792,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             <button
                               onClick={() => handleDisqualify(pos.id)}
                               className="opacity-0 group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
-                              style={{ background: '#f3f4f6', color: '#9ca3af', border: '1px solid #e5e7eb' }}
+                              style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)' }}
                               onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#9ca3af'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-4)'; }}
                               title="Not a fit"
                             >Not a fit</button>
                             <button
@@ -805,8 +805,8 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                           </div>
                         </div>
                         {analysis && !analysis.loading && !analysis.error && (
-                          <div className="mt-1.5 pt-1.5" style={{ borderTop: '1px solid #eaeaf4' }}>
-                            <p className="text-[10px] leading-relaxed mb-1" style={{ color: '#374151' }}>{analysis.summary}</p>
+                          <div className="mt-1.5 pt-1.5" style={{ borderTop: '1px solid var(--border-3)' }}>
+                            <p className="text-[10px] leading-relaxed mb-1" style={{ color: 'var(--text-2)' }}>{analysis.summary}</p>
                             {analysis.strengths?.length > 0 && (
                               <div className="flex flex-wrap gap-1">
                                 {analysis.strengths.map((s, i) => (
@@ -830,14 +830,14 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
 
               {/* Add manually */}
               {addingManual ? (
-                <div className="flex flex-col gap-1.5 p-2.5 rounded-lg" style={{ background: '#fff', border: '1px solid #e8e8f4' }}>
+                <div className="flex flex-col gap-1.5 p-2.5 rounded-lg" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
                   <input
                     autoFocus
                     placeholder="Job title"
                     value={manualTitle}
                     onChange={(e) => setManualTitle(e.target.value)}
                     className="text-xs px-2 py-1.5 rounded"
-                    style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827', outline: 'none' }}
+                    style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-1)', outline: 'none' }}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddManual()}
                   />
                   <input
@@ -845,23 +845,23 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     value={manualUrl}
                     onChange={(e) => setManualUrl(e.target.value)}
                     className="text-xs px-2 py-1.5 rounded"
-                    style={{ background: '#f9fafb', border: '1px solid #e5e7eb', color: '#111827', outline: 'none' }}
+                    style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-1)', outline: 'none' }}
                     onKeyDown={(e) => e.key === 'Enter' && handleAddManual()}
                   />
                   <div className="flex gap-1.5">
                     <button onClick={handleAddManual} className="flex-1 text-xs py-1 rounded font-medium"
                       style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>Save</button>
                     <button onClick={() => { setAddingManual(false); setManualTitle(''); setManualUrl(''); }}
-                      className="flex-1 text-xs py-1 rounded" style={{ background: '#f3f4f6', color: '#6b7280' }}>Cancel</button>
+                      className="flex-1 text-xs py-1 rounded" style={{ background: 'var(--surface-5)', color: 'var(--text-3)' }}>Cancel</button>
                   </div>
                 </div>
               ) : (
                 <button
                   onClick={() => setAddingManual(true)}
                   className="flex items-center gap-1 text-xs transition-all"
-                  style={{ color: '#d1d5db' }}
+                  style={{ color: 'var(--text-5)' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#d1d5db')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
                 >
                   <Plus size={11} /> Add manually
                 </button>
@@ -872,15 +872,15 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
             <div>
               {company.notes && (
                 <div className="mb-3">
-                  <p className="text-[10px] font-medium mb-1" style={{ color: '#d1d5db' }}>NOTES</p>
-                  <p className="text-xs leading-relaxed" style={{ color: '#6b7280' }}>{company.notes}</p>
+                  <p className="text-[10px] font-medium mb-1" style={{ color: 'var(--text-5)' }}>NOTES</p>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--text-3)' }}>{company.notes}</p>
                 </div>
               )}
 
               {/* Outreach badges */}
               {(company.linkedinUrl || company.connections || company.referral || company.viaForm || company.email) && (
                 <div className="mb-3">
-                  <p className="text-[10px] font-medium mb-1.5" style={{ color: '#d1d5db' }}>OUTREACH</p>
+                  <p className="text-[10px] font-medium mb-1.5" style={{ color: 'var(--text-5)' }}>OUTREACH</p>
                   <div className="flex flex-wrap items-center gap-1.5">
                     {company.linkedinUrl && (
                       <a href={company.linkedinUrl} target="_blank" rel="noreferrer"
@@ -890,14 +890,14 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       </a>
                     )}
                     {company.connections && (
-                      <span className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded" style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                      <span className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded" style={{ background: 'var(--surface-5)', color: 'var(--text-3)' }}>
                         <Users size={9} /> {company.connections}
                       </span>
                     )}
                     {company.email && (
                       <a href={`mailto:${company.email}`}
                         className="flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded"
-                        style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                        style={{ background: 'var(--surface-5)', color: 'var(--text-3)' }}>
                         <Mail size={9} /> Email
                       </a>
                     )}
@@ -918,13 +918,13 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
               )}
 
               {/* Footer actions */}
-              <div className="flex items-center gap-2 mt-4" style={{ borderTop: '1px solid #ebebf8', paddingTop: 12 }}>
+              <div className="flex items-center gap-2 mt-4" style={{ borderTop: '1px solid var(--border-3)', paddingTop: 12 }}>
                 <button
                   onClick={() => onAddJob({ companyId: company.id, company: company.name })}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
-                  style={{ color: '#9ca3af' }}
+                  style={{ color: 'var(--text-4)' }}
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-4)')}
                   title="Add a job manually (opens form)"
                 >
                   <Kanban size={11} /> Add job manually
@@ -932,18 +932,18 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                 {company.website && (
                   <a href={company.website} target="_blank" rel="noreferrer"
                     className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
-                    style={{ background: '#f3f4f6', color: '#6b7280' }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#111827')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = '#6b7280')}>
+                    style={{ background: 'var(--surface-5)', color: 'var(--text-3)' }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-1)')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-3)')}>
                     <ExternalLink size={11} /> Careers page
                   </a>
                 )}
                 <button
                   onClick={() => onEdit(company)}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ml-auto"
-                  style={{ color: '#9ca3af' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#374151')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9ca3af')}
+                  style={{ color: 'var(--text-4)' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-2)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-4)')}
                 >
                   <Pencil size={11} /> Edit
                 </button>

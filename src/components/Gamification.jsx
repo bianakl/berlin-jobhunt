@@ -48,37 +48,37 @@ export default function Gamification({ jobs, companies, streak, achievements, on
   }, [jobs, companies, streak, achievements, onUnlockAchievement]);
 
   return (
-    <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
-      <h2 className="text-sm font-semibold mb-4" style={{ color: '#111827' }}>Progress</h2>
+    <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+      <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Progress</h2>
 
       {/* Streak + Level */}
       <div className="grid grid-cols-2 gap-3 mb-4">
         {/* Streak */}
-        <div className="rounded-xl p-3.5 text-center" style={{ background: streak > 0 ? 'rgba(245,158,11,0.06)' : '#f9fafb', border: `1px solid ${streak > 0 ? 'rgba(245,158,11,0.2)' : '#e5e7eb'}` }}>
+        <div className="rounded-xl p-3.5 text-center" style={{ background: streak > 0 ? 'rgba(245,158,11,0.06)' : 'var(--surface-2)', border: `1px solid ${streak > 0 ? 'rgba(245,158,11,0.2)' : 'var(--border-2)'}` }}>
           <div className="text-2xl mb-0.5">{streak > 0 ? '🔥' : '💤'}</div>
-          <div className="text-lg font-bold" style={{ color: streak > 0 ? '#f59e0b' : '#d1d5db' }}>{streak}</div>
-          <div className="text-[10px] font-medium" style={{ color: '#9ca3af' }}>day streak</div>
+          <div className="text-lg font-bold" style={{ color: streak > 0 ? '#f59e0b' : 'var(--text-5)' }}>{streak}</div>
+          <div className="text-[10px] font-medium" style={{ color: 'var(--text-4)' }}>day streak</div>
         </div>
 
         {/* Level */}
         <div className="rounded-xl p-3.5 text-center" style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
           <div className="text-2xl mb-0.5">{level.emoji}</div>
           <div className="text-xs font-bold" style={{ color: '#6366f1' }}>{level.name}</div>
-          <div className="text-[10px]" style={{ color: '#9ca3af' }}>{appliedCount} applications</div>
+          <div className="text-[10px]" style={{ color: 'var(--text-4)' }}>{appliedCount} applications</div>
         </div>
       </div>
 
       {/* Progress to next milestone */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-xs" style={{ color: '#9ca3af' }}>
+          <span className="text-xs" style={{ color: 'var(--text-4)' }}>
             {next ? `Next: ${next} applications` : 'Max level reached!'}
           </span>
           <span className="text-xs font-medium" style={{ color: '#6366f1' }}>
             {level.max === Infinity ? '100%' : `${levelPct}%`}
           </span>
         </div>
-        <div className="h-2 rounded-full overflow-hidden" style={{ background: '#f3f4f6' }}>
+        <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-5)' }}>
           <div
             className="h-2 rounded-full transition-all duration-700"
             style={{ width: `${Math.min(levelPct, 100)}%`, background: 'linear-gradient(90deg, #6366f1, #a855f7)' }}
@@ -88,7 +88,7 @@ export default function Gamification({ jobs, companies, streak, achievements, on
 
       {/* Badges */}
       <div>
-        <p className="text-[10px] font-medium mb-2" style={{ color: '#d1d5db' }}>ACHIEVEMENTS</p>
+        <p className="text-[10px] font-medium mb-2" style={{ color: 'var(--text-5)' }}>ACHIEVEMENTS</p>
         <div className="flex flex-wrap gap-2">
           {BADGE_DEFS.map((badge) => {
             const earned = earnedBadges.has(badge.id);
@@ -98,8 +98,8 @@ export default function Gamification({ jobs, companies, streak, achievements, on
                 title={badge.desc}
                 className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs"
                 style={{
-                  background: earned ? 'rgba(99,102,241,0.08)' : '#f3f4f6',
-                  color: earned ? '#6366f1' : '#d1d5db',
+                  background: earned ? 'rgba(99,102,241,0.08)' : 'var(--surface-5)',
+                  color: earned ? '#6366f1' : 'var(--text-5)',
                   border: `1px solid ${earned ? 'rgba(99,102,241,0.2)' : 'transparent'}`,
                   filter: earned ? 'none' : 'grayscale(1) opacity(0.5)',
                 }}

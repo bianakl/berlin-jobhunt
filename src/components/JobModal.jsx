@@ -34,9 +34,9 @@ function StarRow({ value, onChange }) {
 function Field({ label, children, hint }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#374151' }}>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-2)' }}>
         {label}
-        {hint && <span className="ml-1 font-normal" style={{ color: '#9ca3af' }}>— {hint}</span>}
+        {hint && <span className="ml-1 font-normal" style={{ color: 'var(--text-4)' }}>— {hint}</span>}
       </label>
       {children}
     </div>
@@ -45,10 +45,10 @@ function Field({ label, children, hint }) {
 
 const inputStyle = {
   width: '100%',
-  background: '#f9fafb',
-  border: '1px solid #e5e7eb',
+  background: 'var(--surface-2)',
+  border: '1px solid var(--border-2)',
   borderRadius: 8,
-  color: '#111827',
+  color: 'var(--text-1)',
   padding: '8px 12px',
   fontSize: 13,
   outline: 'none',
@@ -102,29 +102,29 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(17,24,39,0.4)', backdropFilter: 'blur(4px)' }}
+      style={{ background: 'var(--backdrop)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         className="w-full max-w-lg rounded-2xl border flex flex-col fade-in"
-        style={{ background: '#fff', borderColor: '#e8e8f4', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#f3f4f6' }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
           <div>
-            <h2 className="text-base font-semibold" style={{ color: '#111827' }}>
+            <h2 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>
               {isEdit ? 'Edit job' : 'Add job'}
             </h2>
-            <p className="text-xs mt-0.5" style={{ color: '#9ca3af' }}>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
               {isEdit ? `Editing ${job.title}` : 'Track a new opportunity'}
             </p>
           </div>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-            style={{ color: '#9ca3af', background: 'transparent' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#111827'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9ca3af'; }}
+            style={{ color: 'var(--text-4)', background: 'transparent' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-1)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-4)'; }}
           >
             <X size={16} />
           </button>
@@ -145,7 +145,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                     onChange={(e) => set('title', e.target.value)}
                     style={inputStyle}
                     onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                   />
                 </Field>
               </div>
@@ -163,7 +163,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                   }}
                   style={inputStyle}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
                 <datalist id="company-list">
                   {companies.map((c) => <option key={c.id} value={c.name} />)}
@@ -177,28 +177,28 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                     onChange={(e) => set('stage', e.target.value)}
                     style={{ ...inputStyle, appearance: 'none', paddingRight: 32, cursor: 'pointer' }}
                     onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                    onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                    onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                   >
                     {STAGES.map((s) => <option key={s.id} value={s.id}>{s.emoji} {s.label}</option>)}
                   </select>
-                  <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#9ca3af' }} />
+                  <ChevronDown size={12} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
                 </div>
               </Field>
             </div>
 
             {/* Details accordion */}
-            <div className="rounded-xl border overflow-hidden" style={{ borderColor: '#e5e7eb' }}>
+            <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--border-2)' }}>
               <button
                 type="button"
                 onClick={() => setDetailsOpen((v) => !v)}
                 className="w-full flex items-center justify-between px-4 py-3 text-left transition-all"
-                style={{ background: detailsOpen ? '#f9fafb' : '#f9fafb' }}
+                style={{ background: detailsOpen ? 'var(--surface-2)' : 'var(--surface-2)' }}
               >
-                <span className="text-xs font-semibold" style={{ color: '#374151' }}>Details</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Details</span>
                 <ChevronDown
                   size={14}
                   style={{
-                    color: '#9ca3af',
+                    color: 'var(--text-4)',
                     transform: detailsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                     transition: 'transform 0.2s',
                   }}
@@ -206,7 +206,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
               </button>
 
               {detailsOpen && (
-                <div className="px-4 pb-4 pt-3 grid grid-cols-2 gap-4" style={{ borderTop: '1px solid #f3f4f6' }}>
+                <div className="px-4 pb-4 pt-3 grid grid-cols-2 gap-4" style={{ borderTop: '1px solid var(--surface-5)' }}>
                   <div className="col-span-2">
                     <Field label="Job posting URL">
                       <div className="relative">
@@ -217,7 +217,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                           onChange={(e) => set('url', e.target.value)}
                           style={{ ...inputStyle, paddingRight: form.url ? 36 : 12 }}
                           onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                          onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                         />
                         {form.url && (
                           <a href={form.url} target="_blank" rel="noreferrer" className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#6366f1' }}>
@@ -235,7 +235,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       onChange={(e) => set('salary', e.target.value)}
                       style={inputStyle}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
 
@@ -246,7 +246,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       onChange={(e) => set('location', e.target.value)}
                       style={inputStyle}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
 
@@ -256,14 +256,14 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                         type="button"
                         onClick={() => set('remote', !form.remote)}
                         className="relative w-10 h-5 rounded-full transition-all"
-                        style={{ background: form.remote ? '#6366f1' : '#e5e7eb' }}
+                        style={{ background: form.remote ? '#6366f1' : 'var(--border-2)' }}
                       >
                         <span
                           className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform shadow-sm"
                           style={{ transform: form.remote ? 'translateX(20px)' : 'translateX(0)' }}
                         />
                       </button>
-                      <span className="text-sm" style={{ color: form.remote ? '#6366f1' : '#9ca3af' }}>
+                      <span className="text-sm" style={{ color: form.remote ? '#6366f1' : 'var(--text-4)' }}>
                         {form.remote ? 'Remote / Hybrid' : 'On-site only'}
                       </span>
                     </div>
@@ -276,7 +276,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       onChange={(e) => set('appliedDate', e.target.value)}
                       style={inputStyle}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
 
@@ -287,7 +287,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       onChange={(e) => set('followUpDate', e.target.value)}
                       style={inputStyle}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
 
@@ -298,7 +298,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       onChange={(e) => set('tags', e.target.value)}
                       style={inputStyle}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
 
@@ -311,15 +311,15 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                         rows={3}
                         style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
                         onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       />
                     </Field>
                   </div>
 
                   {/* Compatibility */}
-                  <div className="col-span-2 rounded-xl p-4 border" style={{ background: '#f9fafb', borderColor: '#e5e7eb' }}>
+                  <div className="col-span-2 rounded-xl p-4 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-2)' }}>
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-xs font-semibold" style={{ color: '#374151' }}>Compatibility rating</h3>
+                      <h3 className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Compatibility rating</h3>
                       {compatScore > 0 && (
                         <span className="text-sm font-bold" style={{ color: scoreColor }}>{compatScore}% match</span>
                       )}
@@ -328,8 +328,8 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       {COMPAT_FACTORS.map(({ key, label, hint }) => (
                         <div key={key} className="flex items-center gap-3">
                           <div className="w-32 shrink-0">
-                            <div className="text-xs font-medium" style={{ color: '#374151' }}>{label}</div>
-                            <div className="text-[10px]" style={{ color: '#9ca3af' }}>{hint}</div>
+                            <div className="text-xs font-medium" style={{ color: 'var(--text-2)' }}>{label}</div>
+                            <div className="text-[10px]" style={{ color: 'var(--text-4)' }}>{hint}</div>
                           </div>
                           <StarRow value={form.compatibility[key]} onChange={(v) => setCompat(key, v)} />
                         </div>
@@ -343,13 +343,13 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" style={{ borderColor: '#f3f4f6' }}>
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" style={{ borderColor: 'var(--surface-5)' }}>
           <button
             type="button" onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-            style={{ color: '#6b7280' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#111827')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = '#6b7280')}
+            style={{ color: 'var(--text-3)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-3)')}
           >
             Cancel
           </button>

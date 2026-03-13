@@ -4,10 +4,10 @@ import { INDUSTRIES, COMPANY_SIZES } from '../data/seed';
 
 const inputStyle = {
   width: '100%',
-  background: '#f9fafb',
-  border: '1px solid #e5e7eb',
+  background: 'var(--surface-2)',
+  border: '1px solid var(--border-2)',
   borderRadius: 8,
-  color: '#111827',
+  color: 'var(--text-1)',
   padding: '8px 12px',
   fontSize: 13,
   outline: 'none',
@@ -17,9 +17,9 @@ const inputStyle = {
 function Field({ label, children, hint }) {
   return (
     <div>
-      <label className="block text-xs font-medium mb-1.5" style={{ color: '#374151' }}>
+      <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-2)' }}>
         {label}
-        {hint && <span className="ml-1 font-normal" style={{ color: '#9ca3af' }}>{hint}</span>}
+        {hint && <span className="ml-1 font-normal" style={{ color: 'var(--text-4)' }}>{hint}</span>}
       </label>
       {children}
     </div>
@@ -72,29 +72,29 @@ export default function CompanyModal({ company, onSave, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(17,24,39,0.4)', backdropFilter: 'blur(4px)' }}
+      style={{ background: 'var(--backdrop)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
         className="w-full max-w-md rounded-2xl border flex flex-col fade-in"
-        style={{ background: '#fff', borderColor: '#e8e8f4', boxShadow: '0 24px 80px rgba(0,0,0,0.18)', maxHeight: '90vh' }}
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: '0 24px 80px rgba(0,0,0,0.18)', maxHeight: '90vh' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#f3f4f6' }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
           <div>
-            <h2 className="text-base font-semibold" style={{ color: '#111827' }}>
+            <h2 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>
               {isEdit ? 'Edit company' : 'Add company'}
             </h2>
-            <p className="text-xs mt-0.5" style={{ color: '#9ca3af' }}>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
               {isEdit ? `Editing ${company.name}` : 'Add a company to your research list'}
             </p>
           </div>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center transition-all"
-            style={{ color: '#9ca3af' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = '#f3f4f6'; e.currentTarget.style.color = '#111827'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#9ca3af'; }}
+            style={{ color: 'var(--text-4)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-1)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-4)'; }}
           >
             <X size={16} />
           </button>
@@ -112,7 +112,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                   onChange={(e) => set('name', e.target.value)}
                   style={inputStyle}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
 
@@ -124,7 +124,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                   onChange={(e) => set('website', e.target.value)}
                   style={inputStyle}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
 
@@ -136,12 +136,12 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onChange={(e) => set('industry', e.target.value)}
                       style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer' }}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     >
                       <option value="">Select...</option>
                       {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
                     </select>
-                    <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#9ca3af' }} />
+                    <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
                   </div>
                 </Field>
 
@@ -152,35 +152,35 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onChange={(e) => set('size', e.target.value)}
                       style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer' }}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     >
                       <option value="">Select...</option>
                       {COMPANY_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
-                    <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#9ca3af' }} />
+                    <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
                   </div>
                 </Field>
               </div>
 
               {/* ATS Integration */}
-              <div className="rounded-xl p-3.5 border" style={{ background: '#f9fafb', borderColor: '#e5e7eb' }}>
-                <p className="text-xs font-semibold mb-3" style={{ color: '#374151' }}>Job board integration</p>
+              <div className="rounded-xl p-3.5 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-2)' }}>
+                <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>Job board integration</p>
                 <div className="grid grid-cols-2 gap-3">
                   <Field label="ATS type">
                     <div className="relative">
                       <select
                         value={form.atsType}
                         onChange={(e) => set('atsType', e.target.value)}
-                        style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer', background: '#fff' }}
+                        style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer', background: 'var(--surface)' }}
                         onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       >
                         <option value="">None</option>
                         <option value="lever">Lever</option>
                         <option value="greenhouse">Greenhouse</option>
                         <option value="ashby">Ashby</option>
                       </select>
-                      <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#9ca3af' }} />
+                      <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
                     </div>
                   </Field>
 
@@ -190,9 +190,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       value={form.atsSlug}
                       onChange={(e) => set('atsSlug', e.target.value)}
                       disabled={!form.atsType}
-                      style={{ ...inputStyle, background: '#fff', opacity: form.atsType ? 1 : 0.5, borderColor: slugError ? '#ef4444' : undefined }}
+                      style={{ ...inputStyle, background: 'var(--surface)', opacity: form.atsType ? 1 : 0.5, borderColor: slugError ? '#ef4444' : undefined }}
                       onFocus={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : 'var(--border-2)')}
                     />
                     {slugError && <p className="text-[10px] mt-1" style={{ color: '#ef4444' }}>{slugError}</p>}
                   </Field>
@@ -207,13 +207,13 @@ export default function CompanyModal({ company, onSave, onClose }) {
                   rows={3}
                   style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
                   onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                  onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
 
               {/* Outreach tracking */}
-              <div className="rounded-xl p-3.5 border" style={{ background: '#f9fafb', borderColor: '#e5e7eb' }}>
-                <p className="text-xs font-semibold mb-3" style={{ color: '#374151' }}>Outreach tracking</p>
+              <div className="rounded-xl p-3.5 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-2)' }}>
+                <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>Outreach tracking</p>
                 <div className="space-y-3">
                   <Field label="Company LinkedIn URL">
                     <input
@@ -223,7 +223,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onChange={(e) => set('linkedinUrl', e.target.value)}
                       style={inputStyle}
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                      onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                      onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
                   <div className="grid grid-cols-2 gap-3">
@@ -234,7 +234,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         onChange={(e) => set('connections', e.target.value)}
                         style={inputStyle}
                         onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       />
                     </Field>
                     <Field label="Contact email">
@@ -245,7 +245,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         onChange={(e) => set('email', e.target.value)}
                         style={inputStyle}
                         onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                        onBlur={(e) => (e.currentTarget.style.borderColor = '#e5e7eb')}
+                        onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       />
                     </Field>
                   </div>
@@ -255,9 +255,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onClick={() => set('referral', !form.referral)}
                       className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all"
                       style={{
-                        background: form.referral ? 'rgba(34,197,94,0.06)' : '#fff',
-                        borderColor: form.referral ? 'rgba(34,197,94,0.3)' : '#e5e7eb',
-                        color: form.referral ? '#22c55e' : '#6b7280',
+                        background: form.referral ? 'rgba(34,197,94,0.06)' : 'var(--surface)',
+                        borderColor: form.referral ? 'rgba(34,197,94,0.3)' : 'var(--border-2)',
+                        color: form.referral ? '#22c55e' : 'var(--text-3)',
                       }}
                     >
                       <span>{form.referral ? '✅' : '⬜'}</span> Referral
@@ -267,9 +267,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onClick={() => set('viaForm', !form.viaForm)}
                       className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all"
                       style={{
-                        background: form.viaForm ? 'rgba(99,102,241,0.06)' : '#fff',
-                        borderColor: form.viaForm ? 'rgba(99,102,241,0.3)' : '#e5e7eb',
-                        color: form.viaForm ? '#6366f1' : '#6b7280',
+                        background: form.viaForm ? 'rgba(99,102,241,0.06)' : 'var(--surface)',
+                        borderColor: form.viaForm ? 'rgba(99,102,241,0.3)' : 'var(--border-2)',
+                        color: form.viaForm ? '#6366f1' : 'var(--text-3)',
                       }}
                     >
                       <span>{form.viaForm ? '✅' : '⬜'}</span> Applied via form
@@ -284,16 +284,16 @@ export default function CompanyModal({ company, onSave, onClose }) {
                 onClick={() => set('favorite', !form.favorite)}
                 className="flex items-center gap-2.5 w-full p-3 rounded-xl border transition-all text-left"
                 style={{
-                  background: form.favorite ? 'rgba(245,158,11,0.04)' : '#f9fafb',
-                  borderColor: form.favorite ? 'rgba(245,158,11,0.25)' : '#e5e7eb',
+                  background: form.favorite ? 'rgba(245,158,11,0.04)' : 'var(--surface-2)',
+                  borderColor: form.favorite ? 'rgba(245,158,11,0.25)' : 'var(--border-2)',
                 }}
               >
-                <Star size={15} fill={form.favorite ? '#f59e0b' : 'none'} style={{ color: form.favorite ? '#f59e0b' : '#9ca3af' }} />
+                <Star size={15} fill={form.favorite ? '#f59e0b' : 'none'} style={{ color: form.favorite ? '#f59e0b' : 'var(--text-4)' }} />
                 <div>
-                  <div className="text-sm font-medium" style={{ color: form.favorite ? '#f59e0b' : '#374151' }}>
+                  <div className="text-sm font-medium" style={{ color: form.favorite ? '#f59e0b' : 'var(--text-2)' }}>
                     {form.favorite ? 'Favorited' : 'Mark as favorite'}
                   </div>
-                  <div className="text-xs" style={{ color: '#9ca3af' }}>Favorites are highlighted across the app</div>
+                  <div className="text-xs" style={{ color: 'var(--text-4)' }}>Favorites are highlighted across the app</div>
                 </div>
               </button>
             </div>
@@ -301,13 +301,13 @@ export default function CompanyModal({ company, onSave, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" style={{ borderColor: '#f3f4f6' }}>
+        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" style={{ borderColor: 'var(--surface-5)' }}>
           <button
             type="button" onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-            style={{ color: '#6b7280' }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = '#111827')}
-            onMouseLeave={(e) => (e.currentTarget.style.color = '#6b7280')}
+            style={{ color: 'var(--text-3)' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-1)')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-3)')}
           >
             Cancel
           </button>

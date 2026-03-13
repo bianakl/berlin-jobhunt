@@ -122,7 +122,7 @@ function StageColumn({ stage, jobs, activeId, onEdit, onDelete, onMove, onAddJob
               className="rounded-xl border-2 border-dashed p-6 text-center"
               style={{ borderColor: `${stage.color}25` }}
             >
-              <p className="text-xs" style={{ color: '#d1d5db' }}>Nothing here yet</p>
+              <p className="text-xs" style={{ color: 'var(--text-5)' }}>Nothing here yet</p>
             </div>
           )}
         </div>
@@ -181,8 +181,8 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
       {/* Content header */}
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-base font-semibold" style={{ color: '#111827' }}>Pipeline</h1>
-          <p className="text-xs mt-0.5" style={{ color: '#9ca3af' }}>
+          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Pipeline</h1>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
             {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} tracked across {STAGES.length} stages
           </p>
         </div>

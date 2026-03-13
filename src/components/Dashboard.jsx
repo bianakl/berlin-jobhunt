@@ -94,8 +94,8 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
     <div className="max-w-5xl mx-auto px-6 py-8 fade-in">
       {/* Greeting */}
       <div className="mb-8">
-        <h1 className="text-2xl font-semibold mb-1" style={{ color: '#111827' }}>Your Berlin Job Search</h1>
-        <p className="text-sm" style={{ color: '#9ca3af' }}>
+        <h1 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Your Berlin Job Search</h1>
+        <p className="text-sm" style={{ color: 'var(--text-4)' }}>
           {activeJobs.length === 0
             ? 'Nothing tracked yet — add your first job to get started.'
             : `${activeJobs.length} active ${activeJobs.length === 1 ? 'opportunity' : 'opportunities'} in your pipeline.`}
@@ -108,38 +108,38 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
           <div
             key={label}
             className="rounded-xl p-4 border"
-            style={{ background: '#fff', borderColor: '#e8e8f4' }}
+            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-medium" style={{ color: '#9ca3af' }}>{label}</span>
+              <span className="text-xs font-medium" style={{ color: 'var(--text-4)' }}>{label}</span>
               <div className="w-6 h-6 rounded-md flex items-center justify-center" style={{ background: `${color}15` }}>
                 <Icon size={12} style={{ color }} />
               </div>
             </div>
-            <div className="text-2xl font-bold mb-0.5" style={{ color: '#111827' }}>{value}</div>
-            <div className="text-xs" style={{ color: '#d1d5db' }}>{sub}</div>
+            <div className="text-2xl font-bold mb-0.5" style={{ color: 'var(--text-1)' }}>{value}</div>
+            <div className="text-xs" style={{ color: 'var(--text-5)' }}>{sub}</div>
           </div>
         ))}
 
         {/* Funnel */}
         <div
           className="rounded-xl p-4 border"
-          style={{ background: '#fff', borderColor: '#e8e8f4' }}
+          style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
         >
-          <span className="text-xs font-medium block mb-3" style={{ color: '#9ca3af' }}>Stage funnel</span>
+          <span className="text-xs font-medium block mb-3" style={{ color: 'var(--text-4)' }}>Stage funnel</span>
           <div className="space-y-2">
             {stageCounts.map((s) => {
               const pct = (s.count / maxCount) * 100;
               return (
                 <div key={s.id} className="flex items-center gap-2">
-                  <span className="text-[10px] w-16 shrink-0" style={{ color: '#9ca3af' }}>{s.emoji} {s.label}</span>
-                  <div className="flex-1 h-1.5 rounded-full" style={{ background: '#f3f4f6' }}>
+                  <span className="text-[10px] w-16 shrink-0" style={{ color: 'var(--text-4)' }}>{s.emoji} {s.label}</span>
+                  <div className="flex-1 h-1.5 rounded-full" style={{ background: 'var(--surface-5)' }}>
                     <div
                       className="h-1.5 rounded-full transition-all"
                       style={{ width: `${pct}%`, background: s.color }}
                     />
                   </div>
-                  <span className="text-[10px] w-3 text-right font-medium shrink-0" style={{ color: s.count ? s.color : '#d1d5db' }}>
+                  <span className="text-[10px] w-3 text-right font-medium shrink-0" style={{ color: s.count ? s.color : 'var(--text-5)' }}>
                     {s.count}
                   </span>
                 </div>
@@ -152,11 +152,11 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
       {/* Row 2: Pipeline mini + Follow-ups */}
       <div className="grid grid-cols-3 gap-5 mb-5">
         {/* Pipeline mini */}
-        <div className="col-span-2 rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
-          <h2 className="text-sm font-semibold mb-4" style={{ color: '#111827' }}>Recently added</h2>
+        <div className="col-span-2 rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+          <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Recently added</h2>
           {recentJobs.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-xs" style={{ color: '#d1d5db' }}>No jobs tracked yet</p>
+              <p className="text-xs" style={{ color: 'var(--text-5)' }}>No jobs tracked yet</p>
             </div>
           ) : (
             <div className="space-y-1">
@@ -169,7 +169,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
                     onClick={() => onEditJob(job)}
                     className="w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-all"
                     style={{ background: 'transparent', border: '1px solid transparent' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f9f9ff'; e.currentTarget.style.borderColor = '#e8e8f4'; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--surface-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = 'transparent'; }}
                   >
                     <div
@@ -179,8 +179,8 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
                       {job.company?.[0] || '?'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium truncate" style={{ color: '#111827' }}>{job.title}</div>
-                      <div className="text-xs" style={{ color: '#9ca3af' }}>{job.company} · {daysAgo(job.addedDate)}</div>
+                      <div className="text-sm font-medium truncate" style={{ color: 'var(--text-1)' }}>{job.title}</div>
+                      <div className="text-xs" style={{ color: 'var(--text-4)' }}>{job.company} · {daysAgo(job.addedDate)}</div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <span
@@ -199,15 +199,15 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
         </div>
 
         {/* Follow-ups */}
-        <div className="rounded-xl border p-5" style={{ background: '#fff', borderColor: '#e8e8f4' }}>
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
             <CalendarClock size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: '#111827' }}>Follow-ups</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Follow-ups</h2>
           </div>
           {followUps.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-2xl mb-2">📅</div>
-              <p className="text-xs" style={{ color: '#d1d5db' }}>No follow-ups scheduled</p>
+              <p className="text-xs" style={{ color: 'var(--text-5)' }}>No follow-ups scheduled</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -223,13 +223,13 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
                       background: overdue ? 'rgba(239,68,68,0.04)' : 'transparent',
                       border: `1px solid ${overdue ? 'rgba(239,68,68,0.15)' : 'transparent'}`,
                     }}
-                    onMouseEnter={(e) => !overdue && (e.currentTarget.style.background = '#f9f9ff')}
+                    onMouseEnter={(e) => !overdue && (e.currentTarget.style.background = 'var(--surface-3)')}
                     onMouseLeave={(e) => !overdue && (e.currentTarget.style.background = 'transparent')}
                   >
                     {overdue && <AlertCircle size={12} style={{ color: '#ef4444', marginTop: 2 }} />}
                     <div className="flex-1 min-w-0">
-                      <div className="text-xs font-medium truncate" style={{ color: '#111827' }}>{job.title}</div>
-                      <div className="text-xs truncate" style={{ color: '#9ca3af' }}>{job.company}</div>
+                      <div className="text-xs font-medium truncate" style={{ color: 'var(--text-1)' }}>{job.title}</div>
+                      <div className="text-xs truncate" style={{ color: 'var(--text-4)' }}>{job.company}</div>
                       <div className="text-xs font-medium mt-0.5" style={{ color: overdue ? '#ef4444' : '#6366f1' }}>
                         {daysUntil(job.followUpDate)}
                       </div>
@@ -276,7 +276,7 @@ export function CompatRing({ score, size = 36 }) {
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e8e8f4" strokeWidth={3} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--border)" strokeWidth={3} />
         <circle
           cx={size / 2} cy={size / 2} r={r} fill="none"
           stroke={color} strokeWidth={3}
