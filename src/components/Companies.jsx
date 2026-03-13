@@ -97,14 +97,14 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
     .sort((a, b) => {
       if (sort === 'az') return a.name.localeCompare(b.name);
       if (sort === 'most') return (b.positions?.length || 0) - (a.positions?.length || 0);
-      // tier 0: has active (non-disqualified) roles  tier 1: checkable + never checked → top
-      // tier 2: no ATS configured  tier 3: checked but all empty/disqualified → bottom
+      // tier 0: has active roles  tier 1: searchable/checkable + never searched → top
+      // tier 2: already searched but empty → bottom  tier 3: nothing configured + never searched
       const tier = (c) => {
         const active = (c.positions || []).filter((p) => !p.disqualified).length;
         if (active > 0) return 0;
-        if (c.atsType && c.atsSlug && !c.atsCheckedAt) return 1;
-        if (c.atsType && c.atsSlug && c.atsCheckedAt) return 3;
-        return 2;
+        if ((c.atsType && c.atsSlug && !c.atsCheckedAt) || !c.atsCheckedAt) return 1;
+        if (c.atsCheckedAt) return 2;
+        return 3;
       };
       const diff = tier(a) - tier(b);
       if (diff !== 0) return diff;
@@ -264,6 +264,8 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
 function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDelete, onAddJob, onQuickAddJob, onUpdateCompany, isLast }) {
   const [checking, setChecking] = useState(false);
   const [checkDone, setCheckDone] = useState(null); // null | 'found' | 'none'
+  const [crawling, setCrawling] = useState(false);
+  const [crawlDone, setCrawlDone] = useState(null); // null | 'found' | 'none' | 'error'
   const [showInlineResults, setShowInlineResults] = useState(false);
   const [salaryEstimates, setSalaryEstimates] = useState({});
   const [addedIds, setAddedIds] = useState(new Set());
@@ -314,6 +316,41 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         return `${days}d ago`;
       })()
     : null;
+
+  const handleCrawl = useCallback(async () => {
+    if (crawling) return;
+    const apiKey = localStorage.getItem('scout-claude-key');
+    if (!apiKey) return alert('Add your Anthropic API key in Profile first.');
+    setCrawling(true);
+    setCrawlDone(null);
+    try {
+      const res = await fetch('/api/crawl-careers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        body: JSON.stringify({ companyName: company.name }),
+      });
+      const data = await res.json();
+      const found = Array.isArray(data.positions) ? data.positions : [];
+      const manualPositions = positions.filter((p) => p.source === 'manual');
+      const updates = {
+        positions: [...manualPositions, ...found],
+        atsCheckedAt: new Date().toISOString(),
+      };
+      // Auto-configure ATS if detected
+      if (data.detectedAts?.type && data.detectedAts?.slug) {
+        updates.atsType = data.detectedAts.type;
+        updates.atsSlug = data.detectedAts.slug;
+      }
+      onUpdateCompany(company.id, updates);
+      const hasPmRoles = found.filter((p) => !p.disqualified).length > 0;
+      setCrawlDone(hasPmRoles ? 'found' : 'none');
+      if (hasPmRoles) setShowInlineResults(true);
+    } catch {
+      setCrawlDone('error');
+    }
+    setCrawling(false);
+    setTimeout(() => setCrawlDone(null), 4000);
+  }, [company, crawling, positions, onUpdateCompany]);
 
   const handleCheck = useCallback(async () => {
     if (!canCheck || checking) return;
@@ -439,6 +476,66 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
           >
             {highestStage.emoji} {highestStage.label}
           </span>
+        )}
+
+        {/* Crawl button — for companies without ATS configured */}
+        {!canCheck && (
+          <div className="flex items-center gap-1.5 shrink-0">
+            {company.atsCheckedAt && positions.filter((p) => p.source !== 'manual').length === 0 && (
+              <span className="text-[10px]" style={{ color: '#d1d5db' }}>{checkedAt}</span>
+            )}
+            <button
+              onClick={(e) => { e.stopPropagation(); handleCrawl(); }}
+              disabled={crawling}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
+              style={{
+                background: crawling
+                  ? '#f3f4f6'
+                  : crawlDone === 'found'
+                    ? 'rgba(34,197,94,0.12)'
+                    : crawlDone === 'none' || crawlDone === 'error'
+                      ? '#f3f4f6'
+                      : activePositions.length > 0
+                        ? 'rgba(34,197,94,0.08)'
+                        : 'rgba(99,102,241,0.06)',
+                color: crawling
+                  ? '#9ca3af'
+                  : crawlDone === 'found'
+                    ? '#16a34a'
+                    : crawlDone === 'none' || crawlDone === 'error'
+                      ? '#9ca3af'
+                      : activePositions.length > 0
+                        ? '#16a34a'
+                        : '#6366f1',
+                border: `1px solid ${
+                  crawlDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' :
+                  crawlDone === 'none' || crawlDone === 'error' ? '#e5e7eb' : 'rgba(99,102,241,0.15)'
+                }`,
+              }}
+              title="Search for open PM roles at this company"
+            >
+              {crawling
+                ? <Loader2 size={10} className="animate-spin" />
+                : crawlDone === 'found'
+                  ? <span style={{ fontSize: 10 }}>✓</span>
+                  : crawlDone === 'none'
+                    ? <span style={{ fontSize: 10 }}>–</span>
+                    : crawlDone === 'error'
+                      ? <span style={{ fontSize: 10 }}>!</span>
+                      : <Search size={10} />}
+              {crawling
+                ? 'Searching…'
+                : crawlDone === 'found'
+                  ? `${activePositions.filter((p) => p.source !== 'manual').length} role${activePositions.filter((p) => p.source !== 'manual').length !== 1 ? 's' : ''} found!`
+                  : crawlDone === 'none'
+                    ? 'None found'
+                    : crawlDone === 'error'
+                      ? 'Failed'
+                      : activePositions.filter((p) => p.source !== 'manual').length > 0
+                        ? `${activePositions.filter((p) => p.source !== 'manual').length} role${activePositions.filter((p) => p.source !== 'manual').length !== 1 ? 's' : ''}`
+                        : 'Find openings'}
+            </button>
+          </div>
         )}
 
         {/* Inline Check button + last-checked label */}
