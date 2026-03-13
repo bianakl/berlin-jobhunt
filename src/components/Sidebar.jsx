@@ -139,8 +139,8 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
 
       {/* ── Mobile bottom nav ─────────────────────────────────── */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-30 flex items-center"
-        style={{ height: 60, background: 'var(--surface)', borderTop: '1px solid var(--border)' }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex items-center"
+        style={{ height: 60, background: 'var(--surface)', borderTop: '2px solid var(--border-2)' }}
       >
         {NAV.map(({ id, Icon }) => {
           const active = activeView === id;
@@ -149,7 +149,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
               key={id}
               onClick={() => onNavigate(id)}
               className="flex-1 flex flex-col items-center justify-center gap-0.5 h-full transition-all"
-              style={{ color: active ? 'var(--accent)' : 'var(--text-4)' }}
+              style={{ color: active ? 'var(--accent)' : 'var(--text-3)' }}
             >
               <Icon size={18} />
               <span className="text-[9px] font-medium">
@@ -162,7 +162,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
         <button
           onClick={onToggleDark}
           className="flex-1 flex flex-col items-center justify-center gap-0.5 h-full transition-all"
-          style={{ color: 'var(--text-4)' }}
+          style={{ color: 'var(--text-3)' }}
         >
           {dark ? <Sun size={18} /> : <Moon size={18} />}
           <span className="text-[9px] font-medium">{dark ? 'Light' : 'Dark'}</span>

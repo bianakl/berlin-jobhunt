@@ -129,13 +129,13 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8 fade-in">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-8 fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4 md:mb-6">
         <div>
           <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Companies</h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
-            {companies.length} companies tracked · {filtered.length} shown
+            {companies.length} tracked · {filtered.length} shown
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -143,45 +143,47 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
             <button
               onClick={handleCheckAll}
               disabled={checkingAll}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={{
                 background: checkingAll ? 'var(--surface-5)' : 'rgba(99,102,241,0.06)',
                 color: checkingAll ? 'var(--text-4)' : '#6366f1',
                 border: '1px solid rgba(99,102,241,0.15)',
               }}
             >
-              {checkingAll ? <Loader2 size={13} className="animate-spin" /> : <CheckSquare size={13} />}
-              {checkingAll ? 'Checking...' : 'Check all'}
+              {checkingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckSquare size={12} />}
+              {checkingAll ? 'Checking…' : 'Check all'}
             </button>
           )}
           <button
             onClick={onAddCompany}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
             style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
           >
-            <Plus size={14} />Add company
+            <Plus size={13} />Add company
           </button>
         </div>
       </div>
 
+      {/* Search */}
+      <div className="relative mb-2">
+        <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-4)' }} />
+        <input
+          type="text"
+          placeholder="Search companies or industry..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full pl-8 pr-3 py-2 rounded-lg text-sm"
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-1)' }}
+          onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+          onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
+        />
+      </div>
+
       {/* Filters + Sort */}
-      <div className="flex flex-wrap items-center gap-3 mb-4">
-        <div className="relative flex-1 min-w-[200px] max-w-xs">
-          <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-4)' }} />
-          <input
-            type="text"
-            placeholder="Search companies or industry..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-3 py-2 rounded-lg text-sm"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-1)' }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
-          />
-        </div>
+      <div className="flex flex-wrap items-center gap-2 mb-4">
         <button
           onClick={() => setFavOnly((v) => !v)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all"
           style={{
             background: favOnly ? 'rgba(245,158,11,0.08)' : 'var(--surface)',
             color: favOnly ? '#f59e0b' : 'var(--text-3)',
@@ -193,7 +195,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
         </button>
         <button
           onClick={() => setHasPmOnly((v) => !v)}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all"
           style={{
             background: hasPmOnly ? 'rgba(99,102,241,0.08)' : 'var(--surface)',
             color: hasPmOnly ? '#6366f1' : 'var(--text-3)',
@@ -215,7 +217,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
                 border: `1px solid ${sort === s ? 'rgba(99,102,241,0.2)' : 'transparent'}`,
               }}
             >
-              {s === 'default' ? 'Relevant' : s === 'az' ? 'A–Z' : 'Most roles'}
+              {s === 'default' ? 'Relevant' : s === 'az' ? 'A–Z' : 'Most'}
             </button>
           ))}
         </div>

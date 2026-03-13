@@ -175,7 +175,7 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
   };
 
   return (
-    <div className="px-6 py-6">
+    <div className="px-4 md:px-6 py-4 md:py-6">
       <Confetti active={confetti} />
 
       {/* Content header */}

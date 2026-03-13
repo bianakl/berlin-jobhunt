@@ -91,7 +91,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
   const stableUnlock = useCallback(onUnlockAchievement, [onUnlockAchievement]);
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-8 fade-in">
+    <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-8 fade-in">
       {/* Greeting */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Your Berlin Job Search</h1>
