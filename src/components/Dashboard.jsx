@@ -93,8 +93,8 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
   return (
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-8 fade-in">
       {/* Greeting */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Your Berlin Job Search</h1>
+      <div className="mb-4 md:mb-8">
+        <h1 className="text-xl md:text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Your Berlin Job Search</h1>
         <p className="text-sm" style={{ color: 'var(--text-4)' }}>
           {activeJobs.length === 0
             ? 'Nothing tracked yet — add your first job to get started.'
@@ -103,7 +103,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
       </div>
 
       {/* Row 1: 3 stat cards + funnel */}
-      <div className="grid gap-3 mb-5" style={{ gridTemplateColumns: '1fr 1fr 1fr 1.4fr' }}>
+      <div className="grid grid-cols-2 md:grid-cols-[1fr_1fr_1fr_1.4fr] gap-3 mb-4 md:mb-5">
         {statCards.map(({ label, value, sub, icon: Icon, color }) => (
           <div
             key={label}
@@ -123,7 +123,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
 
         {/* Funnel */}
         <div
-          className="rounded-xl p-4 border"
+          className="col-span-2 md:col-span-1 rounded-xl p-4 border"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
         >
           <span className="text-xs font-medium block mb-3" style={{ color: 'var(--text-4)' }}>Stage funnel</span>
@@ -150,9 +150,9 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
       </div>
 
       {/* Row 2: Pipeline mini + Follow-ups */}
-      <div className="grid grid-cols-3 gap-5 mb-5">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-5">
         {/* Pipeline mini */}
-        <div className="col-span-2 rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <div className="md:col-span-2 rounded-xl border p-4 md:p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Recently added</h2>
           {recentJobs.length === 0 ? (
             <div className="text-center py-8">
@@ -199,7 +199,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
         </div>
 
         {/* Follow-ups */}
-        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <div className="rounded-xl border p-4 md:p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
             <CalendarClock size={14} style={{ color: '#6366f1' }} />
             <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Follow-ups</h2>
