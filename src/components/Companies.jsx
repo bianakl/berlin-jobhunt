@@ -114,9 +114,13 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
   const jobsForCompany = (companyId) => jobs.filter((j) => j.companyId === companyId);
 
   const checkableCompanies = companies.filter((c) => c.atsType && c.atsSlug);
+  const crawlableCompanies = companies.filter((c) => !c.atsType || !c.atsSlug);
 
   const handleCheckAll = async () => {
     setCheckingAll(true);
+    const apiKey = localStorage.getItem('scout-claude-key');
+
+    // ATS companies — free, direct API
     for (const company of checkableCompanies) {
       const autoFound = await fetchPositionsForCompany(company);
       const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
@@ -125,6 +129,32 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
         atsCheckedAt: new Date().toISOString(),
       });
     }
+
+    // Non-ATS companies — crawl via Claude (requires API key)
+    if (apiKey) {
+      for (const company of crawlableCompanies) {
+        try {
+          const res = await fetch('/api/crawl-careers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+            body: JSON.stringify({ companyName: company.name }),
+          });
+          const data = await res.json();
+          const found = Array.isArray(data.positions) ? data.positions : [];
+          const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
+          const updates = {
+            positions: [...manualPositions, ...found],
+            atsCheckedAt: new Date().toISOString(),
+          };
+          if (data.detectedAts?.type && data.detectedAts?.slug) {
+            updates.atsType = data.detectedAts.type;
+            updates.atsSlug = data.detectedAts.slug;
+          }
+          onUpdateCompany(company.id, updates);
+        } catch { /* skip failed companies */ }
+      }
+    }
+
     setCheckingAll(false);
   };
 
@@ -139,7 +169,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           </p>
         </div>
         <div className="flex items-center gap-2">
-          {checkableCompanies.length > 0 && (
+          {companies.length > 0 && (
             <button
               onClick={handleCheckAll}
               disabled={checkingAll}
@@ -535,7 +565,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       ? 'Failed'
                       : activePositions.filter((p) => p.source !== 'manual').length > 0
                         ? `${activePositions.filter((p) => p.source !== 'manual').length} role${activePositions.filter((p) => p.source !== 'manual').length !== 1 ? 's' : ''}`
-                        : 'Find openings'}
+                        : 'Check'}
             </button>
           </div>
         )}
@@ -732,8 +762,8 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       );
                     }
                     return (
-                      <div key={pos.id} className="rounded-lg p-2.5 group/pos" style={{ background: 'var(--surface)', border: '1px solid var(--border-3)' }}>
-                        <div className="flex items-start gap-1.5 mb-1">
+                      <div key={pos.id} className="rounded-lg p-2.5" style={{ background: 'var(--surface)', border: '1px solid var(--border-3)' }}>
+                        <div className="flex items-start gap-1.5 mb-2">
                           <span
                             className="text-[9px] px-1.5 py-0.5 rounded shrink-0 font-semibold mt-0.5"
                             style={{
@@ -760,51 +790,51 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                               </p>
                             )}
                           </div>
-                          <div className="flex items-center gap-1 shrink-0">
-                            {pos.url && (
-                              <a href={pos.url} target="_blank" rel="noreferrer" style={{ color: 'var(--text-5)' }}
-                                onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
-                                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
-                              ><ExternalLink size={10} /></a>
-                            )}
-                            <button
-                              onClick={() => analyzePosition(pos)}
-                              disabled={analysis?.loading}
-                              className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium transition-all"
-                              style={{
-                                background: analysis?.score != null ? `${scoreColor}15` : 'rgba(99,102,241,0.08)',
-                                color: analysis?.score != null ? scoreColor : '#6366f1',
-                                border: `1px solid ${analysis?.score != null ? `${scoreColor}30` : 'rgba(99,102,241,0.2)'}`,
-                              }}
-                            >
-                              {analysis?.loading ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
-                              {analysis?.score != null ? `${analysis.score}%` : 'Analyze'}
-                            </button>
-                            <button
-                              onClick={() => quickAddToPipeline(pos)}
-                              disabled={addedIds.has(pos.id)}
-                              className="md:opacity-0 md:group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
-                              style={{
-                                background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.08)',
-                                color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
-                                border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.2)'}`,
-                              }}
-                              title="Add this role to pipeline"
-                            >{addedIds.has(pos.id) ? '✓' : '+ Pipeline'}</button>
-                            <button
-                              onClick={() => handleDisqualify(pos.id)}
-                              className="md:opacity-0 md:group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
-                              style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)' }}
-                              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-4)'; }}
-                              title="Not a fit"
-                            >Not a fit</button>
-                            <button
-                              onClick={() => handleRemovePosition(pos.id)}
-                              className="md:opacity-0 md:group-hover/pos:opacity-100 transition-opacity"
-                              style={{ color: '#ef4444' }}
-                            ><X size={10} /></button>
-                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {pos.url && (
+                            <a href={pos.url} target="_blank" rel="noreferrer"
+                              className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
+                              style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)', textDecoration: 'none' }}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
+                              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-4)')}
+                            ><ExternalLink size={9} /> View</a>
+                          )}
+                          <button
+                            onClick={() => analyzePosition(pos)}
+                            disabled={analysis?.loading}
+                            className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
+                            style={{
+                              background: analysis?.score != null ? `${scoreColor}15` : 'rgba(99,102,241,0.08)',
+                              color: analysis?.score != null ? scoreColor : '#6366f1',
+                              border: `1px solid ${analysis?.score != null ? `${scoreColor}30` : 'rgba(99,102,241,0.2)'}`,
+                            }}
+                          >
+                            {analysis?.loading ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
+                            {analysis?.score != null ? `${analysis.score}%` : 'Analyze'}
+                          </button>
+                          <button
+                            onClick={() => quickAddToPipeline(pos)}
+                            disabled={addedIds.has(pos.id)}
+                            className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
+                            style={{
+                              background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.08)',
+                              color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
+                              border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.2)'}`,
+                            }}
+                          >{addedIds.has(pos.id) ? '✓ Added' : '+ Pipeline'}</button>
+                          <button
+                            onClick={() => handleDisqualify(pos.id)}
+                            className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
+                            style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)' }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-4)'; e.currentTarget.style.borderColor = 'var(--border-2)'; }}
+                          >Not a fit</button>
+                          <button
+                            onClick={() => handleRemovePosition(pos.id)}
+                            className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] transition-all"
+                            style={{ background: 'rgba(239,68,68,0.06)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}
+                          ><X size={9} /></button>
                         </div>
                         {analysis && !analysis.loading && !analysis.error && (
                           <div className="mt-1.5 pt-1.5" style={{ borderTop: '1px solid var(--border-3)' }}>
