@@ -75,12 +75,11 @@ function DroppableColumn({ stage, children }) {
   );
 }
 
-function StageColumn({ stage, jobs, activeId, onEdit, onDelete, onMove, onAddJob }) {
+function StageColumn({ stage, jobs, onEdit, onDelete, onMove, onAddJob }) {
   const stageJobs = jobs.filter((j) => j.stage === stage.id);
 
   return (
     <div className="flex flex-col shrink-0" style={{ width: 272 }}>
-      {/* Column header */}
       <div
         className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-3 border"
         style={{ background: stage.bg, borderColor: stage.border }}
@@ -127,6 +126,57 @@ function StageColumn({ stage, jobs, activeId, onEdit, onDelete, onMove, onAddJob
           )}
         </div>
       </DroppableColumn>
+    </div>
+  );
+}
+
+// Mobile: simple vertical stack, no DnD
+function MobileStageSection({ stage, jobs, onEdit, onDelete, onMove, onAddJob }) {
+  const stageJobs = jobs.filter((j) => j.stage === stage.id);
+  return (
+    <div>
+      <div
+        className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-2 border"
+        style={{ background: stage.bg, borderColor: stage.border }}
+      >
+        <span>{stage.emoji}</span>
+        <span className="text-sm font-semibold" style={{ color: stage.color }}>{stage.label}</span>
+        <span
+          className="ml-auto text-xs font-medium px-1.5 py-0.5 rounded-full"
+          style={{ background: `${stage.color}20`, color: stage.color }}
+        >
+          {stageJobs.length}
+        </span>
+        {stage.id !== 'rejected' && (
+          <button
+            onClick={() => onAddJob({ stage: stage.id })}
+            className="w-5 h-5 rounded flex items-center justify-center"
+            style={{ color: stage.color }}
+          >
+            <Plus size={12} />
+          </button>
+        )}
+      </div>
+      <div className="flex flex-col gap-2.5">
+        {stageJobs.map((job) => (
+          <JobCard
+            key={job.id}
+            job={job}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onMove={onMove}
+            stages={STAGES}
+          />
+        ))}
+        {stageJobs.length === 0 && (
+          <div
+            className="rounded-xl border-2 border-dashed p-4 text-center"
+            style={{ borderColor: `${stage.color}25` }}
+          >
+            <p className="text-xs" style={{ color: 'var(--text-5)' }}>Nothing here yet</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -188,42 +238,60 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
         </div>
       </div>
 
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="pipeline-scroll pb-4" style={{ height: 'calc(100svh - 220px)' }}>
-          <div className="flex gap-4 h-full" style={{ minWidth: 'max-content' }}>
-            {STAGES.map((stage) => (
-              <StageColumn
-                key={stage.id}
-                stage={stage}
-                jobs={jobs}
-                activeId={activeId}
-                onEdit={onEditJob}
-                onDelete={onDeleteJob}
-                onMove={handleMove}
-                onAddJob={onAddJob}
-                />
-            ))}
-          </div>
-        </div>
+      {/* Mobile: stages stacked vertically, natural page scroll */}
+      <div className="md:hidden flex flex-col gap-5 pb-20">
+        {STAGES.map((stage) => (
+          <MobileStageSection
+            key={stage.id}
+            stage={stage}
+            jobs={jobs}
+            onEdit={onEditJob}
+            onDelete={onDeleteJob}
+            onMove={handleMove}
+            onAddJob={onAddJob}
+          />
+        ))}
+      </div>
 
-        <DragOverlay dropAnimation={null}>
-          {activeJob ? (
-            <div style={{ transform: 'scale(1.03)', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', borderRadius: 12 }}>
-              <JobCard
-                job={activeJob}
-                onEdit={() => {}}
-                onDelete={() => {}}
-                onMove={() => {}}
-                stages={STAGES}
-              />
+      {/* Desktop: horizontal kanban with drag-and-drop */}
+      <div className="hidden md:block">
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="pipeline-scroll pb-4">
+            <div className="flex gap-4 h-full" style={{ minWidth: 'max-content' }}>
+              {STAGES.map((stage) => (
+                <StageColumn
+                  key={stage.id}
+                  stage={stage}
+                  jobs={jobs}
+                  activeId={activeId}
+                  onEdit={onEditJob}
+                  onDelete={onDeleteJob}
+                  onMove={handleMove}
+                  onAddJob={onAddJob}
+                />
+              ))}
             </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          </div>
+
+          <DragOverlay dropAnimation={null}>
+            {activeJob ? (
+              <div style={{ transform: 'scale(1.03)', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', borderRadius: 12 }}>
+                <JobCard
+                  job={activeJob}
+                  onEdit={() => {}}
+                  onDelete={() => {}}
+                  onMove={() => {}}
+                  stages={STAGES}
+                />
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
     </div>
   );
 }
