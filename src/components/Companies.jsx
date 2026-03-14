@@ -627,7 +627,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
             {activePositions.filter((p) => p.source !== 'manual').map((pos) => (
               <div
                 key={pos.id}
-                className="flex items-start gap-3 rounded-lg px-3 py-2.5"
+                className="flex flex-col sm:flex-row sm:items-start gap-2 rounded-lg px-3 py-2.5"
                 style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
               >
                 <div className="flex-1 min-w-0">
@@ -652,7 +652,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <button
                     onClick={(e) => { e.stopPropagation(); handleDisqualify(pos.id); }}
                     className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all"
@@ -700,7 +700,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       {/* Expanded content */}
       {isExpanded && (
         <div className="px-4 pb-4" style={{ background: 'var(--surface-3)', borderTop: '1px solid var(--border-3)' }}>
-          <div className="grid grid-cols-2 gap-5 pt-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5 pt-4">
             {/* Left col: Positions + ATS + Add manually */}
             <div>
               {/* ATS source + last checked (info only) */}
@@ -783,7 +783,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             <button
                               onClick={() => quickAddToPipeline(pos)}
                               disabled={addedIds.has(pos.id)}
-                              className="opacity-0 group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
+                              className="md:opacity-0 md:group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
                               style={{
                                 background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.08)',
                                 color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
@@ -793,7 +793,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             >{addedIds.has(pos.id) ? '✓' : '+ Pipeline'}</button>
                             <button
                               onClick={() => handleDisqualify(pos.id)}
-                              className="opacity-0 group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
+                              className="md:opacity-0 md:group-hover/pos:opacity-100 transition-all text-[9px] px-1.5 py-0.5 rounded font-medium"
                               style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)' }}
                               onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; }}
                               onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-4)'; }}
@@ -801,7 +801,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             >Not a fit</button>
                             <button
                               onClick={() => handleRemovePosition(pos.id)}
-                              className="opacity-0 group-hover/pos:opacity-100 transition-opacity"
+                              className="md:opacity-0 md:group-hover/pos:opacity-100 transition-opacity"
                               style={{ color: '#ef4444' }}
                             ><X size={10} /></button>
                           </div>
