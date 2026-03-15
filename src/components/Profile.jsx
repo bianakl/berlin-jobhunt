@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon } from 'lucide-react';
+import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon, Cloud, LogOut } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
 
 const inputStyle = {
@@ -26,7 +26,7 @@ function Field({ label, children, hint }) {
   );
 }
 
-export default function Profile({ profile, onUpdate, dark, onToggleDark }) {
+export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUser, syncStatus, onSyncRequest, onSignOut, onSyncNow }) {
   const [form, setForm] = useState({ ...profile });
   const [skillInput, setSkillInput] = useState('');
   const [saved, setSaved] = useState(false);
@@ -45,6 +45,11 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark }) {
   const [extractMsg, setExtractMsg] = useState('');
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef(null);
+
+  // Sync card state
+  const [syncEmail, setSyncEmail] = useState('');
+  const [syncSent, setSyncSent] = useState(false);
+  const [syncEmailError, setSyncEmailError] = useState('');
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
 
@@ -233,6 +238,20 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark }) {
       setExtractMsg(`Error: ${err.message}`);
     }
     setExtracting(false);
+  };
+
+  const handleEnableSync = async () => {
+    setSyncEmailError('');
+    if (!syncEmail.trim() || !syncEmail.includes('@')) {
+      setSyncEmailError('Enter a valid email address.');
+      return;
+    }
+    try {
+      await onSyncRequest(syncEmail.trim());
+      setSyncSent(true);
+    } catch {
+      setSyncEmailError('Failed to send link. Try again.');
+    }
   };
 
   const handleClearData = () => {
@@ -647,6 +666,91 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark }) {
               {dark ? 'Switch to light' : 'Switch to dark'}
             </button>
           </div>
+        </div>
+
+        {/* Sync card */}
+        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Cloud size={14} style={{ color: '#6366f1' }} />
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Cross-device sync</h2>
+            {syncStatus === 'syncing' && (
+              <span className="ml-auto flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-4)' }}>
+                <Loader2 size={10} className="animate-spin" /> Syncing…
+              </span>
+            )}
+            {syncStatus === 'synced' && syncUser && (
+              <span className="ml-auto flex items-center gap-1 text-[10px]" style={{ color: '#22c55e' }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                Synced
+              </span>
+            )}
+            {syncStatus === 'error' && (
+              <span className="ml-auto text-[10px]" style={{ color: '#ef4444' }}>Sync error</span>
+            )}
+          </div>
+          <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
+            Sync jobs, companies, and your profile across desktop and mobile.
+          </p>
+
+          {syncUser ? (
+            /* Signed in */
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#22c55e', display: 'inline-block', flexShrink: 0 }} />
+                <span className="text-xs font-medium" style={{ color: 'var(--text-2)' }}>{syncUser.email}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {onSyncNow && (
+                  <button
+                    onClick={onSyncNow}
+                    className="text-xs flex items-center gap-1"
+                    style={{ color: 'var(--text-4)' }}
+                  >
+                    <RefreshCw size={11} /> Sync now
+                  </button>
+                )}
+                <button
+                  onClick={onSignOut}
+                  className="flex items-center gap-1 text-xs"
+                  style={{ color: 'var(--text-4)' }}
+                >
+                  <LogOut size={11} /> Sign out
+                </button>
+              </div>
+            </div>
+          ) : syncSent ? (
+            /* Magic link sent */
+            <div className="rounded-lg px-4 py-3 text-xs" style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.15)', color: 'var(--text-2)' }}>
+              Check your inbox — we sent a magic link to <strong>{syncEmail}</strong>
+            </div>
+          ) : (
+            /* Not signed in */
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={syncEmail}
+                  onChange={(e) => { setSyncEmail(e.target.value); setSyncEmailError(''); }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleEnableSync()}
+                  className="flex-1 text-xs px-3 py-2 rounded-lg"
+                  style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-1)', outline: 'none' }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
+                />
+                <button
+                  onClick={handleEnableSync}
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white"
+                  style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', whiteSpace: 'nowrap' }}
+                >
+                  Enable sync
+                </button>
+              </div>
+              {syncEmailError && (
+                <p className="text-xs" style={{ color: '#ef4444' }}>{syncEmailError}</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Danger zone */}

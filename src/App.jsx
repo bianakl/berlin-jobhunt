@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import useLocalStorage from './hooks/useLocalStorage';
 import { seedJobs, seedCompanies } from './data/seed';
 import Dashboard from './components/Dashboard';
@@ -8,6 +8,8 @@ import Profile from './components/Profile';
 import Sidebar from './components/Sidebar';
 import JobModal from './components/JobModal';
 import CompanyModal from './components/CompanyModal';
+import { supabase } from './lib/supabase';
+import { pushToSupabase, pullFromSupabase } from './lib/sync';
 
 const defaultProfile = {
   name: '',
@@ -51,6 +53,15 @@ export default function App() {
     document.documentElement.classList.toggle('dark', !!dark);
   }, [dark]);
 
+  // Sync state
+  const [syncUser, setSyncUser] = useState(null); // { id, email } or null
+  const [syncStatus, setSyncStatus] = useState('idle'); // 'idle' | 'syncing' | 'synced' | 'error'
+  const debounceTimer = useRef(null);
+
+  // Refs for accessing latest state inside debounced callback
+  const stateRef = useRef({});
+  stateRef.current = { jobs, companies, profile, streakData, achievements, dark };
+
   const genId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 
   // One-time migration: fix ATS slugs that were pointing to wrong platforms
@@ -70,6 +81,86 @@ export default function App() {
     localStorage.setItem(key, 'done');
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // On mount: check for existing session and pull cloud data
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session?.user) return;
+      setSyncUser({ id: session.user.id, email: session.user.email });
+      await loadCloudData(session.user.id);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        setSyncUser({ id: session.user.id, email: session.user.email });
+        await loadCloudData(session.user.id);
+      }
+      if (event === 'SIGNED_OUT') {
+        setSyncUser(null);
+        setSyncStatus('idle');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function loadCloudData(userId) {
+    setSyncStatus('syncing');
+    try {
+      const data = await pullFromSupabase(userId);
+      if (data) {
+        if (data.jobs) setJobs(data.jobs);
+        if (data.companies) setCompanies(data.companies);
+        if (data.profile) setProfile(data.profile);
+        if (data.streak) setStreakData(data.streak);
+        if (data.achievements) setAchievements(data.achievements);
+        if (data.dark_mode !== undefined) setDark(data.dark_mode);
+        if (data.claude_key) localStorage.setItem('scout-claude-key', data.claude_key);
+        if (data.cv_name) localStorage.setItem('scout-cv-name', data.cv_name);
+        if (data.cv_text) localStorage.setItem('scout-cv-text', data.cv_text);
+        if (data.market_value) localStorage.setItem('scout-market-value', JSON.stringify(data.market_value));
+      }
+      setSyncStatus('synced');
+    } catch {
+      setSyncStatus('error');
+    }
+  }
+
+  function scheduleSyncFor(userId) {
+    if (!userId) return;
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(async () => {
+      const s = stateRef.current;
+      setSyncStatus('syncing');
+      try {
+        await pushToSupabase(userId, {
+          jobs: s.jobs,
+          companies: s.companies,
+          profile: s.profile,
+          streak: s.streakData,
+          achievements: s.achievements,
+          dark_mode: s.dark,
+          claude_key: localStorage.getItem('scout-claude-key') || '',
+          cv_name: localStorage.getItem('scout-cv-name') || '',
+          cv_text: localStorage.getItem('scout-cv-text') || '',
+          market_value: (() => {
+            try { return JSON.parse(localStorage.getItem('scout-market-value') || 'null'); } catch { return null; }
+          })(),
+        });
+        setSyncStatus('synced');
+      } catch {
+        setSyncStatus('error');
+      }
+    }, 2000);
+  }
+
+  // Wrap syncUser in ref so wrappers can always read current value
+  const syncUserRef = useRef(syncUser);
+  syncUserRef.current = syncUser;
+
+  const triggerSync = useCallback(() => {
+    scheduleSyncFor(syncUserRef.current?.id);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const touchStreak = useCallback(() => {
     setStreakData((prev) => updateStreak(prev));
   }, [setStreakData]);
@@ -77,6 +168,7 @@ export default function App() {
   const addJob = (data) => {
     setJobs((prev) => [...prev, { ...data, id: genId(), addedDate: new Date().toISOString() }]);
     touchStreak();
+    triggerSync();
   };
 
   const updateJob = (id, updates) => {
@@ -90,17 +182,38 @@ export default function App() {
       };
     }));
     touchStreak();
+    triggerSync();
   };
 
-  const deleteJob = (id) => setJobs((prev) => prev.filter((j) => j.id !== id));
+  const deleteJob = (id) => {
+    setJobs((prev) => prev.filter((j) => j.id !== id));
+    triggerSync();
+  };
 
-  const addCompany = (data) =>
+  const addCompany = (data) => {
     setCompanies((prev) => [...prev, { ...data, id: genId(), positions: [], atsCheckedAt: null }]);
+    triggerSync();
+  };
 
-  const updateCompany = (id, updates) =>
+  const updateCompany = (id, updates) => {
     setCompanies((prev) => prev.map((c) => (c.id === id ? { ...c, ...updates } : c)));
+    triggerSync();
+  };
 
-  const deleteCompany = (id) => setCompanies((prev) => prev.filter((c) => c.id !== id));
+  const deleteCompany = (id) => {
+    setCompanies((prev) => prev.filter((c) => c.id !== id));
+    triggerSync();
+  };
+
+  const handleSetProfile = (val) => {
+    setProfile(val);
+    triggerSync();
+  };
+
+  const handleToggleDark = () => {
+    setDark((d) => !d);
+    triggerSync();
+  };
 
   const openAddJob = (defaults = {}) => setJobModal({ open: true, job: null, defaults });
   const openEditJob = (job) => setJobModal({ open: true, job });
@@ -113,7 +226,15 @@ export default function App() {
       ids.forEach((id) => set.add(id));
       return [...set];
     });
-  }, [setAchievements]);
+    triggerSync();
+  }, [setAchievements, triggerSync]);
+
+  const handleSyncRequest = async (email) => {
+    await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+  };
 
   const streak = streakData?.count || 0;
 
@@ -128,7 +249,7 @@ export default function App() {
         jobs={jobs}
         companies={companies}
         dark={dark}
-        onToggleDark={() => setDark((d) => !d)}
+        onToggleDark={handleToggleDark}
       />
 
       {/* Main content — desktop gets left margin for sidebar, mobile gets bottom padding for nav */}
@@ -169,9 +290,14 @@ export default function App() {
         {activeView === 'profile' && (
           <Profile
             profile={profile}
-            onUpdate={setProfile}
+            onUpdate={handleSetProfile}
             dark={dark}
-            onToggleDark={() => setDark((d) => !d)}
+            onToggleDark={handleToggleDark}
+            syncUser={syncUser}
+            syncStatus={syncStatus}
+            onSyncRequest={handleSyncRequest}
+            onSignOut={() => supabase.auth.signOut()}
+            onSyncNow={() => scheduleSyncFor(syncUser?.id)}
           />
         )}
       </main>
