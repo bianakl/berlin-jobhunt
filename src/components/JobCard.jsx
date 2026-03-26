@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MoreHorizontal, ExternalLink, Pencil, Clock, CalendarClock, AlertCircle, Banknote, ChevronRight, TrendingUp, Loader2 } from 'lucide-react';
+import { MoreHorizontal, ExternalLink, Pencil, Clock, CalendarClock, AlertCircle, Banknote, ChevronRight, TrendingUp, Loader2, MessageSquare } from 'lucide-react';
 import { STAGES } from '../data/seed';
 import { CompatRing } from './Dashboard';
 
@@ -231,9 +231,16 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
           </div>
         )}
 
-        {/* Row 4: Compat ring + Salary + Market estimate */}
+        {/* Row 4: Compat ring + Salary + Market estimate + log count */}
         <div className="flex items-center justify-between gap-2">
-          <CompatRing score={score} size={28} />
+          <div className="flex items-center gap-2">
+            <CompatRing score={score} size={28} />
+            {job.activityLog?.length > 0 && (
+              <span className="flex items-center gap-0.5 text-[10px]" style={{ color: 'var(--text-5)' }}>
+                <MessageSquare size={9} />{job.activityLog.length}
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-1.5 min-w-0">
             {job.salary && (
               <span className="flex items-center gap-1 text-[11px] shrink-0" style={{ color: 'var(--text-4)' }}>

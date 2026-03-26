@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, ExternalLink, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare } from 'lucide-react';
 import { STAGES } from '../data/seed';
 
 const COMPAT_FACTORS = [
@@ -69,6 +69,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
     remote: job?.remote ?? true,
     tags: job?.tags?.join(', ') || '',
     notes: job?.notes || '',
+    activityLog: job?.activityLog || [],
     followUpDate: job?.followUpDate ? job.followUpDate.split('T')[0] : '',
     appliedDate: job?.appliedDate ? job.appliedDate.split('T')[0] : '',
     compatibility: job?.compatibility || { roleMatch: 0, skillsMatch: 0, culture: 0, compensation: 0, growth: 0 },
@@ -76,6 +77,23 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
 
   // Details accordion: expanded by default for edits, collapsed for new jobs
   const [detailsOpen, setDetailsOpen] = useState(isEdit);
+
+  // Activity log
+  const [newEntry, setNewEntry] = useState('');
+  const entryRef = useRef(null);
+
+  const addLogEntry = () => {
+    const text = newEntry.trim();
+    if (!text) return;
+    const entry = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, date: new Date().toISOString(), text };
+    setForm((f) => ({ ...f, activityLog: [entry, ...f.activityLog] }));
+    setNewEntry('');
+    entryRef.current?.focus();
+  };
+
+  const deleteLogEntry = (id) => {
+    setForm((f) => ({ ...f, activityLog: f.activityLog.filter((e) => e.id !== id) }));
+  };
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
   const setCompat = (key, val) => setForm((f) => ({ ...f, compatibility: { ...f.compatibility, [key]: val } }));
@@ -94,6 +112,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
       tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
       followUpDate: form.followUpDate ? new Date(form.followUpDate).toISOString() : null,
       appliedDate: form.appliedDate ? new Date(form.appliedDate).toISOString() : null,
+      activityLog: form.activityLog,
     });
   };
 
@@ -339,6 +358,83 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                 </div>
               )}
             </div>
+          {/* Activity Log */}
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-2.5">
+              <MessageSquare size={13} style={{ color: '#6366f1' }} />
+              <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Activity log</span>
+              {form.activityLog.length > 0 && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>
+                  {form.activityLog.length}
+                </span>
+              )}
+            </div>
+
+            {/* New entry input */}
+            <div className="flex gap-2 mb-3">
+              <input
+                ref={entryRef}
+                placeholder="Log a call, update, or note..."
+                value={newEntry}
+                onChange={(e) => setNewEntry(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addLogEntry(); } }}
+                style={{ ...inputStyle, flex: 1 }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
+              />
+              <button
+                type="button"
+                onClick={addLogEntry}
+                disabled={!newEntry.trim()}
+                className="px-3 rounded-lg text-xs font-medium transition-all flex items-center gap-1"
+                style={{
+                  background: newEntry.trim() ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'var(--surface-5)',
+                  color: newEntry.trim() ? '#fff' : 'var(--text-5)',
+                  border: 'none',
+                }}
+              >
+                <Plus size={12} /> Log
+              </button>
+            </div>
+
+            {/* Entries */}
+            {form.activityLog.length > 0 ? (
+              <div className="space-y-2">
+                {form.activityLog.map((entry) => {
+                  const d = new Date(entry.date);
+                  const dateLabel = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                  const timeLabel = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                  return (
+                    <div
+                      key={entry.id}
+                      className="group flex gap-2.5 p-2.5 rounded-lg"
+                      style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}
+                    >
+                      <div className="shrink-0 mt-0.5">
+                        <div className="w-1.5 h-1.5 rounded-full mt-1.5" style={{ background: '#6366f1' }} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{entry.text}</p>
+                        <span className="text-[10px]" style={{ color: 'var(--text-5)' }}>{dateLabel} at {timeLabel}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => deleteLogEntry(entry.id)}
+                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        style={{ color: 'var(--text-5)' }}
+                        onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
+                      >
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>No activity yet. Log your first update above.</p>
+            )}
+          </div>
           </form>
         </div>
 
