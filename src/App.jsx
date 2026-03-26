@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import SyncBanner from './components/SyncBanner';
 import useLocalStorage from './hooks/useLocalStorage';
 import { seedJobs, seedCompanies } from './data/seed';
 import Dashboard from './components/Dashboard';
@@ -254,6 +255,9 @@ export default function App() {
 
       {/* Main content — desktop gets left margin for sidebar, mobile gets bottom padding for nav */}
       <main className="flex-1 main-content md:ml-[220px]">
+        {!syncUser && (
+          <SyncBanner onSyncRequest={handleSyncRequest} />
+        )}
         {activeView === 'dashboard' && (
           <Dashboard
             jobs={jobs}
