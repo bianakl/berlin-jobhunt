@@ -27,11 +27,11 @@ export default function SyncBanner({ onSyncRequest }) {
     <div
       className="flex items-center gap-3 px-4 py-2.5 text-sm"
       style={{
-        background: 'linear-gradient(90deg, rgba(99,102,241,0.08), rgba(139,92,246,0.06))',
-        borderBottom: '1px solid rgba(99,102,241,0.15)',
+        background: 'linear-gradient(90deg, rgba(13,148,136,0.08), rgba(139,92,246,0.06))',
+        borderBottom: '1px solid rgba(13,148,136,0.15)',
       }}
     >
-      <Cloud size={14} style={{ color: '#6366f1', shrink: 0 }} />
+      <Cloud size={14} style={{ color: '#0d9488', shrink: 0 }} />
 
       {sent ? (
         <span className="flex items-center gap-2 text-xs" style={{ color: '#22c55e' }}>
@@ -51,18 +51,18 @@ export default function SyncBanner({ onSyncRequest }) {
             className="text-xs rounded-lg px-3 py-1.5 min-w-0"
             style={{
               background: 'var(--surface)',
-              border: `1px solid ${error ? '#ef4444' : 'rgba(99,102,241,0.25)'}`,
+              border: `1px solid ${error ? '#ef4444' : 'rgba(13,148,136,0.25)'}`,
               color: 'var(--text-1)',
               outline: 'none',
               width: 180,
             }}
-            onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-            onBlur={(e) => (e.currentTarget.style.borderColor = error ? '#ef4444' : 'rgba(99,102,241,0.25)')}
+            onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+            onBlur={(e) => (e.currentTarget.style.borderColor = error ? '#ef4444' : 'rgba(13,148,136,0.25)')}
           />
           <button
             onClick={handleSend}
             className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg shrink-0 transition-all"
-            style={{ background: '#6366f1', color: '#fff' }}
+            style={{ background: '#0d9488', color: '#fff' }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >

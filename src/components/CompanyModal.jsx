@@ -111,7 +111,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                   value={form.name}
                   onChange={(e) => set('name', e.target.value)}
                   style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
@@ -123,7 +123,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                   value={form.website}
                   onChange={(e) => set('website', e.target.value)}
                   style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
@@ -135,7 +135,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       value={form.industry}
                       onChange={(e) => set('industry', e.target.value)}
                       style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer' }}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     >
                       <option value="">Select...</option>
@@ -151,7 +151,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       value={form.size}
                       onChange={(e) => set('size', e.target.value)}
                       style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer' }}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     >
                       <option value="">Select...</option>
@@ -172,7 +172,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         value={form.atsType}
                         onChange={(e) => set('atsType', e.target.value)}
                         style={{ ...inputStyle, appearance: 'none', paddingRight: 28, cursor: 'pointer', background: 'var(--surface)' }}
-                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                         onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       >
                         <option value="">None</option>
@@ -191,7 +191,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onChange={(e) => set('atsSlug', e.target.value)}
                       disabled={!form.atsType}
                       style={{ ...inputStyle, background: 'var(--surface)', opacity: form.atsType ? 1 : 0.5, borderColor: slugError ? '#ef4444' : undefined }}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : '#6366f1')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : '#0d9488')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = slugError ? '#ef4444' : 'var(--border-2)')}
                     />
                     {slugError && <p className="text-[10px] mt-1" style={{ color: '#ef4444' }}>{slugError}</p>}
@@ -206,7 +206,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                   onChange={(e) => set('notes', e.target.value)}
                   rows={3}
                   style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
@@ -222,7 +222,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       value={form.linkedinUrl}
                       onChange={(e) => set('linkedinUrl', e.target.value)}
                       style={inputStyle}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
@@ -233,7 +233,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         value={form.connections}
                         onChange={(e) => set('connections', e.target.value)}
                         style={inputStyle}
-                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                         onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       />
                     </Field>
@@ -244,7 +244,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         value={form.email}
                         onChange={(e) => set('email', e.target.value)}
                         style={inputStyle}
-                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                         onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       />
                     </Field>
@@ -267,9 +267,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onClick={() => set('viaForm', !form.viaForm)}
                       className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium transition-all"
                       style={{
-                        background: form.viaForm ? 'rgba(99,102,241,0.06)' : 'var(--surface)',
-                        borderColor: form.viaForm ? 'rgba(99,102,241,0.3)' : 'var(--border-2)',
-                        color: form.viaForm ? '#6366f1' : 'var(--text-3)',
+                        background: form.viaForm ? 'rgba(13,148,136,0.06)' : 'var(--surface)',
+                        borderColor: form.viaForm ? 'rgba(13,148,136,0.3)' : 'var(--border-2)',
+                        color: form.viaForm ? '#0d9488' : 'var(--text-3)',
                       }}
                     >
                       <span>{form.viaForm ? '✅' : '⬜'}</span> Applied via form
@@ -314,7 +314,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
           <button
             type="submit" form="company-form"
             className="px-5 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
+            style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >

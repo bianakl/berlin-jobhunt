@@ -42,7 +42,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
         <div className="flex items-center gap-2.5 px-4 py-5">
           <div
             className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #a855f7)' }}
+            style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
           >
             S
           </div>
@@ -106,7 +106,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--border)' }}>
               <div
                 className="h-1.5 rounded-full transition-all duration-700"
-                style={{ width: `${Math.min(levelPct, 100)}%`, background: 'linear-gradient(90deg, #6366f1, #a855f7)' }}
+                style={{ width: `${Math.min(levelPct, 100)}%`, background: 'linear-gradient(90deg, #0d9488, #0891b2)' }}
               />
             </div>
           </div>
@@ -128,7 +128,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
           <button
             onClick={() => onAddJob()}
             className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
-            style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
+            style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
@@ -182,7 +182,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
         <button
           onClick={() => onAddJob()}
           className="absolute left-1/2 -translate-x-1/2 w-12 h-12 rounded-full flex items-center justify-center text-white shadow-lg"
-          style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', bottom: 18 }}
+          style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)', bottom: 18 }}
         >
           <Plus size={20} />
         </button>

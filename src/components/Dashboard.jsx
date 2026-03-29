@@ -70,7 +70,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
       value: activeJobs.length,
       sub: addedThisWeek > 0 ? `+${addedThisWeek} this week` : 'No new this week',
       icon: Briefcase,
-      color: '#6366f1',
+      color: '#0d9488',
     },
     {
       label: 'Applied',
@@ -201,7 +201,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
         {/* Follow-ups */}
         <div className="rounded-xl border p-4 md:p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
-            <CalendarClock size={14} style={{ color: '#6366f1' }} />
+            <CalendarClock size={14} style={{ color: '#0d9488' }} />
             <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Follow-ups</h2>
           </div>
           {followUps.length === 0 ? (
@@ -230,7 +230,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
                     <div className="flex-1 min-w-0">
                       <div className="text-xs font-medium truncate" style={{ color: 'var(--text-1)' }}>{job.title}</div>
                       <div className="text-xs truncate" style={{ color: 'var(--text-4)' }}>{job.company}</div>
-                      <div className="text-xs font-medium mt-0.5" style={{ color: overdue ? '#ef4444' : '#6366f1' }}>
+                      <div className="text-xs font-medium mt-0.5" style={{ color: overdue ? '#ef4444' : '#0d9488' }}>
                         {daysUntil(job.followUpDate)}
                       </div>
                     </div>
@@ -245,10 +245,10 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
 
           <div
             className="mt-5 p-3 rounded-lg text-center"
-            style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.12)' }}
+            style={{ background: 'rgba(13,148,136,0.05)', border: '1px solid rgba(13,148,136,0.12)' }}
           >
             <div className="text-lg mb-1">🐻</div>
-            <p className="text-xs" style={{ color: '#6366f1' }}>
+            <p className="text-xs" style={{ color: '#0d9488' }}>
               Berlin is yours.<br />Keep pushing.
             </p>
           </div>
@@ -271,7 +271,7 @@ export function CompatRing({ score, size = 36 }) {
   const r = (size - 4) / 2;
   const circ = 2 * Math.PI * r;
   const filled = (score / 100) * circ;
-  const color = score >= 80 ? '#22c55e' : score >= 60 ? '#f59e0b' : score >= 40 ? '#6366f1' : '#ef4444';
+  const color = score >= 80 ? '#22c55e' : score >= 60 ? '#f59e0b' : score >= 40 ? '#0d9488' : '#ef4444';
 
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>

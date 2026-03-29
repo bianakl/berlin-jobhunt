@@ -275,7 +275,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         <button
           onClick={handleSave}
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-          style={{ background: saved ? '#22c55e' : 'linear-gradient(135deg, #6366f1, #8b5cf6)' }}
+          style={{ background: saved ? '#22c55e' : 'linear-gradient(135deg, #0d9488, #0891b2)' }}
           onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
           onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
         >
@@ -289,7 +289,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         {/* Basic info card */}
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
-            <User size={14} style={{ color: '#6366f1' }} />
+            <User size={14} style={{ color: '#0d9488' }} />
             <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Basic info</h2>
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -299,7 +299,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 value={form.name}
                 onChange={(e) => set('name', e.target.value)}
                 style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
@@ -309,7 +309,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 value={form.currentRole}
                 onChange={(e) => set('currentRole', e.target.value)}
                 style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
@@ -320,7 +320,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 value={form.linkedinUrl}
                 onChange={(e) => set('linkedinUrl', e.target.value)}
                 style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
@@ -331,7 +331,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 value={form.cvUrl}
                 onChange={(e) => set('cvUrl', e.target.value)}
                 style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
@@ -344,7 +344,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 value={form.yearsExperience}
                 onChange={(e) => set('yearsExperience', e.target.value)}
                 style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
@@ -354,7 +354,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 value={form.preferredLocations}
                 onChange={(e) => set('preferredLocations', e.target.value)}
                 style={inputStyle}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
@@ -366,7 +366,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   onChange={(e) => set('bio', e.target.value)}
                   rows={3}
                   style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
@@ -385,7 +385,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               <span
                 key={sk}
                 className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium"
-                style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+                style={{ background: 'rgba(13,148,136,0.08)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.15)' }}
               >
                 {sk}
                 <button onClick={() => removeSkill(sk)} style={{ color: '#a5b4fc' }}>
@@ -405,13 +405,13 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
               className="flex-1 text-xs px-3 py-2 rounded-lg"
               style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-1)', outline: 'none' }}
-              onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+              onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
               onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
             />
             <button
               onClick={addSkill}
               className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-medium"
-              style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+              style={{ background: 'rgba(13,148,136,0.08)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.15)' }}
             >
               <Plus size={12} /> Add
             </button>
@@ -422,14 +422,14 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
-              <TrendingUp size={14} style={{ color: '#6366f1' }} />
+              <TrendingUp size={14} style={{ color: '#0d9488' }} />
               <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Your market value</h2>
             </div>
             <button
               onClick={handleAnalyzeWorth}
               disabled={marketLoading}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-              style={{ background: marketLoading ? 'var(--surface-5)' : 'rgba(99,102,241,0.08)', color: marketLoading ? 'var(--text-4)' : '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+              style={{ background: marketLoading ? 'var(--surface-5)' : 'rgba(13,148,136,0.08)', color: marketLoading ? 'var(--text-4)' : '#0d9488', border: '1px solid rgba(13,148,136,0.15)' }}
             >
               {marketLoading ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
               {marketLoading ? 'Analyzing…' : marketValue ? 'Re-analyze' : 'Analyze my worth'}
@@ -442,7 +442,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
           {marketError && <p className="text-xs mb-3" style={{ color: '#ef4444' }}>{marketError}</p>}
 
           {marketValue && !marketLoading && (
-            <div className="rounded-xl p-4 fade-in" style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.05), rgba(139,92,246,0.05))', border: '1px solid rgba(99,102,241,0.12)' }}>
+            <div className="rounded-xl p-4 fade-in" style={{ background: 'linear-gradient(135deg, rgba(13,148,136,0.05), rgba(139,92,246,0.05))', border: '1px solid rgba(13,148,136,0.12)' }}>
               {/* Range + level */}
               <div className="flex items-end justify-between mb-3">
                 <div>
@@ -452,7 +452,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   <div className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>gross annual · Berlin market</div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(99,102,241,0.12)', color: '#6366f1' }}>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(13,148,136,0.12)', color: '#0d9488' }}>
                     {marketValue.level}
                   </span>
                   {marketValue.confidence && (
@@ -462,8 +462,8 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               </div>
 
               {/* Progress bar */}
-              <div className="h-1.5 rounded-full mb-3 overflow-hidden" style={{ background: 'rgba(99,102,241,0.12)' }}>
-                <div className="h-full rounded-full" style={{ width: `${Math.min(100, Math.round((marketValue.midpoint - 40000) / (220000 - 40000) * 100))}%`, background: 'linear-gradient(90deg, #6366f1, #8b5cf6)' }} />
+              <div className="h-1.5 rounded-full mb-3 overflow-hidden" style={{ background: 'rgba(13,148,136,0.12)' }}>
+                <div className="h-full rounded-full" style={{ width: `${Math.min(100, Math.round((marketValue.midpoint - 40000) / (220000 - 40000) * 100))}%`, background: 'linear-gradient(90deg, #0d9488, #0891b2)' }} />
               </div>
 
               {/* Headline */}
@@ -495,7 +495,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
           )}
 
           {!marketValue && !marketLoading && (
-            <div className="rounded-xl border-2 border-dashed p-6 text-center" style={{ borderColor: 'rgba(99,102,241,0.15)' }}>
+            <div className="rounded-xl border-2 border-dashed p-6 text-center" style={{ borderColor: 'rgba(13,148,136,0.15)' }}>
               <TrendingUp size={24} style={{ color: 'var(--border)', margin: '0 auto 8px' }} />
               <p className="text-xs" style={{ color: 'var(--text-4)' }}>Upload your CV and click "Analyze my worth" to see your Berlin market value</p>
             </div>
@@ -517,7 +517,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   value={form.salaryMin}
                   onChange={(e) => set('salaryMin', e.target.value)}
                   style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
@@ -530,7 +530,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   value={form.salaryMax}
                   onChange={(e) => set('salaryMax', e.target.value)}
                   style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
@@ -551,9 +551,9 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                     onClick={() => toggleIndustry(ind)}
                     className="text-xs px-2.5 py-1 rounded-full transition-all"
                     style={{
-                      background: active ? 'rgba(99,102,241,0.1)' : 'var(--surface-5)',
-                      color: active ? '#6366f1' : 'var(--text-3)',
-                      border: `1px solid ${active ? 'rgba(99,102,241,0.3)' : 'transparent'}`,
+                      background: active ? 'rgba(13,148,136,0.1)' : 'var(--surface-5)',
+                      color: active ? '#0d9488' : 'var(--text-3)',
+                      border: `1px solid ${active ? 'rgba(13,148,136,0.3)' : 'transparent'}`,
                       fontWeight: active ? 600 : 400,
                     }}
                   >
@@ -568,7 +568,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         {/* AI + CV Upload card — advanced, lives at the bottom */}
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
-            <Sparkles size={14} style={{ color: '#6366f1' }} />
+            <Sparkles size={14} style={{ color: '#0d9488' }} />
             <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>AI profile extraction</h2>
           </div>
           <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
@@ -586,7 +586,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   style={{ ...inputStyle, paddingLeft: 28 }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = 'var(--border-2)';
                     localStorage.setItem('scout-claude-key', apiKey);
@@ -602,7 +602,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
           {/* CV Upload */}
           <div
             className="rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-all mb-3"
-            style={{ borderColor: dragging ? '#6366f1' : 'var(--border)', background: dragging ? 'rgba(99,102,241,0.04)' : 'var(--surface-2)' }}
+            style={{ borderColor: dragging ? '#0d9488' : 'var(--border)', background: dragging ? 'rgba(13,148,136,0.04)' : 'var(--surface-2)' }}
             onClick={() => fileRef.current?.click()}
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
@@ -618,7 +618,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
             <Upload size={20} style={{ color: 'var(--text-5)', margin: '0 auto 8px' }} />
             {cvFileName ? (
               <div>
-                <p className="text-xs font-medium" style={{ color: '#6366f1' }}>{cvFileName}</p>
+                <p className="text-xs font-medium" style={{ color: '#0d9488' }}>{cvFileName}</p>
                 <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-4)' }}>Click to replace</p>
               </div>
             ) : (
@@ -635,7 +635,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               onClick={handleExtractClick}
               disabled={extracting}
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-              style={{ background: extracting ? 'var(--text-4)' : 'linear-gradient(135deg, #6366f1, #8b5cf6)', cursor: extracting ? 'not-allowed' : 'pointer' }}
+              style={{ background: extracting ? 'var(--text-4)' : 'linear-gradient(135deg, #0d9488, #0891b2)', cursor: extracting ? 'not-allowed' : 'pointer' }}
             >
               {extracting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
               {extracting ? 'Extracting...' : 'Extract profile from CV'}
@@ -671,7 +671,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         {/* Sync card */}
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-1">
-            <Cloud size={14} style={{ color: '#6366f1' }} />
+            <Cloud size={14} style={{ color: '#0d9488' }} />
             <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Cross-device sync</h2>
             {syncStatus === 'syncing' && (
               <span className="ml-auto flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-4)' }}>
@@ -720,7 +720,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
             </div>
           ) : syncSent ? (
             /* Magic link sent */
-            <div className="rounded-lg px-4 py-3 text-xs" style={{ background: 'rgba(99,102,241,0.05)', border: '1px solid rgba(99,102,241,0.15)', color: 'var(--text-2)' }}>
+            <div className="rounded-lg px-4 py-3 text-xs" style={{ background: 'rgba(13,148,136,0.05)', border: '1px solid rgba(13,148,136,0.15)', color: 'var(--text-2)' }}>
               Check your inbox — we sent a magic link to <strong>{syncEmail}</strong>
             </div>
           ) : (
@@ -735,13 +735,13 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   onKeyDown={(e) => e.key === 'Enter' && handleEnableSync()}
                   className="flex-1 text-xs px-3 py-2 rounded-lg"
                   style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-1)', outline: 'none' }}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
                 <button
                   onClick={handleEnableSync}
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold text-white"
-                  style={{ background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', whiteSpace: 'nowrap' }}
+                  style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)', whiteSpace: 'nowrap' }}
                 >
                   Enable sync
                 </button>

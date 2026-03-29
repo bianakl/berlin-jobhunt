@@ -98,7 +98,7 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
         borderLeft: `3px solid ${stage?.color || 'var(--border)'}`,
         transition: 'box-shadow 0.15s',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(99,102,241,0.08)'; }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 2px 12px rgba(13,148,136,0.08)'; }}
       onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; }}
     >
       {/* Clickable body */}
@@ -222,8 +222,8 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
           <div
             className="flex items-center gap-1 text-[11px] mb-2 px-2 py-1 rounded"
             style={{
-              background: followUp.overdue ? 'rgba(239,68,68,0.06)' : 'rgba(99,102,241,0.06)',
-              color: followUp.overdue ? '#ef4444' : '#6366f1',
+              background: followUp.overdue ? 'rgba(239,68,68,0.06)' : 'rgba(13,148,136,0.06)',
+              color: followUp.overdue ? '#ef4444' : '#0d9488',
             }}
           >
             {followUp.overdue ? <AlertCircle size={10} /> : <CalendarClock size={10} />}
@@ -250,7 +250,7 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
             {salaryEst && !salaryEst.error ? (
               <span
                 className="flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0"
-                style={{ background: 'rgba(99,102,241,0.07)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
+                style={{ background: 'rgba(13,148,136,0.07)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.15)' }}
                 title={salaryEst.note || ''}
               >
                 <TrendingUp size={9} />{salaryEst.label}
@@ -261,7 +261,7 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
                 disabled={salaryLoading}
                 className="flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded transition-all shrink-0"
                 style={{ color: 'var(--text-5)', border: '1px solid transparent' }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = '#6366f1'; e.currentTarget.style.borderColor = 'rgba(99,102,241,0.2)'; e.currentTarget.style.background = 'rgba(99,102,241,0.05)'; }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = '#0d9488'; e.currentTarget.style.borderColor = 'rgba(13,148,136,0.2)'; e.currentTarget.style.background = 'rgba(13,148,136,0.05)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-5)'; e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
                 title="Get salary estimate for this role"
               >
