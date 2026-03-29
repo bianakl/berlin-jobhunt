@@ -231,9 +231,12 @@ export default function App() {
   }, [setAchievements, triggerSync]);
 
   const handleSyncRequest = async (email) => {
+    const redirectTo = window.location.hostname === 'localhost'
+      ? 'https://berlin-jobhunt.vercel.app'
+      : window.location.origin;
     await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.origin },
+      options: { emailRedirectTo: redirectTo },
     });
   };
 
