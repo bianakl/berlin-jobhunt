@@ -24,30 +24,56 @@ export default async function handler(req, res) {
   const client = new Anthropic({ apiKey });
 
   const jobContext = jobSnippet
-    ? `Role: ${jobTitle} at ${companyName}\nJob description excerpt: ${jobSnippet}`
+    ? `Role: ${jobTitle} at ${companyName}\nJob description:\n${jobSnippet}`
     : `Role: ${jobTitle} at ${companyName}`;
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
-    max_tokens: 512,
+    max_tokens: 1024,
     messages: [{
       role: 'user',
-      content: `You are a job compatibility analyzer. Given a candidate's CV and a job role, assess the fit.
+      content: `You are a sharp, honest career advisor helping a PM evaluate whether to pursue a specific role. Be direct, specific, and genuinely useful — not generic.
 
 ${jobContext}
 
 Candidate CV:
 ${cvText}
 
-Return ONLY valid JSON (no markdown, no explanation):
+Analyze the fit and return ONLY valid JSON (no markdown, no explanation):
 {
-  "score": 75,
-  "summary": "One sentence honest assessment of fit",
-  "strengths": ["specific strength 1", "specific strength 2"],
-  "gaps": ["specific gap 1"]
+  "score": 78,
+  "verdict": "strong match",
+  "summary": "2-3 sentence honest assessment — what makes this person a good or poor fit for THIS specific role",
+  "strengths": [
+    "specific, concrete strength directly relevant to this role",
+    "another specific strength with evidence from their CV"
+  ],
+  "gaps": [
+    "specific gap or missing requirement for this role"
+  ],
+  "highlights": [
+    "what to lead with in the cover letter or first conversation",
+    "specific experience or achievement to emphasize"
+  ],
+  "watchouts": [
+    "one honest concern the hiring manager might raise"
+  ],
+  "compatibility": {
+    "roleMatch": 4,
+    "skillsMatch": 3,
+    "seniorityFit": 4,
+    "industryFit": 3,
+    "overallFit": 4
+  }
 }
 
-Score 0-100. Be specific and honest. Return ONLY the JSON.`,
+Scoring rules:
+- score: 0-100 overall fit
+- verdict: one of "strong match" | "good match" | "possible match" | "stretch" | "not a fit"
+- compatibility values: 1-5 stars
+- Be specific — reference actual details from their CV and the job description
+- Do not sugarcoat gaps
+- Return ONLY the JSON`,
     }],
   });
 

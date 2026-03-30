@@ -60,11 +60,11 @@ export default async function handler(req, res) {
   let prompt;
 
   if (mode === 'profile') {
-    prompt = `You are a senior talent advisor specializing in European tech product management.
+    prompt = `You are a senior talent advisor specializing in European tech product management. You give honest, calibrated assessments — not inflated ones.
 
 ${MARKET_CONTEXT}
 
-Analyze this candidate's CV/profile and assess their realistic market value for PM roles in Berlin / Europe.
+Analyze this candidate's CV/profile and give them a realistic, specific picture of their market value for PM roles in Berlin / Europe.
 
 CV / Profile:
 ${cvText}
@@ -76,13 +76,24 @@ Return ONLY valid JSON (no markdown, no explanation):
   "rangeMax": 110000,
   "midpoint": 97000,
   "confidence": "high",
-  "headline": "One punchy sentence on their positioning and leverage",
-  "strengths": ["specific sellable strength 1", "specific sellable strength 2", "specific sellable strength 3"],
-  "limitingFactors": ["one realistic factor keeping them from the top of the range"],
-  "tip": "One actionable negotiation tip specific to their profile"
+  "headline": "One punchy, honest sentence on their positioning — what makes them stand out or what holds them back",
+  "strengths": [
+    "specific, sellable strength with evidence from their CV",
+    "another concrete strength relevant to Berlin PM market",
+    "third strength"
+  ],
+  "limitingFactors": [
+    "honest factor keeping them from top of range — be specific"
+  ],
+  "positioning": "2-3 sentences on how they should position themselves in the Berlin market — which companies, industries, or roles are the best fit given their background",
+  "tip": "One very specific, actionable negotiation tip based on their actual profile — not generic advice"
 }
 
-Be calibrated to real Berlin market data. Do not inflate. Return ONLY JSON.`;
+Rules:
+- Be calibrated to real Berlin market data above
+- Do not inflate numbers to make the candidate feel good
+- Reference specific details from their CV
+- Return ONLY JSON`;
   } else {
     // Per-role estimate
     const cvSummary = cvText.slice(0, 2000);

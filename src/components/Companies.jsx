@@ -835,16 +835,49 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                           ><X size={9} /></button>
                         </div>
                         {analysis && !analysis.loading && !analysis.error && (
-                          <div className="mt-1.5 pt-1.5" style={{ borderTop: '1px solid var(--border-3)' }}>
-                            <p className="text-[10px] leading-relaxed mb-1" style={{ color: 'var(--text-2)' }}>{analysis.summary}</p>
-                            {analysis.strengths?.length > 0 && (
+                          <div className="mt-1.5 pt-1.5 space-y-1.5" style={{ borderTop: '1px solid var(--border-3)' }}>
+                            {/* Verdict badge */}
+                            {analysis.verdict && (
+                              <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded-full" style={{
+                                background: analysis.verdict === 'strong match' ? 'rgba(34,197,94,0.1)' : analysis.verdict === 'good match' ? 'rgba(13,148,136,0.1)' : analysis.verdict === 'possible match' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
+                                color: analysis.verdict === 'strong match' ? '#16a34a' : analysis.verdict === 'good match' ? '#0d9488' : analysis.verdict === 'possible match' ? '#b45309' : '#dc2626',
+                              }}>
+                                {analysis.verdict.toUpperCase()}
+                              </span>
+                            )}
+                            {/* Summary */}
+                            <p className="text-[10px] leading-relaxed" style={{ color: 'var(--text-2)' }}>{analysis.summary}</p>
+                            {/* Strengths + gaps */}
+                            {(analysis.strengths?.length > 0 || analysis.gaps?.length > 0) && (
                               <div className="flex flex-wrap gap-1">
-                                {analysis.strengths.map((s, i) => (
+                                {analysis.strengths?.map((s, i) => (
                                   <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(34,197,94,0.08)', color: '#16a34a' }}>✓ {s}</span>
                                 ))}
                                 {analysis.gaps?.map((g, i) => (
                                   <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(239,68,68,0.06)', color: '#dc2626' }}>✗ {g}</span>
                                 ))}
+                              </div>
+                            )}
+                            {/* What to highlight */}
+                            {analysis.highlights?.length > 0 && (
+                              <div>
+                                <p className="text-[9px] font-semibold mb-0.5" style={{ color: 'var(--text-4)' }}>LEAD WITH</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {analysis.highlights.map((h, i) => (
+                                    <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(13,148,136,0.07)', color: '#0d9488' }}>→ {h}</span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {/* Watch outs */}
+                            {analysis.watchouts?.length > 0 && (
+                              <div>
+                                <p className="text-[9px] font-semibold mb-0.5" style={{ color: 'var(--text-4)' }}>WATCH OUT</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {analysis.watchouts.map((w, i) => (
+                                    <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.08)', color: '#b45309' }}>⚠ {w}</span>
+                                  ))}
+                                </div>
                               </div>
                             )}
                           </div>

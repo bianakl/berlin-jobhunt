@@ -461,10 +461,17 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 ))}
               </div>
 
+              {/* Positioning */}
+              {marketValue.positioning && (
+                <div className="rounded-lg px-3 py-2.5 text-xs mb-2" style={{ background: 'rgba(13,148,136,0.06)', color: '#0d5c55', border: '1px solid rgba(13,148,136,0.15)' }}>
+                  <span className="font-semibold">Positioning: </span>{marketValue.positioning}
+                </div>
+              )}
+
               {/* Tip */}
               {marketValue.tip && (
                 <div className="rounded-lg px-3 py-2.5 text-xs" style={{ background: 'rgba(245,158,11,0.07)', color: '#92400e', border: '1px solid rgba(245,158,11,0.15)' }}>
-                  <span className="font-semibold">Tip: </span>{marketValue.tip}
+                  <span className="font-semibold">Negotiation tip: </span>{marketValue.tip}
                 </div>
               )}
             </div>
