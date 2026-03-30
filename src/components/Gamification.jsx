@@ -61,9 +61,9 @@ export default function Gamification({ jobs, companies, streak, achievements, on
         </div>
 
         {/* Level */}
-        <div className="rounded-xl p-3.5 text-center" style={{ background: 'rgba(13,148,136,0.06)', border: '1px solid rgba(13,148,136,0.15)' }}>
+        <div className="rounded-xl p-3.5 text-center" style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}>
           <div className="text-2xl mb-0.5">{level.emoji}</div>
-          <div className="text-xs font-bold" style={{ color: '#0d9488' }}>{level.name}</div>
+          <div className="text-xs font-bold" style={{ color: '#6366f1' }}>{level.name}</div>
           <div className="text-[10px]" style={{ color: 'var(--text-4)' }}>{appliedCount} applications</div>
         </div>
       </div>
@@ -74,14 +74,14 @@ export default function Gamification({ jobs, companies, streak, achievements, on
           <span className="text-xs" style={{ color: 'var(--text-4)' }}>
             {next ? `Next: ${next} applications` : 'Max level reached!'}
           </span>
-          <span className="text-xs font-medium" style={{ color: '#0d9488' }}>
+          <span className="text-xs font-medium" style={{ color: '#6366f1' }}>
             {level.max === Infinity ? '100%' : `${levelPct}%`}
           </span>
         </div>
         <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--surface-5)' }}>
           <div
             className="h-2 rounded-full transition-all duration-700"
-            style={{ width: `${Math.min(levelPct, 100)}%`, background: 'linear-gradient(90deg, #0d9488, #0891b2)' }}
+            style={{ width: `${Math.min(levelPct, 100)}%`, background: 'linear-gradient(90deg, #6366f1, #4f46e5)' }}
           />
         </div>
       </div>
@@ -98,9 +98,9 @@ export default function Gamification({ jobs, companies, streak, achievements, on
                 title={badge.desc}
                 className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs"
                 style={{
-                  background: earned ? 'rgba(13,148,136,0.08)' : 'var(--surface-5)',
-                  color: earned ? '#0d9488' : 'var(--text-5)',
-                  border: `1px solid ${earned ? 'rgba(13,148,136,0.2)' : 'transparent'}`,
+                  background: earned ? 'rgba(99,102,241,0.08)' : 'var(--surface-5)',
+                  color: earned ? '#6366f1' : 'var(--text-5)',
+                  border: `1px solid ${earned ? 'rgba(99,102,241,0.2)' : 'transparent'}`,
                   filter: earned ? 'none' : 'grayscale(1) opacity(0.5)',
                 }}
               >

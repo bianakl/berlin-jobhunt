@@ -1,5 +1,5 @@
 export const STAGES = [
-  { id: 'saved', label: 'Saved', emoji: '📌', color: '#0d9488', bg: 'rgba(13,148,136,0.08)', border: 'rgba(13,148,136,0.2)' },
+  { id: 'saved', label: 'Saved', emoji: '📌', color: '#6366f1', bg: 'rgba(99,102,241,0.08)', border: 'rgba(99,102,241,0.2)' },
   { id: 'applied', label: 'Applied', emoji: '📬', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },
   { id: 'interview', label: 'Interview', emoji: '💬', color: '#06b6d4', bg: 'rgba(6,182,212,0.08)', border: 'rgba(6,182,212,0.2)' },
   { id: 'offer', label: 'Offer', emoji: '🎉', color: '#22c55e', bg: 'rgba(34,197,94,0.08)', border: 'rgba(34,197,94,0.2)' },

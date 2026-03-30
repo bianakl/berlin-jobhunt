@@ -159,7 +159,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
     });
   };
 
-  const scoreColor = compatScore >= 80 ? '#22c55e' : compatScore >= 60 ? '#f59e0b' : compatScore >= 40 ? '#0d9488' : '#ef4444';
+  const scoreColor = compatScore >= 80 ? '#22c55e' : compatScore >= 60 ? '#f59e0b' : compatScore >= 40 ? '#6366f1' : '#ef4444';
 
   return (
     <div
@@ -206,7 +206,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                     value={form.title}
                     onChange={(e) => set('title', e.target.value)}
                     style={inputStyle}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                     onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                   />
                 </Field>
@@ -224,7 +224,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                     if (found) set('companyId', found.id);
                   }}
                   style={inputStyle}
-                  onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
                 <datalist id="company-list">
@@ -238,7 +238,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                     value={form.stage}
                     onChange={(e) => set('stage', e.target.value)}
                     style={{ ...inputStyle, appearance: 'none', paddingRight: 32, cursor: 'pointer' }}
-                    onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                    onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                     onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                   >
                     {STAGES.map((s) => <option key={s.id} value={s.id}>{s.emoji} {s.label}</option>)}
@@ -278,11 +278,11 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                           value={form.url}
                           onChange={(e) => set('url', e.target.value)}
                           style={{ ...inputStyle, paddingRight: form.url ? 36 : 12 }}
-                          onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                          onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                           onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                         />
                         {form.url && (
-                          <a href={form.url} target="_blank" rel="noreferrer" className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#0d9488' }}>
+                          <a href={form.url} target="_blank" rel="noreferrer" className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: '#6366f1' }}>
                             <ExternalLink size={13} />
                           </a>
                         )}
@@ -296,7 +296,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       value={form.salary}
                       onChange={(e) => set('salary', e.target.value)}
                       style={inputStyle}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
@@ -307,7 +307,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       value={form.location}
                       onChange={(e) => set('location', e.target.value)}
                       style={inputStyle}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
@@ -318,14 +318,14 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                         type="button"
                         onClick={() => set('remote', !form.remote)}
                         className="relative w-10 h-5 rounded-full transition-all"
-                        style={{ background: form.remote ? '#0d9488' : 'var(--border-2)' }}
+                        style={{ background: form.remote ? '#6366f1' : 'var(--border-2)' }}
                       >
                         <span
                           className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white transition-transform shadow-sm"
                           style={{ transform: form.remote ? 'translateX(20px)' : 'translateX(0)' }}
                         />
                       </button>
-                      <span className="text-sm" style={{ color: form.remote ? '#0d9488' : 'var(--text-4)' }}>
+                      <span className="text-sm" style={{ color: form.remote ? '#6366f1' : 'var(--text-4)' }}>
                         {form.remote ? 'Remote / Hybrid' : 'On-site only'}
                       </span>
                     </div>
@@ -337,7 +337,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       value={form.appliedDate}
                       onChange={(e) => set('appliedDate', e.target.value)}
                       style={inputStyle}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
@@ -348,7 +348,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       value={form.followUpDate}
                       onChange={(e) => set('followUpDate', e.target.value)}
                       style={inputStyle}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
@@ -359,7 +359,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       value={form.tags}
                       onChange={(e) => set('tags', e.target.value)}
                       style={inputStyle}
-                      onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                      onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
@@ -372,7 +372,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                         onChange={(e) => set('notes', e.target.value)}
                         rows={3}
                         style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.5 }}
-                        onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                        onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                         onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       />
                     </Field>
@@ -404,10 +404,10 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
           {/* Activity Log */}
           <div className="mt-4">
             <div className="flex items-center gap-2 mb-2.5">
-              <MessageSquare size={13} style={{ color: '#0d9488' }} />
+              <MessageSquare size={13} style={{ color: '#6366f1' }} />
               <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Activity log</span>
               {form.activityLog.length > 0 && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: 'rgba(13,148,136,0.1)', color: '#0d9488' }}>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>
                   {form.activityLog.length}
                 </span>
               )}
@@ -422,7 +422,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                 onChange={(e) => setNewEntry(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addLogEntry(); } }}
                 style={{ ...inputStyle, flex: 1 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
               <button
@@ -431,7 +431,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                 disabled={!newEntry.trim()}
                 className="px-3 rounded-lg text-xs font-medium transition-all flex items-center gap-1"
                 style={{
-                  background: newEntry.trim() ? 'linear-gradient(135deg, #0d9488, #0891b2)' : 'var(--surface-5)',
+                  background: newEntry.trim() ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'var(--surface-5)',
                   color: newEntry.trim() ? '#fff' : 'var(--text-5)',
                   border: 'none',
                 }}
@@ -454,7 +454,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
                       style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}
                     >
                       <div className="shrink-0 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full mt-1.5" style={{ background: '#0d9488' }} />
+                        <div className="w-1.5 h-1.5 rounded-full mt-1.5" style={{ background: '#6366f1' }} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{entry.text}</p>
@@ -555,7 +555,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
           <button
             type="submit" form="job-form"
             className="px-5 py-2 rounded-lg text-sm font-semibold text-white transition-all"
-            style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
+            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >

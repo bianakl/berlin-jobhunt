@@ -4,59 +4,59 @@
 
 /* ─── CSS custom properties ───────────────────────────────── */
 :root {
-  --bg:        #f5f5fb;
+  --bg:        #fafafa;
   --surface:   #ffffff;
-  --surface-2: #f9fafb;
-  --surface-3: #fafaff;
-  --surface-4: #f9f9ff;
-  --surface-5: #f3f4f6;
+  --surface-2: #f4f4f5;
+  --surface-3: #fafafa;
+  --surface-4: #f9f9fa;
+  --surface-5: #f0f0f2;
 
-  --text-1: #111827;
-  --text-2: #374151;
-  --text-3: #6b7280;
-  --text-4: #9ca3af;
-  --text-5: #d1d5db;
+  --text-1: #18181b;
+  --text-2: #3f3f46;
+  --text-3: #71717a;
+  --text-4: #a1a1aa;
+  --text-5: #d4d4d8;
 
-  --border:   #e0f0ee;
-  --border-2: #e5e7eb;
-  --border-3: #eaf5f4;
-  --border-4: #f3f4f6;
+  --border:   #e8e8ed;
+  --border-2: #e4e4e7;
+  --border-3: #efeff2;
+  --border-4: #f4f4f5;
 
-  --accent:       #0d9488;
-  --accent-faint: rgba(13,148,136,0.08);
-  --accent-muted: rgba(13,148,136,0.15);
+  --accent:       #6366f1;
+  --accent-faint: rgba(99,102,241,0.07);
+  --accent-muted: rgba(99,102,241,0.15);
 
-  --backdrop: rgba(17,24,39,0.4);
-  --scrollbar-track: #f5f5fb;
-  --scrollbar-thumb: #b2d8d4;
+  --backdrop: rgba(24,24,27,0.45);
+  --scrollbar-track: #fafafa;
+  --scrollbar-thumb: #a1a1aa;
 }
 
 .dark {
-  --bg:        #0b0b14;
-  --surface:   #13131f;
-  --surface-2: #191927;
-  --surface-3: #1a1a2e;
-  --surface-4: #1e1e35;
-  --surface-5: #1c1c2c;
+  --bg:        #09090b;
+  --surface:   #18181b;
+  --surface-2: #27272a;
+  --surface-3: #1f1f23;
+  --surface-4: #222226;
+  --surface-5: #2c2c30;
 
-  --text-1: #f0f0f8;
-  --text-2: #d1d5db;
-  --text-3: #9ca3af;
-  --text-4: #6b7280;
-  --text-5: #4b5563;
+  --text-1: #fafafa;
+  --text-2: #e4e4e7;
+  --text-3: #a1a1aa;
+  --text-4: #71717a;
+  --text-5: #52525b;
 
-  --border:   #1a2e2d;
-  --border-2: #1a2e2d;
-  --border-3: #1e3533;
-  --border-4: #182a29;
+  --border:   #3f3f46;
+  --border-2: #3f3f46;
+  --border-3: #2e2e34;
+  --border-4: #27272a;
 
-  --accent:       #2dd4bf;
-  --accent-faint: rgba(45,212,191,0.1);
-  --accent-muted: rgba(45,212,191,0.2);
+  --accent:       #818cf8;
+  --accent-faint: rgba(129,140,248,0.1);
+  --accent-muted: rgba(129,140,248,0.18);
 
-  --backdrop: rgba(0,0,0,0.65);
-  --scrollbar-track: #13131f;
-  --scrollbar-thumb: #1e3533;
+  --backdrop: rgba(0,0,0,0.7);
+  --scrollbar-track: #18181b;
+  --scrollbar-thumb: #3f3f46;
 }
 
 /* ─── Base ─────────────────────────────────────────────────── */
@@ -75,7 +75,7 @@ body {
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
 ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #b0b8d4; }
+::-webkit-scrollbar-thumb:hover { background: #818cf8; }
 
 /* ─── Animations ───────────────────────────────────────────── */
 @keyframes fadeIn {

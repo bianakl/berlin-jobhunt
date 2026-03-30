@@ -176,9 +176,9 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
               disabled={checkingAll}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={{
-                background: checkingAll ? 'var(--surface-5)' : 'rgba(13,148,136,0.06)',
-                color: checkingAll ? 'var(--text-4)' : '#0d9488',
-                border: '1px solid rgba(13,148,136,0.15)',
+                background: checkingAll ? 'var(--surface-5)' : 'rgba(99,102,241,0.06)',
+                color: checkingAll ? 'var(--text-4)' : '#6366f1',
+                border: '1px solid rgba(99,102,241,0.15)',
               }}
             >
               {checkingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckSquare size={12} />}
@@ -188,7 +188,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           <button
             onClick={onAddCompany}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
-            style={{ background: 'rgba(13,148,136,0.08)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.15)' }}
+            style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
           >
             <Plus size={13} /><span className="hidden sm:inline">Add company</span><span className="sm:hidden">Add</span>
           </button>
@@ -205,7 +205,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-8 pr-3 py-2 rounded-lg text-sm"
           style={{ background: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-1)' }}
-          onFocus={(e) => (e.currentTarget.style.borderColor = '#0d9488')}
+          onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
           onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border)')}
         />
       </div>
@@ -228,9 +228,9 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           onClick={() => setHasPmOnly((v) => !v)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all"
           style={{
-            background: hasPmOnly ? 'rgba(13,148,136,0.08)' : 'var(--surface)',
-            color: hasPmOnly ? '#0d9488' : 'var(--text-3)',
-            border: `1px solid ${hasPmOnly ? 'rgba(13,148,136,0.25)' : 'var(--border)'}`,
+            background: hasPmOnly ? 'rgba(99,102,241,0.08)' : 'var(--surface)',
+            color: hasPmOnly ? '#6366f1' : 'var(--text-3)',
+            border: `1px solid ${hasPmOnly ? 'rgba(99,102,241,0.25)' : 'var(--border)'}`,
           }}
         >
           <Link2 size={13} />
@@ -243,9 +243,9 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
               onClick={() => setSort(s)}
               className="px-2 py-1.5 rounded-lg text-xs font-medium transition-all"
               style={{
-                background: sort === s ? 'rgba(13,148,136,0.1)' : 'transparent',
-                color: sort === s ? '#0d9488' : 'var(--text-4)',
-                border: `1px solid ${sort === s ? 'rgba(13,148,136,0.2)' : 'transparent'}`,
+                background: sort === s ? 'rgba(99,102,241,0.1)' : 'transparent',
+                color: sort === s ? '#6366f1' : 'var(--text-4)',
+                border: `1px solid ${sort === s ? 'rgba(99,102,241,0.2)' : 'transparent'}`,
               }}
             >
               {s === 'default' ? 'Relevant' : s === 'az' ? 'A–Z' : 'Most'}
@@ -265,7 +265,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
             <button
               onClick={onAddCompany}
               className="px-4 py-2 rounded-lg text-sm font-medium"
-              style={{ background: 'rgba(13,148,136,0.08)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.15)' }}
+              style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
             >
               Add your first company
             </button>
@@ -521,7 +521,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         {/* Avatar */}
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0"
-          style={{ background: 'rgba(13,148,136,0.08)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.12)' }}
+          style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.12)' }}
         >
           {company.name[0]}
         </div>
@@ -566,7 +566,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       ? 'var(--surface-5)'
                       : activePositions.length > 0
                         ? 'rgba(34,197,94,0.08)'
-                        : 'rgba(13,148,136,0.06)',
+                        : 'rgba(99,102,241,0.06)',
                 color: crawling
                   ? 'var(--text-4)'
                   : crawlDone === 'found'
@@ -575,10 +575,10 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       ? 'var(--text-4)'
                       : activePositions.length > 0
                         ? '#16a34a'
-                        : '#0d9488',
+                        : '#6366f1',
                 border: `1px solid ${
                   crawlDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' :
-                  crawlDone === 'none' || crawlDone === 'error' ? 'var(--border-2)' : 'rgba(13,148,136,0.15)'
+                  crawlDone === 'none' || crawlDone === 'error' ? 'var(--border-2)' : 'rgba(99,102,241,0.15)'
                 }`,
               }}
               title="Search for open PM roles at this company"
@@ -626,7 +626,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     ? 'var(--surface-5)'
                     : activePositions.length > 0
                       ? 'rgba(34,197,94,0.08)'
-                      : 'rgba(13,148,136,0.06)',
+                      : 'rgba(99,102,241,0.06)',
               color: checking
                 ? 'var(--text-4)'
                 : checkDone === 'found'
@@ -635,8 +635,8 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     ? 'var(--text-4)'
                     : activePositions.length > 0
                       ? '#16a34a'
-                      : '#0d9488',
-              border: `1px solid ${checkDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' : checkDone === 'none' ? 'var(--border-2)' : 'rgba(13,148,136,0.15)'}`,
+                      : '#6366f1',
+              border: `1px solid ${checkDone === 'found' || activePositions.length > 0 ? 'rgba(34,197,94,0.2)' : checkDone === 'none' ? 'var(--border-2)' : 'rgba(99,102,241,0.15)'}`,
               transition: 'all 0.3s',
             }}
             title={checkedAt ? `Last checked ${checkedAt}` : 'Check for PM roles'}
@@ -706,7 +706,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     {salaryEstimates[pos.id] && !salaryEstimates[pos.id].loading && salaryEstimates[pos.id].label && (
                       <span
                         className="text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0"
-                        style={{ background: 'rgba(13,148,136,0.07)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.15)' }}
+                        style={{ background: 'rgba(99,102,241,0.07)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
                         title={salaryEstimates[pos.id].note || ''}
                       >
                         ~{salaryEstimates[pos.id].label}
@@ -735,9 +735,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     disabled={addedIds.has(pos.id)}
                     className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-medium transition-all"
                     style={{
-                      background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(13,148,136,0.08)',
-                      color: addedIds.has(pos.id) ? '#16a34a' : '#0d9488',
-                      border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(13,148,136,0.2)'}`,
+                      background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.08)',
+                      color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
+                      border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.2)'}`,
                     }}
                     title="Add this specific role to your pipeline"
                   >
@@ -750,7 +750,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       rel="noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
-                      style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)', color: 'var(--surface)', textDecoration: 'none' }}
+                      style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)', color: 'var(--surface)', textDecoration: 'none' }}
                       onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
                       onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
                     >
@@ -783,7 +783,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                 <div className="flex flex-col gap-2 mb-3">
                   {positions.map((pos) => {
                     const analysis = analyses[pos.id];
-                    const scoreColor = analysis?.score >= 80 ? '#22c55e' : analysis?.score >= 60 ? '#f59e0b' : analysis?.score >= 40 ? '#0d9488' : '#ef4444';
+                    const scoreColor = analysis?.score >= 80 ? '#22c55e' : analysis?.score >= 60 ? '#f59e0b' : analysis?.score >= 40 ? '#6366f1' : '#ef4444';
                     if (pos.disqualified) {
                       return (
                         <div key={pos.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-3)' }}>
@@ -792,7 +792,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             onClick={() => handleUndisqualify(pos.id)}
                             className="text-[10px] shrink-0 transition-all"
                             style={{ color: 'var(--text-5)' }}
-                            onMouseEnter={(e) => (e.currentTarget.style.color = '#0d9488')}
+                            onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
                             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
                           >undo</button>
                         </div>
@@ -804,8 +804,8 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                           <span
                             className="text-[9px] px-1.5 py-0.5 rounded shrink-0 font-semibold mt-0.5"
                             style={{
-                              background: pos.source === 'manual' ? 'rgba(245,158,11,0.1)' : 'rgba(13,148,136,0.1)',
-                              color: pos.source === 'manual' ? '#f59e0b' : '#0d9488',
+                              background: pos.source === 'manual' ? 'rgba(245,158,11,0.1)' : 'rgba(99,102,241,0.1)',
+                              color: pos.source === 'manual' ? '#f59e0b' : '#6366f1',
                             }}
                           >
                             {pos.source === 'manual' ? 'manual' : pos.source}
@@ -833,7 +833,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             <a href={pos.url} target="_blank" rel="noreferrer"
                               className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
                               style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)', textDecoration: 'none' }}
-                              onMouseEnter={(e) => (e.currentTarget.style.color = '#0d9488')}
+                              onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
                               onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-4)')}
                             ><ExternalLink size={9} /> View</a>
                           )}
@@ -842,9 +842,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             disabled={analysis?.loading}
                             className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
                             style={{
-                              background: analysis?.score != null ? `${scoreColor}15` : 'rgba(13,148,136,0.08)',
-                              color: analysis?.score != null ? scoreColor : '#0d9488',
-                              border: `1px solid ${analysis?.score != null ? `${scoreColor}30` : 'rgba(13,148,136,0.2)'}`,
+                              background: analysis?.score != null ? `${scoreColor}15` : 'rgba(99,102,241,0.08)',
+                              color: analysis?.score != null ? scoreColor : '#6366f1',
+                              border: `1px solid ${analysis?.score != null ? `${scoreColor}30` : 'rgba(99,102,241,0.2)'}`,
                             }}
                           >
                             {analysis?.loading ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
@@ -858,9 +858,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                                 disabled={cl?.loading}
                                 className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
                                 style={{
-                                  background: cl?.letter ? 'rgba(139,92,246,0.08)' : 'rgba(13,148,136,0.08)',
-                                  color: cl?.letter ? '#7c3aed' : '#0d9488',
-                                  border: `1px solid ${cl?.letter ? 'rgba(139,92,246,0.2)' : 'rgba(13,148,136,0.2)'}`,
+                                  background: cl?.letter ? 'rgba(139,92,246,0.08)' : 'rgba(99,102,241,0.08)',
+                                  color: cl?.letter ? '#7c3aed' : '#6366f1',
+                                  border: `1px solid ${cl?.letter ? 'rgba(139,92,246,0.2)' : 'rgba(99,102,241,0.2)'}`,
                                 }}
                               >
                                 {cl?.loading ? <Loader2 size={9} className="animate-spin" /> : <FileText size={9} />}
@@ -873,9 +873,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             disabled={addedIds.has(pos.id)}
                             className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
                             style={{
-                              background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(13,148,136,0.08)',
-                              color: addedIds.has(pos.id) ? '#16a34a' : '#0d9488',
-                              border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(13,148,136,0.2)'}`,
+                              background: addedIds.has(pos.id) ? 'rgba(34,197,94,0.1)' : 'rgba(99,102,241,0.08)',
+                              color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
+                              border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.2)'}`,
                             }}
                           >{addedIds.has(pos.id) ? '✓ Added' : '+ Pipeline'}</button>
                           <button
@@ -896,8 +896,8 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             {/* Verdict badge */}
                             {analysis.verdict && (
                               <span className="inline-block text-[9px] font-semibold px-2 py-0.5 rounded-full" style={{
-                                background: analysis.verdict === 'strong match' ? 'rgba(34,197,94,0.1)' : analysis.verdict === 'good match' ? 'rgba(13,148,136,0.1)' : analysis.verdict === 'possible match' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
-                                color: analysis.verdict === 'strong match' ? '#16a34a' : analysis.verdict === 'good match' ? '#0d9488' : analysis.verdict === 'possible match' ? '#b45309' : '#dc2626',
+                                background: analysis.verdict === 'strong match' ? 'rgba(34,197,94,0.1)' : analysis.verdict === 'good match' ? 'rgba(99,102,241,0.1)' : analysis.verdict === 'possible match' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
+                                color: analysis.verdict === 'strong match' ? '#16a34a' : analysis.verdict === 'good match' ? '#6366f1' : analysis.verdict === 'possible match' ? '#b45309' : '#dc2626',
                               }}>
                                 {analysis.verdict.toUpperCase()}
                               </span>
@@ -921,7 +921,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                                 <p className="text-[9px] font-semibold mb-0.5" style={{ color: 'var(--text-4)' }}>LEAD WITH</p>
                                 <div className="flex flex-wrap gap-1">
                                   {analysis.highlights.map((h, i) => (
-                                    <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(13,148,136,0.07)', color: '#0d9488' }}>→ {h}</span>
+                                    <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(99,102,241,0.07)', color: '#6366f1' }}>→ {h}</span>
                                   ))}
                                 </div>
                               </div>
@@ -1001,7 +1001,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   />
                   <div className="flex gap-1.5">
                     <button onClick={handleAddManual} className="flex-1 text-xs py-1 rounded font-medium"
-                      style={{ background: 'rgba(13,148,136,0.1)', color: '#0d9488' }}>Save</button>
+                      style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>Save</button>
                     <button onClick={() => { setAddingManual(false); setManualTitle(''); setManualUrl(''); }}
                       className="flex-1 text-xs py-1 rounded" style={{ background: 'var(--surface-5)', color: 'var(--text-3)' }}>Cancel</button>
                   </div>
@@ -1011,7 +1011,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   onClick={() => setAddingManual(true)}
                   className="flex items-center gap-1 text-xs transition-all"
                   style={{ color: 'var(--text-5)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#0d9488')}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
                 >
                   <Plus size={11} /> Add manually
@@ -1060,7 +1060,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     )}
                     {company.viaForm && (
                       <span className="text-[10px] px-1.5 py-0.5 rounded font-medium"
-                        style={{ background: 'rgba(13,148,136,0.08)', color: '#0d9488', border: '1px solid rgba(13,148,136,0.2)' }}>
+                        style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }}>
                         ✓ Via form
                       </span>
                     )}
@@ -1074,7 +1074,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   onClick={() => onAddJob({ companyId: company.id, company: company.name })}
                   className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
                   style={{ color: 'var(--text-4)' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#0d9488')}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-4)')}
                   title="Add a job manually (opens form)"
                 >

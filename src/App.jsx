@@ -266,7 +266,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <div
               className="w-6 h-6 rounded-md flex items-center justify-center text-[11px] font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
+              style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
             >S</div>
             <span className="font-semibold text-sm" style={{ color: 'var(--text-1)' }}>Scout</span>
             <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}>Berlin</span>
