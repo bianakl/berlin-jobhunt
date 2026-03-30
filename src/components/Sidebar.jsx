@@ -115,6 +115,11 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
           </p>
         </div>
 
+        {/* Attribution */}
+        <p className="text-center text-[10px] pb-2" style={{ color: 'var(--text-5)' }}>
+          made with ❤️ by Biana · Berlin
+        </p>
+
         {/* Dark mode toggle + Add Job */}
         <div className="px-3 pb-4 flex flex-col gap-2">
           <button
