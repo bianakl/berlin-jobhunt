@@ -39,20 +39,23 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
         style={{ width: 220, background: 'var(--surface)', borderColor: 'var(--border)' }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-2.5 px-4 py-5">
-          <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0"
-            style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
-          >
-            S
+        <div className="px-4 py-5">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white shrink-0"
+              style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
+            >
+              S
+            </div>
+            <span className="font-semibold text-sm tracking-tight" style={{ color: 'var(--text-1)' }}>Scout</span>
+            <span
+              className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+              style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}
+            >
+              Berlin
+            </span>
           </div>
-          <span className="font-semibold text-sm tracking-tight" style={{ color: 'var(--text-1)' }}>Scout</span>
-          <span
-            className="text-[10px] font-medium px-1.5 py-0.5 rounded"
-            style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}
-          >
-            Berlin
-          </span>
+          <p className="text-[10px] mt-1 ml-9" style={{ color: 'var(--text-5)' }}>made with ❤️ by Biana</p>
         </div>
 
         {/* Nav */}
@@ -114,11 +117,6 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             {next ? `${appliedCount}/${next} to next level` : 'Max level!'}
           </p>
         </div>
-
-        {/* Attribution */}
-        <p className="text-center text-[10px] pb-2" style={{ color: 'var(--text-5)' }}>
-          made with ❤️ by Biana · Berlin
-        </p>
 
         {/* Dark mode toggle + Add Job */}
         <div className="px-3 pb-4 flex flex-col gap-2">
