@@ -352,7 +352,6 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   const handleCrawl = useCallback(async () => {
     if (crawling) return;
     const apiKey = localStorage.getItem('scout-claude-key');
-    if (!apiKey) return alert('Add your Anthropic API key in Profile first.');
     setCrawling(true);
     setCrawlDone(null);
     try {
@@ -414,7 +413,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
     if (!showInlineResults) return;
     const apiKey = localStorage.getItem('scout-claude-key');
     const cvText = localStorage.getItem('scout-cv-text');
-    if (!apiKey || !cvText) return;
+    if (!cvText) return;
     const toFetch = activePositions.filter((p) => p.source !== 'manual' && !salaryEstimates[p.id]);
     toFetch.forEach(async (pos) => {
       setSalaryEstimates((prev) => ({ ...prev, [pos.id]: { loading: true } }));
@@ -454,8 +453,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   const analyzePosition = async (pos) => {
     const cvText = localStorage.getItem('scout-cv-text');
     const apiKey = localStorage.getItem('scout-claude-key');
-    if (!cvText) return alert('Upload your CV in the Profile tab first.');
-    if (!apiKey) return alert('Add your Anthropic API key in the Profile tab first.');
+    if (!cvText) { setAnalyses((a) => ({ ...a, [pos.id]: { error: 'Upload your CV in the Profile tab first.' } })); return; }
     setAnalyses((a) => ({ ...a, [pos.id]: { loading: true } }));
     try {
       const res = await fetch('/api/analyze-job', {

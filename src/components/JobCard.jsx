@@ -33,7 +33,7 @@ function salaryEstCacheKey(title, company) {
 async function fetchSalaryEst(title, company) {
   const apiKey = localStorage.getItem('scout-claude-key');
   const cvText = localStorage.getItem('scout-cv-text');
-  if (!apiKey || !cvText) return null;
+  if (!cvText) return null;
   const res = await fetch('/api/salary-estimate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },

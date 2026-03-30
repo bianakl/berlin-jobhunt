@@ -74,7 +74,6 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
   const handleAnalyzeWorth = async () => {
     const key = localStorage.getItem('scout-claude-key') || apiKey;
     const cvText = localStorage.getItem('scout-cv-text');
-    if (!key) { setMarketError('Add your Anthropic API key first.'); return; }
     if (!cvText) { setMarketError('Upload your CV first (AI profile extraction section below).'); return; }
     setMarketLoading(true);
     setMarketError('');
@@ -115,33 +114,10 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
     localStorage.setItem('scout-cv-name', file.name);
     setExtractMsg('');
 
-    if (!apiKey) {
-      // Just store the file text for later
-      if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-        const text = await file.text();
-        localStorage.setItem('scout-cv-text', text);
-        setExtractMsg('CV text saved. Add your API key and click Extract to populate your profile.');
-      } else {
-        // Store as base64 for later
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const b64 = e.target.result.split(',')[1];
-          localStorage.setItem('scout-cv-b64', b64);
-          setExtractMsg('CV saved. Add your API key and click Extract to populate your profile.');
-        };
-        reader.readAsDataURL(file);
-      }
-      return;
-    }
-
     await extractFromFile(file);
   };
 
   const extractFromFile = async (file) => {
-    if (!apiKey) {
-      setExtractMsg('Add your Anthropic API key first.');
-      return;
-    }
     setExtracting(true);
     setExtractMsg('Reading CV...');
     try {
