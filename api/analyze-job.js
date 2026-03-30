@@ -75,6 +75,7 @@ Scoring rules:
 - compatibility values: 1-5 stars
 - Be specific — reference actual details from their CV and the job description
 - Do not sugarcoat gaps
+- IGNORE location entirely — assume the candidate is willing to relocate to Berlin or is already there. Never mention location as a gap or concern.
 - Return ONLY the JSON`,
       }],
     });
