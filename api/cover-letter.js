@@ -28,12 +28,13 @@ export default async function handler(req, res) {
     ? `Role: ${jobTitle} at ${companyName}\nJob description:\n${jobSnippet}`
     : `Role: ${jobTitle} at ${companyName}`;
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    messages: [{
-      role: 'user',
-      content: `You are a career coach who writes cover letters for European tech and product roles. Your letters are read by both humans and ATS bots — they must work for both.
+  try {
+    const message = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: `You are a career coach who writes cover letters for European tech and product roles. Your letters are read by both humans and ATS bots — they must work for both.
 
 ${jobContext}
 ${skillsContext}
@@ -66,9 +67,14 @@ FORMAT:
 - Total length: 200-250 words maximum
 - Start directly with the opening sentence (no "Dear Hiring Team," header)
 - Return ONLY the letter text, nothing else`,
-    }],
-  });
+      }],
+    });
 
-  const letter = message.content[0].text.trim();
-  return res.status(200).json({ letter });
+    const letter = message.content[0].text.trim();
+    return res.status(200).json({ letter });
+  } catch (err) {
+    const msg = err?.message || 'Cover letter generation failed';
+    const status = err?.status || 500;
+    return res.status(status).json({ error: msg });
+  }
 }

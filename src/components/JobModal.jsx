@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2 } from 'lucide-react';
+import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles } from 'lucide-react';
 import { STAGES } from '../data/seed';
 
 const COMPAT_FACTORS = [
@@ -93,6 +93,40 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
 
   const deleteLogEntry = (id) => {
     setForm((f) => ({ ...f, activityLog: f.activityLog.filter((e) => e.id !== id) }));
+  };
+
+  // Fit analysis
+  const [fitAnalysis, setFitAnalysis] = useState(null);
+  const [fitLoading, setFitLoading] = useState(false);
+  const [fitError, setFitError] = useState(null);
+
+  const analyzeFit = async () => {
+    const cvText = localStorage.getItem('scout-cv-text');
+    if (!cvText) { setFitError('Upload your CV in the Profile tab first.'); return; }
+    if (!form.title.trim()) { setFitError('Add a job title first.'); return; }
+    setFitLoading(true);
+    setFitError(null);
+    try {
+      const apiKey = localStorage.getItem('scout-claude-key');
+      const skills = profile?.skills || [];
+      const res = await fetch('/api/analyze-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        body: JSON.stringify({
+          cvText,
+          jobTitle: form.title,
+          companyName: form.company,
+          jobSnippet: form.notes || '',
+          skills,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) setFitError(data.error);
+      else setFitAnalysis(data);
+    } catch (err) {
+      setFitError(err.message);
+    }
+    setFitLoading(false);
   };
 
   // Cover letter
@@ -476,6 +510,84 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
               </div>
             ) : (
               <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>No activity yet. Log your first update above.</p>
+            )}
+          </div>
+
+          {/* Fit analysis */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <Sparkles size={13} style={{ color: '#6366f1' }} />
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>CV fit analysis</span>
+                {fitAnalysis?.score != null && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{
+                    background: fitAnalysis.score >= 80 ? 'rgba(34,197,94,0.12)' : fitAnalysis.score >= 60 ? 'rgba(99,102,241,0.1)' : fitAnalysis.score >= 40 ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)',
+                    color: fitAnalysis.score >= 80 ? '#16a34a' : fitAnalysis.score >= 60 ? '#6366f1' : fitAnalysis.score >= 40 ? '#b45309' : '#dc2626',
+                  }}>
+                    {fitAnalysis.score}%
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={analyzeFit}
+                disabled={fitLoading}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
+                style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }}
+              >
+                {fitLoading ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                {fitLoading ? 'Analyzing…' : fitAnalysis ? 'Re-analyze' : 'Analyze fit'}
+              </button>
+            </div>
+
+            {fitError && <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{fitError}</p>}
+
+            {fitAnalysis && !fitLoading && (
+              <div className="rounded-xl p-3 space-y-2.5" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}>
+                {fitAnalysis.verdict && (
+                  <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide" style={{
+                    background: fitAnalysis.verdict === 'strong match' ? 'rgba(34,197,94,0.1)' : fitAnalysis.verdict === 'good match' ? 'rgba(99,102,241,0.1)' : fitAnalysis.verdict === 'possible match' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
+                    color: fitAnalysis.verdict === 'strong match' ? '#16a34a' : fitAnalysis.verdict === 'good match' ? '#6366f1' : fitAnalysis.verdict === 'possible match' ? '#b45309' : '#dc2626',
+                  }}>
+                    {fitAnalysis.verdict}
+                  </span>
+                )}
+                {fitAnalysis.summary && (
+                  <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-2)' }}>{fitAnalysis.summary}</p>
+                )}
+                {(fitAnalysis.strengths?.length > 0 || fitAnalysis.gaps?.length > 0) && (
+                  <div className="space-y-1">
+                    {fitAnalysis.strengths?.map((s, i) => (
+                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#16a34a' }}>✓</span><span style={{ color: 'var(--text-2)' }}>{s}</span></div>
+                    ))}
+                    {fitAnalysis.gaps?.map((g, i) => (
+                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#ef4444' }}>✗</span><span style={{ color: 'var(--text-3)' }}>{g}</span></div>
+                    ))}
+                  </div>
+                )}
+                {fitAnalysis.highlights?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>LEAD WITH</p>
+                    {fitAnalysis.highlights.map((h, i) => (
+                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#6366f1' }}>→</span><span style={{ color: 'var(--text-2)' }}>{h}</span></div>
+                    ))}
+                  </div>
+                )}
+                {fitAnalysis.watchouts?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>WATCH OUT</p>
+                    {fitAnalysis.watchouts.map((w, i) => (
+                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#f59e0b' }}>⚠</span><span style={{ color: 'var(--text-3)' }}>{w}</span></div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!fitAnalysis && !fitLoading && !fitError && (
+              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
+                Analyze how well your CV matches this role.
+              </p>
             )}
           </div>
 

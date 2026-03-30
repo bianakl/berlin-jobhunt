@@ -28,12 +28,13 @@ export default async function handler(req, res) {
     : `Role: ${jobTitle} at ${companyName}`;
   const skillsContext = skills?.length ? `\nCandidate's key skills: ${skills.join(', ')}` : '';
 
-  const message = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 1024,
-    messages: [{
-      role: 'user',
-      content: `You are a sharp, honest career advisor helping a PM evaluate whether to pursue a specific role. Be direct, specific, and genuinely useful — not generic.
+  try {
+    const message = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: `You are a sharp, honest career advisor helping a PM evaluate whether to pursue a specific role. Be direct, specific, and genuinely useful — not generic.
 
 ${jobContext}${skillsContext}
 
@@ -75,14 +76,19 @@ Scoring rules:
 - Be specific — reference actual details from their CV and the job description
 - Do not sugarcoat gaps
 - Return ONLY the JSON`,
-    }],
-  });
+      }],
+    });
 
-  const raw = message.content[0].text.trim();
-  try {
-    const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
-    return res.status(200).json(JSON.parse(jsonStr));
-  } catch {
-    return res.status(500).json({ error: 'Failed to parse analysis response.' });
+    const raw = message.content[0].text.trim();
+    try {
+      const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
+      return res.status(200).json(JSON.parse(jsonStr));
+    } catch {
+      return res.status(500).json({ error: 'Failed to parse analysis response.' });
+    }
+  } catch (err) {
+    const msg = err?.message || 'Analysis failed';
+    const status = err?.status || 500;
+    return res.status(status).json({ error: msg });
   }
 }
