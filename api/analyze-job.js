@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const apiKey = req.headers['x-api-key'] || process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(400).json({ error: 'No API key provided.' });
 
-  const { cvText, jobTitle, companyName, jobSnippet } = req.body || {};
+  const { cvText, jobTitle, companyName, jobSnippet, skills } = req.body || {};
   if (!cvText || !jobTitle) return res.status(400).json({ error: 'Missing cvText or jobTitle.' });
   if (cvText.length > 50000) return res.status(400).json({ error: 'CV text too large.' });
 
@@ -26,6 +26,7 @@ export default async function handler(req, res) {
   const jobContext = jobSnippet
     ? `Role: ${jobTitle} at ${companyName}\nJob description:\n${jobSnippet}`
     : `Role: ${jobTitle} at ${companyName}`;
+  const skillsContext = skills?.length ? `\nCandidate's key skills: ${skills.join(', ')}` : '';
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-6',
@@ -34,7 +35,7 @@ export default async function handler(req, res) {
       role: 'user',
       content: `You are a sharp, honest career advisor helping a PM evaluate whether to pursue a specific role. Be direct, specific, and genuinely useful — not generic.
 
-${jobContext}
+${jobContext}${skillsContext}
 
 Candidate CV:
 ${cvText}

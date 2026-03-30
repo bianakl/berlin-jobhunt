@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import {
   Star, ExternalLink, Pencil, Trash2, Plus, Building2, Search, RefreshCw, X,
   CheckSquare, Loader2, Link2, Mail, Users, Kanban, Sparkles, ChevronRight,
+  FileText, Copy, Check,
 } from 'lucide-react';
 import { STAGES } from '../data/seed';
 
@@ -322,6 +323,8 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   const [manualTitle, setManualTitle] = useState('');
   const [manualUrl, setManualUrl] = useState('');
   const [analyses, setAnalyses] = useState({});
+  const [coverLetters, setCoverLetters] = useState({});
+  const [copiedId, setCopiedId] = useState(null);
 
   const positions = company.positions || [];
   const activePositions = positions.filter((p) => !p.disqualified);
@@ -456,10 +459,12 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
     if (!cvText) { setAnalyses((a) => ({ ...a, [pos.id]: { error: 'Upload your CV in the Profile tab first.' } })); return; }
     setAnalyses((a) => ({ ...a, [pos.id]: { loading: true } }));
     try {
+      const profile = JSON.parse(localStorage.getItem('scout-profile-v4') || '{}');
+      const skills = profile.skills || [];
       const res = await fetch('/api/analyze-job', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
-        body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name, jobSnippet: pos.snippet || '' }),
+        body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name, jobSnippet: pos.snippet || '', skills }),
       });
       const data = await res.json();
       if (data.error) setAnalyses((a) => ({ ...a, [pos.id]: { error: data.error } }));
@@ -467,6 +472,40 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
     } catch (err) {
       setAnalyses((a) => ({ ...a, [pos.id]: { error: err.message } }));
     }
+  };
+
+  const draftCoverLetter = async (pos) => {
+    const cvText = localStorage.getItem('scout-cv-text');
+    const apiKey = localStorage.getItem('scout-claude-key');
+    if (!cvText) { setCoverLetters((cl) => ({ ...cl, [pos.id]: { error: 'Upload your CV in the Profile tab first.' } })); return; }
+    setCoverLetters((cl) => ({ ...cl, [pos.id]: { loading: true } }));
+    try {
+      const profile = JSON.parse(localStorage.getItem('scout-profile-v4') || '{}');
+      const res = await fetch('/api/cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        body: JSON.stringify({
+          cvText,
+          jobTitle: pos.title,
+          companyName: company.name,
+          jobSnippet: pos.snippet || '',
+          candidateName: profile.name || '',
+          skills: profile.skills || [],
+        }),
+      });
+      const data = await res.json();
+      if (data.error) setCoverLetters((cl) => ({ ...cl, [pos.id]: { error: data.error } }));
+      else setCoverLetters((cl) => ({ ...cl, [pos.id]: { letter: data.letter } }));
+    } catch (err) {
+      setCoverLetters((cl) => ({ ...cl, [pos.id]: { error: err.message } }));
+    }
+  };
+
+  const copyLetter = (posId, text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(posId);
+      setTimeout(() => setCopiedId(null), 2000);
+    });
   };
 
   return (
@@ -811,6 +850,24 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             {analysis?.loading ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
                             {analysis?.score != null ? `${analysis.score}%` : 'Analyze'}
                           </button>
+                          {(() => {
+                            const cl = coverLetters[pos.id];
+                            return (
+                              <button
+                                onClick={() => draftCoverLetter(pos)}
+                                disabled={cl?.loading}
+                                className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
+                                style={{
+                                  background: cl?.letter ? 'rgba(139,92,246,0.08)' : 'rgba(13,148,136,0.08)',
+                                  color: cl?.letter ? '#7c3aed' : '#0d9488',
+                                  border: `1px solid ${cl?.letter ? 'rgba(139,92,246,0.2)' : 'rgba(13,148,136,0.2)'}`,
+                                }}
+                              >
+                                {cl?.loading ? <Loader2 size={9} className="animate-spin" /> : <FileText size={9} />}
+                                {cl?.letter ? 'Re-draft' : 'Cover letter'}
+                              </button>
+                            );
+                          })()}
                           <button
                             onClick={() => quickAddToPipeline(pos)}
                             disabled={addedIds.has(pos.id)}
@@ -885,6 +942,37 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                         {analysis?.error && (
                           <p className="text-[10px] mt-1" style={{ color: '#ef4444' }}>{analysis.error}</p>
                         )}
+                        {/* Cover letter */}
+                        {(() => {
+                          const cl = coverLetters[pos.id];
+                          if (!cl || cl.loading) return null;
+                          if (cl.error) return <p className="text-[10px] mt-1.5" style={{ color: '#ef4444' }}>{cl.error}</p>;
+                          return (
+                            <div className="mt-1.5 pt-1.5" style={{ borderTop: '1px solid var(--border-3)' }}>
+                              <div className="flex items-center justify-between mb-1">
+                                <p className="text-[9px] font-semibold" style={{ color: 'var(--text-4)' }}>COVER LETTER</p>
+                                <button
+                                  onClick={() => copyLetter(pos.id, cl.letter)}
+                                  className="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium transition-all"
+                                  style={{
+                                    background: copiedId === pos.id ? 'rgba(34,197,94,0.1)' : 'var(--surface-5)',
+                                    color: copiedId === pos.id ? '#16a34a' : 'var(--text-4)',
+                                    border: `1px solid ${copiedId === pos.id ? 'rgba(34,197,94,0.2)' : 'var(--border-2)'}`,
+                                  }}
+                                >
+                                  {copiedId === pos.id ? <Check size={8} /> : <Copy size={8} />}
+                                  {copiedId === pos.id ? 'Copied!' : 'Copy'}
+                                </button>
+                              </div>
+                              <div
+                                className="text-[10px] leading-relaxed whitespace-pre-wrap max-h-48 overflow-y-auto rounded p-2"
+                                style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border-3)' }}
+                              >
+                                {cl.letter}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })}
