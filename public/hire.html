@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biana Kleyner — Senior Product Manager, Berlin</title>
+  <meta name="description" content="Senior Product Manager specialising in AI products and digital strategy. Based in Berlin." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --indigo: #6366f1;
+      --indigo-light: #818cf8;
+      --violet: #7c3aed;
+      --bg: #09090b;
+      --surface: #18181b;
+      --surface-2: #27272a;
+      --border: #3f3f46;
+      --text-1: #fafafa;
+      --text-2: #e4e4e7;
+      --text-3: #a1a1aa;
+      --text-4: #71717a;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: 'Inter', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Background orbs ── */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+      top: -100px; left: -100px;
+    }
+    body::after {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+      bottom: -80px; right: -80px;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 680px;
+      background: rgba(24, 24, 27, 0.8);
+      border: 1px solid rgba(99,102,241,0.15);
+      border-radius: 24px;
+      padding: 48px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 0 1px rgba(99,102,241,0.06), 0 32px 80px rgba(0,0,0,0.5);
+      animation: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      margin-bottom: 32px;
+    }
+
+    .avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #6366f1, #7c3aed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      border: 3px solid rgba(99,102,241,0.3);
+      box-shadow: 0 0 32px rgba(99,102,241,0.25);
+      overflow: hidden;
+      /* Replace src via JS if photo available */
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: none; /* shown by JS if URL is provided */
+    }
+
+    .header-text { flex: 1; min-width: 0; }
+
+    .name {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+
+    .title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--indigo-light);
+      margin-bottom: 6px;
+    }
+
+    .location {
+      font-size: 13px;
+      color: var(--text-4);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .location svg { flex-shrink: 0; }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,0.25), transparent);
+      margin: 28px 0;
+    }
+
+    /* ── Bio ── */
+    .bio {
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text-2);
+      margin-bottom: 28px;
+    }
+
+    .bio strong {
+      color: var(--text-1);
+      font-weight: 600;
+    }
+
+    /* ── Skills ── */
+    .skills-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: 10px;
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 32px;
+    }
+
+    .skill {
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 11px;
+      border-radius: 20px;
+      background: rgba(99,102,241,0.1);
+      color: var(--indigo-light);
+      border: 1px solid rgba(99,102,241,0.2);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── CTAs ── */
+    .ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s ease;
+      border: none;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(99,102,241,0.35);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(99,102,241,0.45);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(99,102,241,0.35);
+      color: var(--text-1);
+      transform: translateY(-1px);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-4);
+    }
+    .footer a {
+      color: var(--text-3);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer a:hover { color: var(--indigo-light); }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .card { padding: 32px 24px; }
+      .header { gap: 18px; }
+      .avatar { width: 70px; height: 70px; font-size: 26px; }
+      .name { font-size: 21px; }
+      .btn { width: 100%; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="header">
+        <div class="avatar" id="avatar">
+          <img id="avatar-img" alt="Biana Kleyner" />
+          <span id="avatar-initial">B</span>
+        </div>
+        <div class="header-text">
+          <div class="name">Biana Kleyner</div>
+          <div class="title">Senior Product Manager</div>
+          <div class="location">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            Berlin, Germany
+          </div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="bio">
+        Senior PM with a background in <strong>design and digital media</strong>, now focused on building
+        <strong>AI-native products</strong> that people actually want to use. I bridge the gap between
+        what's technically possible and what users genuinely need — and I do it in Berlin's fast-moving
+        tech scene. I care about craft, clarity, and shipping things that matter.
+      </p>
+
+      <div class="skills-label">What I bring</div>
+      <div class="skills" id="skills-container">
+        <span class="skill">AI Products</span>
+        <span class="skill">Product Strategy</span>
+        <span class="skill">User Research</span>
+        <span class="skill">Roadmapping</span>
+        <span class="skill">Data-Driven</span>
+        <span class="skill">Design Thinking</span>
+        <span class="skill">Stakeholder Mgmt</span>
+        <span class="skill">B2B &amp; B2C</span>
+        <span class="skill">Berlin Tech</span>
+      </div>
+
+      <div class="ctas">
+        <a
+          href="https://www.linkedin.com/in/bianak/"
+          target="_blank"
+          rel="noreferrer"
+          class="btn btn-primary"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/>
+          </svg>
+          View LinkedIn
+        </a>
+        <button class="btn btn-secondary" id="cv-btn" onclick="downloadCV()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download CV
+        </button>
+      </div>
+    </div>
+
+    <div class="footer">
+      Built with ❤️ in Berlin &nbsp;·&nbsp;
+      <a href="/">Back to Scout</a>
+    </div>
+  </div>
+
+  <script>
+    // ── Photo: replace PHOTO_URL with an actual image URL to enable ──
+    const PHOTO_URL = '';
+    if (PHOTO_URL) {
+      const img = document.getElementById('avatar-img');
+      const initial = document.getElementById('avatar-initial');
+      img.src = PHOTO_URL;
+      img.style.display = 'block';
+      initial.style.display = 'none';
+    }
+
+    // ── Skills: pull from Scout profile in localStorage if available ──
+    try {
+      const profile = JSON.parse(localStorage.getItem('scout-profile-v4') || '{}');
+      if (profile.skills && profile.skills.length > 0) {
+        const container = document.getElementById('skills-container');
+        container.innerHTML = profile.skills.slice(0, 12).map(
+          s => `<span class="skill">${s}</span>`
+        ).join('');
+      }
+    } catch (e) {}
+
+    // ── CV download: pulls from Scout localStorage if available ──
+    function downloadCV() {
+      const btn = document.getElementById('cv-btn');
+      try {
+        const cvText = localStorage.getItem('scout-cv-text');
+        if (cvText) {
+          const blob = new Blob([cvText], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'Biana-Kleyner-CV.txt';
+          a.click();
+          URL.revokeObjectURL(url);
+          btn.textContent = '✓ Downloaded';
+          setTimeout(() => {
+            btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download CV`;
+          }, 2000);
+        } else {
+          // Fallback: go to LinkedIn
+          window.open('https://www.linkedin.com/in/bianak/', '_blank');
+        }
+      } catch (e) {
+        window.open('https://www.linkedin.com/in/bianak/', '_blank');
+      }
+    }
+  </script>
+</body>
+</html>

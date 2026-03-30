@@ -271,7 +271,7 @@ export default function App() {
             <span className="font-semibold text-sm" style={{ color: 'var(--text-1)' }}>Scout</span>
             <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}>Berlin</span>
           </div>
-          <span className="text-[10px]" style={{ color: 'var(--text-5)' }}>made with ❤️ by Biana</span>
+          <a href="/hire" target="_blank" rel="noreferrer" className="text-[10px] hover:underline" style={{ color: 'var(--text-4)', textDecoration: 'none' }}>made with ❤️ by Biana</a>
         </div>
         {!syncUser && (
           <SyncBanner onSyncRequest={handleSyncRequest} />

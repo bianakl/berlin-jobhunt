@@ -55,7 +55,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
               Berlin
             </span>
           </div>
-          <p className="text-[10px] mt-1 ml-9" style={{ color: 'var(--text-4)' }}>made with ❤️ by Biana</p>
+          <a href="/hire" target="_blank" rel="noreferrer" className="text-[10px] mt-1 ml-9 hover:underline" style={{ color: 'var(--text-4)', textDecoration: 'none' }}>made with ❤️ by Biana</a>
         </div>
 
         {/* Nav */}
