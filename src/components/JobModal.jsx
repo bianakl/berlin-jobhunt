@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2 } from 'lucide-react';
 import { STAGES } from '../data/seed';
 
 const COMPAT_FACTORS = [
@@ -93,6 +93,49 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
 
   const deleteLogEntry = (id) => {
     setForm((f) => ({ ...f, activityLog: f.activityLog.filter((e) => e.id !== id) }));
+  };
+
+  // Cover letter
+  const [coverLetter, setCoverLetter] = useState(null);
+  const [coverLetterLoading, setCoverLetterLoading] = useState(false);
+  const [coverLetterError, setCoverLetterError] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  const draftCoverLetter = async () => {
+    const cvText = localStorage.getItem('scout-cv-text');
+    if (!cvText) { setCoverLetterError('Upload your CV in the Profile tab first.'); return; }
+    if (!form.title.trim()) { setCoverLetterError('Add a job title first.'); return; }
+    setCoverLetterLoading(true);
+    setCoverLetterError(null);
+    try {
+      const apiKey = localStorage.getItem('scout-claude-key');
+      const res = await fetch('/api/cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        body: JSON.stringify({
+          cvText,
+          jobTitle: form.title,
+          companyName: form.company,
+          jobSnippet: form.notes || '',
+          candidateName: profile?.name || '',
+          skills: profile?.skills || [],
+        }),
+      });
+      const data = await res.json();
+      if (data.error) setCoverLetterError(data.error);
+      else setCoverLetter(data.letter);
+    } catch (err) {
+      setCoverLetterError(err.message);
+    }
+    setCoverLetterLoading(false);
+  };
+
+  const copyLetter = () => {
+    if (!coverLetter) return;
+    navigator.clipboard.writeText(coverLetter).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
@@ -433,6 +476,66 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
               </div>
             ) : (
               <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>No activity yet. Log your first update above.</p>
+            )}
+          </div>
+
+          {/* Cover letter */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <FileText size={13} style={{ color: '#7c3aed' }} />
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Cover letter</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {coverLetter && (
+                  <button
+                    type="button"
+                    onClick={copyLetter}
+                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
+                    style={{
+                      background: copied ? 'rgba(34,197,94,0.1)' : 'var(--surface-5)',
+                      color: copied ? '#16a34a' : 'var(--text-4)',
+                      border: `1px solid ${copied ? 'rgba(34,197,94,0.2)' : 'var(--border-2)'}`,
+                    }}
+                  >
+                    {copied ? <Check size={10} /> : <Copy size={10} />}
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={draftCoverLetter}
+                  disabled={coverLetterLoading}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
+                  style={{
+                    background: coverLetter ? 'rgba(139,92,246,0.06)' : 'rgba(139,92,246,0.08)',
+                    color: '#7c3aed',
+                    border: '1px solid rgba(139,92,246,0.2)',
+                  }}
+                >
+                  {coverLetterLoading ? <Loader2 size={10} className="animate-spin" /> : <FileText size={10} />}
+                  {coverLetterLoading ? 'Drafting…' : coverLetter ? 'Re-draft' : 'Draft letter'}
+                </button>
+              </div>
+            </div>
+
+            {coverLetterError && (
+              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{coverLetterError}</p>
+            )}
+
+            {coverLetter && (
+              <div
+                className="text-xs leading-relaxed whitespace-pre-wrap rounded-xl p-4 max-h-64 overflow-y-auto"
+                style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-2)' }}
+              >
+                {coverLetter}
+              </div>
+            )}
+
+            {!coverLetter && !coverLetterLoading && !coverLetterError && (
+              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
+                Draft a tailored cover letter based on your CV and this role.
+              </p>
             )}
           </div>
           </form>
