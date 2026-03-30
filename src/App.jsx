@@ -258,6 +258,21 @@ export default function App() {
 
       {/* Main content — desktop gets left margin for sidebar, mobile gets bottom padding for nav */}
       <main className="flex-1 main-content md:ml-[220px]">
+        {/* Mobile header */}
+        <div
+          className="md:hidden flex items-center justify-between px-4 py-3 border-b"
+          style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+        >
+          <div className="flex items-center gap-2">
+            <div
+              className="w-6 h-6 rounded-md flex items-center justify-center text-[11px] font-bold text-white"
+              style={{ background: 'linear-gradient(135deg, #0d9488, #0891b2)' }}
+            >S</div>
+            <span className="font-semibold text-sm" style={{ color: 'var(--text-1)' }}>Scout</span>
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}>Berlin</span>
+          </div>
+          <span className="text-[10px]" style={{ color: 'var(--text-5)' }}>made with ❤️ by Biana</span>
+        </div>
         {!syncUser && (
           <SyncBanner onSyncRequest={handleSyncRequest} />
         )}
