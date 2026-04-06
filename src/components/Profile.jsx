@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { authHeader } from '../lib/authHeader';
 import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon, Cloud, LogOut } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
 
@@ -72,7 +73,6 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
   };
 
   const handleAnalyzeWorth = async () => {
-    const key = localStorage.getItem('scout-claude-key') || apiKey;
     const cvText = localStorage.getItem('scout-cv-text');
     if (!cvText) { setMarketError('Upload your CV first (AI profile extraction section below).'); return; }
     setMarketLoading(true);
@@ -80,7 +80,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
     try {
       const res = await fetch('/api/salary-estimate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': key },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify({ cvText, mode: 'profile' }),
       });
       const data = await res.json();
@@ -142,7 +142,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
       setExtractMsg('Extracting profile with AI...');
       const res = await fetch('/api/extract-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -188,7 +188,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
       const body = b64 ? { cvBase64: b64 } : { cvText: text };
       const res = await fetch('/api/extract-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify(body),
       });
       const data = await res.json();

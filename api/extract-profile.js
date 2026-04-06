@@ -1,21 +1,16 @@
 import Anthropic from '@anthropic-ai/sdk';
-
-function setCors(req, res) {
-  const allowed = process.env.ALLOWED_ORIGIN || null;
-  const origin = req.headers.origin || '';
-  res.setHeader('Access-Control-Allow-Origin', allowed || origin || '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-api-key');
-  if (allowed) res.setHeader('Vary', 'Origin');
-}
+import { verifyAuth, setCors } from './_auth.js';
 
 export default async function handler(req, res) {
   setCors(req, res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const apiKey = process.env.ANTHROPIC_API_KEY || req.headers['x-api-key'];
-  if (!apiKey) return res.status(400).json({ error: 'No API key. Add your Anthropic key in Profile settings.' });
+  const user = await verifyAuth(req);
+  if (!user) return res.status(401).json({ error: 'Sign in to use AI features.' });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'API not configured.' });
 
   const { cvText, cvBase64 } = req.body || {};
   if (!cvText && !cvBase64) return res.status(400).json({ error: 'No CV content provided.' });

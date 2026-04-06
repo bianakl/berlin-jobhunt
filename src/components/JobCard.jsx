@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { authHeader } from '../lib/authHeader';
 import { MoreHorizontal, ExternalLink, Pencil, Clock, CalendarClock, AlertCircle, Banknote, ChevronRight, TrendingUp, Loader2, MessageSquare } from 'lucide-react';
 import { STAGES } from '../data/seed';
 import { CompatRing } from './Dashboard';
@@ -31,12 +32,11 @@ function salaryEstCacheKey(title, company) {
 }
 
 async function fetchSalaryEst(title, company) {
-  const apiKey = localStorage.getItem('scout-claude-key');
   const cvText = localStorage.getItem('scout-cv-text');
   if (!cvText) return null;
   const res = await fetch('/api/salary-estimate', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+    headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
     body: JSON.stringify({ cvText, jobTitle: title, companyName: company }),
   });
   if (!res.ok) return null;

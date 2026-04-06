@@ -115,7 +115,6 @@ export default function App() {
         if (data.streak) setStreakData(data.streak);
         if (data.achievements) setAchievements(data.achievements);
         if (data.dark_mode !== undefined) setDark(data.dark_mode);
-        if (data.claude_key) localStorage.setItem('scout-claude-key', data.claude_key);
         if (data.cv_name) localStorage.setItem('scout-cv-name', data.cv_name);
         if (data.cv_text) localStorage.setItem('scout-cv-text', data.cv_text);
         if (data.market_value) localStorage.setItem('scout-market-value', JSON.stringify(data.market_value));
@@ -140,7 +139,6 @@ export default function App() {
           streak: s.streakData,
           achievements: s.achievements,
           dark_mode: s.dark,
-          claude_key: localStorage.getItem('scout-claude-key') || '',
           cv_name: localStorage.getItem('scout-cv-name') || '',
           cv_text: localStorage.getItem('scout-cv-text') || '',
           market_value: (() => {

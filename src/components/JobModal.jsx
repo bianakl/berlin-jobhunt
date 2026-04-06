@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { authHeader } from '../lib/authHeader';
 import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles } from 'lucide-react';
 import { STAGES } from '../data/seed';
 
@@ -107,11 +108,10 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
     setFitLoading(true);
     setFitError(null);
     try {
-      const apiKey = localStorage.getItem('scout-claude-key');
       const skills = profile?.skills || [];
       const res = await fetch('/api/analyze-job', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify({
           cvText,
           jobTitle: form.title,
@@ -142,10 +142,9 @@ export default function JobModal({ job, defaults = {}, companies, profile, onSav
     setCoverLetterLoading(true);
     setCoverLetterError(null);
     try {
-      const apiKey = localStorage.getItem('scout-claude-key');
       const res = await fetch('/api/cover-letter', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify({
           cvText,
           jobTitle: form.title,

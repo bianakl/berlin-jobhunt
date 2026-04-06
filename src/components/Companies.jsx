@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
+import { authHeader } from '../lib/authHeader';
 import {
   Star, ExternalLink, Pencil, Trash2, Plus, Building2, Search, RefreshCw, X,
   CheckSquare, Loader2, Link2, Mail, Users, Kanban, Sparkles, ChevronRight,
@@ -119,7 +120,6 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
 
   const handleCheckAll = async () => {
     setCheckingAll(true);
-    const apiKey = localStorage.getItem('scout-claude-key');
 
     // ATS companies — free, direct API
     for (const company of checkableCompanies) {
@@ -131,15 +131,14 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
       });
     }
 
-    // Non-ATS companies — crawl via Claude (requires API key)
-    if (apiKey) {
-      for (const company of crawlableCompanies) {
-        try {
-          const res = await fetch('/api/crawl-careers', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
-            body: JSON.stringify({ companyName: company.name }),
-          });
+    // Non-ATS companies — crawl via Claude
+    for (const company of crawlableCompanies) {
+      try {
+        const res = await fetch('/api/crawl-careers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+          body: JSON.stringify({ companyName: company.name }),
+        });
           const data = await res.json();
           const found = Array.isArray(data.positions) ? data.positions : [];
           const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
@@ -154,7 +153,6 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           onUpdateCompany(company.id, updates);
         } catch { /* skip failed companies */ }
       }
-    }
 
     setCheckingAll(false);
   };
@@ -354,13 +352,12 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
 
   const handleCrawl = useCallback(async () => {
     if (crawling) return;
-    const apiKey = localStorage.getItem('scout-claude-key');
     setCrawling(true);
     setCrawlDone(null);
     try {
       const res = await fetch('/api/crawl-careers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify({ companyName: company.name }),
       });
       const data = await res.json();
@@ -414,7 +411,6 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
   // Auto-fetch salary estimates when inline panel opens
   useEffect(() => {
     if (!showInlineResults) return;
-    const apiKey = localStorage.getItem('scout-claude-key');
     const cvText = localStorage.getItem('scout-cv-text');
     if (!cvText) return;
     const toFetch = activePositions.filter((p) => p.source !== 'manual' && !salaryEstimates[p.id]);
@@ -423,7 +419,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       try {
         const res = await fetch('/api/salary-estimate', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+          headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
           body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name }),
         });
         const data = await res.json();
@@ -455,7 +451,6 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
 
   const analyzePosition = async (pos) => {
     const cvText = localStorage.getItem('scout-cv-text');
-    const apiKey = localStorage.getItem('scout-claude-key');
     if (!cvText) { setAnalyses((a) => ({ ...a, [pos.id]: { error: 'Upload your CV in the Profile tab first.' } })); return; }
     setAnalyses((a) => ({ ...a, [pos.id]: { loading: true } }));
     try {
@@ -463,7 +458,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       const skills = profile.skills || [];
       const res = await fetch('/api/analyze-job', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name, jobSnippet: pos.snippet || '', skills }),
       });
       const data = await res.json();
@@ -476,14 +471,13 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
 
   const draftCoverLetter = async (pos) => {
     const cvText = localStorage.getItem('scout-cv-text');
-    const apiKey = localStorage.getItem('scout-claude-key');
     if (!cvText) { setCoverLetters((cl) => ({ ...cl, [pos.id]: { error: 'Upload your CV in the Profile tab first.' } })); return; }
     setCoverLetters((cl) => ({ ...cl, [pos.id]: { loading: true } }));
     try {
       const profile = JSON.parse(localStorage.getItem('scout-profile-v4') || '{}');
       const res = await fetch('/api/cover-letter', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey },
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
         body: JSON.stringify({
           cvText,
           jobTitle: pos.title,

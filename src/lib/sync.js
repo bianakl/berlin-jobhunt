@@ -7,7 +7,6 @@ export const SYNC_FIELDS = [
   'streak',
   'achievements',
   'dark_mode',
-  'claude_key',
   'cv_name',
   'cv_text',
   'market_value',
