@@ -329,6 +329,7 @@ export default function App() {
           defaults={jobModal.defaults}
           companies={companies}
           profile={profile}
+          onUpdateProfile={handleSetProfile}
           onSave={(data) => {
             jobModal.job ? updateJob(jobModal.job.id, data) : addJob(data);
             setJobModal({ open: false, job: null });
