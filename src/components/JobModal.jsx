@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { authHeader } from '../lib/authHeader';
 import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles } from 'lucide-react';
 import { STAGES } from '../data/seed';
-import CvUploadModal from './CvUploadModal';
 
 const COMPAT_FACTORS = [
   { key: 'roleMatch', label: 'Role fit', hint: 'Does the job match what you want to do?' },
@@ -57,7 +56,7 @@ const inputStyle = {
   transition: 'border-color 0.15s',
 };
 
-export default function JobModal({ job, defaults = {}, companies, profile, onUpdateProfile, onSave, onClose }) {
+export default function JobModal({ job, defaults = {}, companies, profile, onNeedCv, onSave, onClose }) {
   const isEdit = !!job;
 
   const [form, setForm] = useState({
@@ -97,25 +96,6 @@ export default function JobModal({ job, defaults = {}, companies, profile, onUpd
     setForm((f) => ({ ...f, activityLog: f.activityLog.filter((e) => e.id !== id) }));
   };
 
-  // CV upload modal
-  const [showCvModal, setShowCvModal] = useState(false);
-  const [pendingAction, setPendingAction] = useState(null); // 'analyze' | 'cover'
-
-  const requireCv = (action) => {
-    const cvText = localStorage.getItem('scout-cv-text');
-    if (cvText) return true;
-    setPendingAction(action);
-    setShowCvModal(true);
-    return false;
-  };
-
-  const onCvUploaded = () => {
-    setShowCvModal(false);
-    if (pendingAction === 'analyze') analyzeFit();
-    else if (pendingAction === 'cover') draftCoverLetter();
-    setPendingAction(null);
-  };
-
   // Fit analysis
   const [fitAnalysis, setFitAnalysis] = useState(null);
   const [fitLoading, setFitLoading] = useState(false);
@@ -123,7 +103,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onUpd
 
   const analyzeFit = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { requireCv('analyze'); return; }
+    if (!cvText) { onNeedCv?.(); return; }
     if (!form.title.trim()) { setFitError('Add a job title first.'); return; }
     setFitLoading(true);
     setFitError(null);
@@ -157,7 +137,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onUpd
 
   const draftCoverLetter = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { requireCv('cover'); return; }
+    if (!cvText) { onNeedCv?.(); return; }
     if (!form.title.trim()) { setCoverLetterError('Add a job title first.'); return; }
     setCoverLetterLoading(true);
     setCoverLetterError(null);
@@ -671,16 +651,6 @@ export default function JobModal({ job, defaults = {}, companies, profile, onUpd
           </div>
           </form>
         </div>
-
-        {/* CV upload modal (rendered on top) */}
-        {showCvModal && (
-          <CvUploadModal
-            profile={profile}
-            onUpdateProfile={onUpdateProfile}
-            onSuccess={onCvUploaded}
-            onClose={() => { setShowCvModal(false); setPendingAction(null); }}
-          />
-        )}
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" style={{ borderColor: 'var(--surface-5)' }}>

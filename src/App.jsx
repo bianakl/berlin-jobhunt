@@ -9,6 +9,7 @@ import Profile from './components/Profile';
 import Sidebar from './components/Sidebar';
 import JobModal from './components/JobModal';
 import CompanyModal from './components/CompanyModal';
+import CvUploadModal from './components/CvUploadModal';
 import { supabase } from './lib/supabase';
 import { pushToSupabase, pullFromSupabase } from './lib/sync';
 
@@ -47,6 +48,7 @@ export default function App() {
   const [activeView, setActiveView] = useState('companies');
   const [jobModal, setJobModal] = useState({ open: false, job: null });
   const [companyModal, setCompanyModal] = useState({ open: false, company: null });
+  const [cvModal, setCvModal] = useState(false);
 
   // Dark mode
   const [dark, setDark] = useLocalStorage('scout-dark-mode', false);
@@ -329,12 +331,20 @@ export default function App() {
           defaults={jobModal.defaults}
           companies={companies}
           profile={profile}
-          onUpdateProfile={handleSetProfile}
+          onNeedCv={() => setCvModal(true)}
           onSave={(data) => {
             jobModal.job ? updateJob(jobModal.job.id, data) : addJob(data);
             setJobModal({ open: false, job: null });
           }}
           onClose={() => setJobModal({ open: false, job: null })}
+        />
+      )}
+      {cvModal && (
+        <CvUploadModal
+          profile={profile}
+          onUpdateProfile={handleSetProfile}
+          onSuccess={() => setCvModal(false)}
+          onClose={() => setCvModal(false)}
         />
       )}
       {companyModal.open && (

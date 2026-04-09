@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { Upload, X, Loader2, CheckCircle } from 'lucide-react';
 import { authHeader } from '../lib/authHeader';
 
@@ -84,7 +83,7 @@ export default function CvUploadModal({ profile, onUpdateProfile, onSuccess, onC
     if (file) handleFile(file);
   };
 
-  const modal = (
+  return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center p-4"
       style={{ background: 'var(--backdrop)', backdropFilter: 'blur(4px)' }}
@@ -154,6 +153,4 @@ export default function CvUploadModal({ profile, onUpdateProfile, onSuccess, onC
       </div>
     </div>
   );
-
-  return createPortal(modal, document.body);
 }
