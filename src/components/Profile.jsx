@@ -150,23 +150,37 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         setExtractMsg(`Error: ${data.error}`);
       } else {
         // Merge extracted data into form (keep existing non-empty values)
-        setForm((prev) => ({
-          ...prev,
-          name: data.name || prev.name,
-          currentRole: data.currentRole || prev.currentRole,
-          skills: data.skills?.length ? data.skills : prev.skills,
-          yearsExperience: data.yearsExperience || prev.yearsExperience,
-          preferredIndustries: data.preferredIndustries?.length ? data.preferredIndustries : prev.preferredIndustries,
-          salaryMin: data.salaryMin || prev.salaryMin,
-          salaryMax: data.salaryMax || prev.salaryMax,
-          bio: data.bio || prev.bio,
-        }));
-        // Store CV as text representation for job analysis
-        if (body.cvText) localStorage.setItem('scout-cv-text', body.cvText);
-        else localStorage.setItem('scout-cv-text', JSON.stringify(data)); // fallback: use extracted JSON as context
+        const merged = {
+          ...form,
+          name: data.name || form.name,
+          currentRole: data.currentRole || form.currentRole,
+          skills: data.skills?.length ? data.skills : form.skills,
+          yearsExperience: data.yearsExperience || form.yearsExperience,
+          preferredIndustries: data.preferredIndustries?.length ? data.preferredIndustries : form.preferredIndustries,
+          salaryMin: data.salaryMin || form.salaryMin,
+          salaryMax: data.salaryMax || form.salaryMax,
+          bio: data.bio || form.bio,
+        };
+        setForm(merged);
+        // Store readable CV text for job analysis (never store raw JSON)
+        if (body.cvText) {
+          localStorage.setItem('scout-cv-text', body.cvText);
+        } else {
+          const cvSummary = [
+            data.name ? `Name: ${data.name}` : '',
+            data.currentRole ? `Current Role: ${data.currentRole}` : '',
+            data.yearsExperience ? `Years of Experience: ${data.yearsExperience}` : '',
+            data.skills?.length ? `Skills: ${data.skills.join(', ')}` : '',
+            data.preferredIndustries?.length ? `Industries: ${data.preferredIndustries.join(', ')}` : '',
+            data.bio ? `Summary: ${data.bio}` : '',
+          ].filter(Boolean).join('\n');
+          localStorage.setItem('scout-cv-text', cvSummary);
+        }
         // Clean up base64 blob — no longer needed after extraction
         localStorage.removeItem('scout-cv-b64');
-        setExtractMsg('Profile extracted! Review the fields below and save.');
+        // Auto-save so CV is synced without requiring manual Save click
+        onUpdate(merged);
+        setExtractMsg('Profile extracted and saved!');
       }
     } catch (err) {
       setExtractMsg(`Error: ${err.message}`);
@@ -195,20 +209,32 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
       if (data.error) {
         setExtractMsg(`Error: ${data.error}`);
       } else {
-        setForm((prev) => ({
-          ...prev,
-          name: data.name || prev.name,
-          currentRole: data.currentRole || prev.currentRole,
-          skills: data.skills?.length ? data.skills : prev.skills,
-          yearsExperience: data.yearsExperience || prev.yearsExperience,
-          preferredIndustries: data.preferredIndustries?.length ? data.preferredIndustries : prev.preferredIndustries,
-          salaryMin: data.salaryMin || prev.salaryMin,
-          salaryMax: data.salaryMax || prev.salaryMax,
-          bio: data.bio || prev.bio,
-        }));
-        if (!text) localStorage.setItem('scout-cv-text', JSON.stringify(data));
+        const merged = {
+          ...form,
+          name: data.name || form.name,
+          currentRole: data.currentRole || form.currentRole,
+          skills: data.skills?.length ? data.skills : form.skills,
+          yearsExperience: data.yearsExperience || form.yearsExperience,
+          preferredIndustries: data.preferredIndustries?.length ? data.preferredIndustries : form.preferredIndustries,
+          salaryMin: data.salaryMin || form.salaryMin,
+          salaryMax: data.salaryMax || form.salaryMax,
+          bio: data.bio || form.bio,
+        };
+        setForm(merged);
+        if (!text) {
+          const cvSummary = [
+            data.name ? `Name: ${data.name}` : '',
+            data.currentRole ? `Current Role: ${data.currentRole}` : '',
+            data.yearsExperience ? `Years of Experience: ${data.yearsExperience}` : '',
+            data.skills?.length ? `Skills: ${data.skills.join(', ')}` : '',
+            data.preferredIndustries?.length ? `Industries: ${data.preferredIndustries.join(', ')}` : '',
+            data.bio ? `Summary: ${data.bio}` : '',
+          ].filter(Boolean).join('\n');
+          localStorage.setItem('scout-cv-text', cvSummary);
+        }
         localStorage.removeItem('scout-cv-b64');
-        setExtractMsg('Profile extracted! Review the fields below and save.');
+        onUpdate(merged);
+        setExtractMsg('Profile extracted and saved!');
       }
     } catch (err) {
       setExtractMsg(`Error: ${err.message}`);
