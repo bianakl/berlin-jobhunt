@@ -85,12 +85,12 @@ export default function CvUploadModal({ profile, onUpdateProfile, onSuccess, onC
 
   return (
     <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center sm:p-4"
       style={{ background: 'var(--backdrop)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="w-full max-w-sm rounded-2xl border fade-in"
+        className="w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl border fade-in"
         style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: '0 24px 80px rgba(0,0,0,0.2)' }}
       >
         {/* Header */}

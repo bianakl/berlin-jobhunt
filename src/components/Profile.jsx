@@ -294,7 +294,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
             <User size={14} style={{ color: '#6366f1' }} />
             <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Basic info</h2>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Field label="Your name">
               <input
                 placeholder="Biana K."
@@ -512,7 +512,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         </div>
 
         {/* Salary + Industries */}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Salary */}
           <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
             <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Salary expectations</h2>

@@ -196,16 +196,16 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
       style={{ background: 'var(--backdrop)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="w-full max-w-lg rounded-2xl border flex flex-col fade-in"
-        style={{ background: 'var(--surface)', borderColor: 'var(--border)', maxHeight: '90vh', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}
+        className="w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl border flex flex-col fade-in"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)', maxHeight: '92dvh', boxShadow: '0 24px 80px rgba(0,0,0,0.18)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
           <div>
             <h2 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>
               {isEdit ? 'Edit job' : 'Add job'}
@@ -226,11 +226,11 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
         </div>
 
         {/* Body */}
-        <div className="overflow-y-auto flex-1 px-6 py-5">
+        <div className="overflow-y-auto flex-1 px-4 sm:px-6 py-4 sm:py-5">
           <form id="job-form" onSubmit={handleSubmit}>
 
             {/* Required section — always visible */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
               <div className="col-span-2">
                 <Field label="Job title *">
                   <input
@@ -301,7 +301,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
               </button>
 
               {detailsOpen && (
-                <div className="px-4 pb-4 pt-3 grid grid-cols-2 gap-4" style={{ borderTop: '1px solid var(--surface-5)' }}>
+                <div className="px-3 sm:px-4 pb-4 pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4" style={{ borderTop: '1px solid var(--surface-5)' }}>
                   <div className="col-span-2">
                     <Field label="Job posting URL">
                       <div className="relative">
@@ -653,7 +653,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" style={{ borderColor: 'var(--surface-5)' }}>
+        <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-3 sm:py-4 border-t" style={{ borderColor: 'var(--surface-5)' }}>
           <button
             type="button" onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm font-medium transition-all"

@@ -71,16 +71,16 @@ export default function CompanyModal({ company, onSave, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4"
       style={{ background: 'var(--backdrop)', backdropFilter: 'blur(4px)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className="w-full max-w-md rounded-2xl border flex flex-col fade-in"
-        style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: '0 24px 80px rgba(0,0,0,0.18)', maxHeight: '90vh' }}
+        className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border flex flex-col fade-in"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)', boxShadow: '0 24px 80px rgba(0,0,0,0.18)', maxHeight: '92dvh' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
           <div>
             <h2 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>
               {isEdit ? 'Edit company' : 'Add company'}
@@ -101,7 +101,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
         </div>
 
         {/* Body */}
-        <div className="px-6 py-5 overflow-y-auto flex-1">
+        <div className="px-4 sm:px-6 py-4 sm:py-5 overflow-y-auto flex-1">
           <form id="company-form" onSubmit={handleSubmit}>
             <div className="space-y-4">
               <Field label="Company name *">
@@ -128,7 +128,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                 />
               </Field>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <Field label="Industry">
                   <div className="relative">
                     <select
@@ -165,7 +165,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
               {/* ATS Integration */}
               <div className="rounded-xl p-3.5 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-2)' }}>
                 <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>Job board integration</p>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Field label="ATS type">
                     <div className="relative">
                       <select
@@ -226,7 +226,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     />
                   </Field>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Field label="Connections" hint="— 1st, 2nd, name...">
                       <input
                         placeholder="e.g. 2nd degree"
@@ -301,7 +301,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t" style={{ borderColor: 'var(--surface-5)' }}>
+        <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-3 sm:py-4 border-t" style={{ borderColor: 'var(--surface-5)' }}>
           <button
             type="button" onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
