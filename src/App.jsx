@@ -49,6 +49,7 @@ export default function App() {
   const [jobModal, setJobModal] = useState({ open: false, job: null });
   const [companyModal, setCompanyModal] = useState({ open: false, company: null });
   const [cvModal, setCvModal] = useState(false);
+  const pendingCvAction = useRef(null);
 
   // Dark mode
   const [dark, setDark] = useLocalStorage('scout-dark-mode', false);
@@ -103,7 +104,18 @@ export default function App() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Pull fresh data when user returns to the tab (e.g. switch from desktop → mobile)
+    const handleFocus = () => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) loadCloudData(session.user.id);
+      });
+    };
+    window.addEventListener('focus', handleFocus);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadCloudData(userId) {
@@ -331,7 +343,7 @@ export default function App() {
           defaults={jobModal.defaults}
           companies={companies}
           profile={profile}
-          onNeedCv={() => setCvModal(true)}
+          onNeedCv={(cb) => { pendingCvAction.current = cb || null; setCvModal(true); }}
           onAnalyzed={jobModal.job ? (a) => updateJob(jobModal.job.id, { fitAnalysis: a }) : undefined}
           onSave={(data) => {
             jobModal.job ? updateJob(jobModal.job.id, data) : addJob(data);
@@ -344,7 +356,12 @@ export default function App() {
         <CvUploadModal
           profile={profile}
           onUpdateProfile={handleSetProfile}
-          onSuccess={() => setCvModal(false)}
+          onSuccess={() => {
+              const action = pendingCvAction.current;
+              pendingCvAction.current = null;
+              setCvModal(false);
+              if (action) setTimeout(action, 150);
+            }}
           onClose={() => setCvModal(false)}
         />
       )}

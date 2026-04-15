@@ -103,7 +103,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
 
   const analyzeFit = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { onNeedCv?.(); return; }
+    if (!cvText) { onNeedCv?.(() => analyzeFit()); return; }
     if (!form.title.trim()) { setFitError('Add a job title first.'); return; }
     setFitLoading(true);
     setFitError(null);
@@ -137,7 +137,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
 
   const draftCoverLetter = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { onNeedCv?.(); return; }
+    if (!cvText) { onNeedCv?.(() => draftCoverLetter()); return; }
     if (!form.title.trim()) { setCoverLetterError('Add a job title first.'); return; }
     setCoverLetterLoading(true);
     setCoverLetterError(null);
