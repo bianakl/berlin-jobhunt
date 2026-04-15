@@ -332,6 +332,7 @@ export default function App() {
           companies={companies}
           profile={profile}
           onNeedCv={() => setCvModal(true)}
+          onAnalyzed={jobModal.job ? (a) => updateJob(jobModal.job.id, { fitAnalysis: a }) : undefined}
           onSave={(data) => {
             jobModal.job ? updateJob(jobModal.job.id, data) : addJob(data);
             setJobModal({ open: false, job: null });

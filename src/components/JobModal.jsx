@@ -56,7 +56,7 @@ const inputStyle = {
   transition: 'border-color 0.15s',
 };
 
-export default function JobModal({ job, defaults = {}, companies, profile, onNeedCv, onSave, onClose }) {
+export default function JobModal({ job, defaults = {}, companies, profile, onNeedCv, onAnalyzed, onSave, onClose }) {
   const isEdit = !!job;
 
   const [form, setForm] = useState({
@@ -96,8 +96,8 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
     setForm((f) => ({ ...f, activityLog: f.activityLog.filter((e) => e.id !== id) }));
   };
 
-  // Fit analysis
-  const [fitAnalysis, setFitAnalysis] = useState(null);
+  // Fit analysis — init from saved job data so results persist across sessions
+  const [fitAnalysis, setFitAnalysis] = useState(job?.fitAnalysis || null);
   const [fitLoading, setFitLoading] = useState(false);
   const [fitError, setFitError] = useState(null);
 
@@ -122,7 +122,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
       });
       const data = await res.json();
       if (data.error) setFitError(data.error);
-      else setFitAnalysis(data);
+      else { setFitAnalysis(data); onAnalyzed?.(data); }
     } catch (err) {
       setFitError(err.message);
     }
@@ -189,6 +189,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
       followUpDate: form.followUpDate ? new Date(form.followUpDate).toISOString() : null,
       appliedDate: form.appliedDate ? new Date(form.appliedDate).toISOString() : null,
       activityLog: form.activityLog,
+      fitAnalysis: fitAnalysis || undefined,
     });
   };
 
