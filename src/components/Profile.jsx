@@ -8,7 +8,7 @@ const PORTFOLIO_PROJECTS = [
     title: 'TamaGotchi 2.0',
     description: 'A web-based virtual pet. Feed, play with, and keep your digital companion alive.',
     url: 'https://tamagotchi-app-five.vercel.app/',
-    screenshotUrl: 'https://tamagotchi-app-five.vercel.app/',
+    screenshot: '/portfolio/tamagotchi.png',
     tags: ['React', 'Game', 'Web App'],
     accent: '#6366f1',
   },
@@ -16,7 +16,7 @@ const PORTFOLIO_PROJECTS = [
     title: 'pooping.com',
     description: 'Everyone does it. Health, humor, gear, and community for every bathroom moment.',
     url: 'https://pooping-com.vercel.app/login',
-    screenshotUrl: 'https://pooping-com.vercel.app/',
+    screenshot: '/portfolio/pooping.png',
     tags: ['Next.js', 'Community', 'Health'],
     accent: '#f59e0b',
   },
@@ -24,7 +24,7 @@ const PORTFOLIO_PROJECTS = [
     title: 'Recipe Finder',
     description: 'Discover recipes worldwide, plan weekly meals, build shopping lists, and track nutrition.',
     url: 'https://recipe-finder-two-red.vercel.app/#saved',
-    screenshotUrl: 'https://recipe-finder-two-red.vercel.app/',
+    screenshot: '/portfolio/recipe-finder.png',
     tags: ['React', 'PWA', 'Supabase'],
     accent: '#ef4444',
   },
@@ -425,7 +425,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 {/* Screenshot */}
                 <div className="relative overflow-hidden" style={{ aspectRatio: '16/10', background: 'var(--surface-2)' }}>
                   <img
-                    src={`https://image.thum.io/get/width/600/crop/375/${project.screenshotUrl}`}
+                    src={project.screenshot}
                     alt={project.title}
                     className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                     style={{ display: 'block' }}
