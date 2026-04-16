@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import SyncBanner from './components/SyncBanner';
+import ProfileSignInGate from './components/ProfileSignInGate';
 import useLocalStorage from './hooks/useLocalStorage';
 import { seedJobs, seedCompanies } from './data/seed';
 import Dashboard from './components/Dashboard';
@@ -321,7 +322,10 @@ export default function App() {
             onUpdateCompany={updateCompany}
           />
         )}
-        {activeView === 'profile' && (
+        {activeView === 'profile' && !syncUser && (
+          <ProfileSignInGate onSyncRequest={handleSyncRequest} />
+        )}
+        {activeView === 'profile' && syncUser && (
           <Profile
             profile={profile}
             onUpdate={handleSetProfile}
