@@ -250,6 +250,83 @@
     }
     .footer a:hover { color: var(--indigo-light); }
 
+    /* ── Projects ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-4);
+      margin-bottom: 12px;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .project-card {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+      background: var(--surface-2);
+    }
+
+    .project-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .project-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+      background: var(--surface);
+    }
+
+    .project-info {
+      padding: 10px 12px;
+    }
+
+    .project-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 4px;
+    }
+
+    .project-name svg { flex-shrink: 0; opacity: 0.4; }
+
+    .project-desc {
+      font-size: 11px;
+      color: var(--text-4);
+      line-height: 1.45;
+      margin-bottom: 7px;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .project-tag {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 20px;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 520px) {
       .card { padding: 32px 24px; }
@@ -257,6 +334,7 @@
       .avatar { width: 70px; height: 70px; font-size: 26px; }
       .name { font-size: 21px; }
       .btn { width: 100%; justify-content: center; }
+      .projects { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -300,6 +378,55 @@
         <span class="skill">Stakeholder Mgmt</span>
         <span class="skill">B2B &amp; B2C</span>
         <span class="skill">Berlin Tech</span>
+      </div>
+
+      <div class="section-label">Projects</div>
+      <div class="projects">
+        <a class="project-card" href="https://tamagotchi-app-five.vercel.app/" target="_blank" rel="noreferrer">
+          <img class="project-thumb" src="/portfolio/tamagotchi.png" alt="TamaGotchi 2.0" />
+          <div class="project-info">
+            <div class="project-name">
+              TamaGotchi 2.0
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+            <p class="project-desc">A web-based virtual pet. Feed, play, and keep your companion alive.</p>
+            <div class="project-tags">
+              <span class="project-tag" style="background:rgba(99,102,241,0.12);color:#818cf8">React</span>
+              <span class="project-tag" style="background:rgba(99,102,241,0.12);color:#818cf8">Game</span>
+              <span class="project-tag" style="background:rgba(99,102,241,0.12);color:#818cf8">Web App</span>
+            </div>
+          </div>
+        </a>
+        <a class="project-card" href="https://pooping-com.vercel.app/login" target="_blank" rel="noreferrer">
+          <img class="project-thumb" src="/portfolio/pooping.png" alt="pooping.com" />
+          <div class="project-info">
+            <div class="project-name">
+              pooping.com
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+            <p class="project-desc">Health, humor, and community for every bathroom moment.</p>
+            <div class="project-tags">
+              <span class="project-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b">Next.js</span>
+              <span class="project-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b">Community</span>
+              <span class="project-tag" style="background:rgba(245,158,11,0.12);color:#f59e0b">Health</span>
+            </div>
+          </div>
+        </a>
+        <a class="project-card" href="https://recipe-finder-two-red.vercel.app/#saved" target="_blank" rel="noreferrer">
+          <img class="project-thumb" src="/portfolio/recipe-finder.png" alt="Recipe Finder" />
+          <div class="project-info">
+            <div class="project-name">
+              Recipe Finder
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </div>
+            <p class="project-desc">Discover recipes, plan meals, build shopping lists, track nutrition.</p>
+            <div class="project-tags">
+              <span class="project-tag" style="background:rgba(239,68,68,0.12);color:#ef4444">React</span>
+              <span class="project-tag" style="background:rgba(239,68,68,0.12);color:#ef4444">PWA</span>
+              <span class="project-tag" style="background:rgba(239,68,68,0.12);color:#ef4444">Supabase</span>
+            </div>
+          </div>
+        </a>
       </div>
 
       <div class="ctas">

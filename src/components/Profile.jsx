@@ -1,34 +1,7 @@
 import { useState, useRef } from 'react';
 import { authHeader } from '../lib/authHeader';
-import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon, Cloud, LogOut, ExternalLink, Globe } from 'lucide-react';
+import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon, Cloud, LogOut } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
-
-const PORTFOLIO_PROJECTS = [
-  {
-    title: 'TamaGotchi 2.0',
-    description: 'A web-based virtual pet. Feed, play with, and keep your digital companion alive.',
-    url: 'https://tamagotchi-app-five.vercel.app/',
-    screenshot: '/portfolio/tamagotchi.png',
-    tags: ['React', 'Game', 'Web App'],
-    accent: '#6366f1',
-  },
-  {
-    title: 'pooping.com',
-    description: 'Everyone does it. Health, humor, gear, and community for every bathroom moment.',
-    url: 'https://pooping-com.vercel.app/login',
-    screenshot: '/portfolio/pooping.png',
-    tags: ['Next.js', 'Community', 'Health'],
-    accent: '#f59e0b',
-  },
-  {
-    title: 'Recipe Finder',
-    description: 'Discover recipes worldwide, plan weekly meals, build shopping lists, and track nutrition.',
-    url: 'https://recipe-finder-two-red.vercel.app/#saved',
-    screenshot: '/portfolio/recipe-finder.png',
-    tags: ['React', 'PWA', 'Supabase'],
-    accent: '#ef4444',
-  },
-];
 
 const inputStyle = {
   width: '100%',
@@ -400,68 +373,6 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 />
               </Field>
             </div>
-          </div>
-        </div>
-
-        {/* Portfolio card */}
-        <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Globe size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Portfolio</h2>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: 'rgba(99,102,241,0.08)', color: '#818cf8' }}>3 projects</span>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {PORTFOLIO_PROJECTS.map((project) => (
-              <a
-                key={project.url}
-                href={project.url}
-                target="_blank"
-                rel="noreferrer"
-                className="group rounded-xl overflow-hidden border transition-all"
-                style={{ borderColor: 'var(--border-2)', textDecoration: 'none', display: 'block' }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = project.accent; e.currentTarget.style.boxShadow = `0 4px 20px ${project.accent}22`; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-2)'; e.currentTarget.style.boxShadow = 'none'; }}
-              >
-                {/* Screenshot */}
-                <div className="relative overflow-hidden" style={{ aspectRatio: '16/10', background: 'var(--surface-2)' }}>
-                  <img
-                    src={project.screenshot}
-                    alt={project.title}
-                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                    style={{ display: 'block' }}
-                    loading="lazy"
-                  />
-                  {/* Hover overlay */}
-                  <div
-                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                    style={{ background: `${project.accent}cc` }}
-                  >
-                    <div className="flex items-center gap-1.5 text-white text-xs font-semibold">
-                      <ExternalLink size={13} /> View project
-                    </div>
-                  </div>
-                </div>
-                {/* Info */}
-                <div className="p-3" style={{ background: 'var(--surface-2)' }}>
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <h3 className="text-xs font-semibold" style={{ color: 'var(--text-1)' }}>{project.title}</h3>
-                    <ExternalLink size={10} style={{ color: 'var(--text-5)', flexShrink: 0, marginTop: 2 }} />
-                  </div>
-                  <p className="text-[11px] leading-relaxed mb-2" style={{ color: 'var(--text-4)' }}>{project.description}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] px-1.5 py-0.5 rounded font-medium"
-                        style={{ background: `${project.accent}14`, color: project.accent }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </a>
-            ))}
           </div>
         </div>
 
