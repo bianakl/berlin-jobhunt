@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import SyncBanner from './components/SyncBanner';
 import ProfileSignInGate from './components/ProfileSignInGate';
 import useLocalStorage from './hooks/useLocalStorage';
-import { seedJobs, seedCompanies } from './data/seed';
+import { seedJobs, starterPackCompanies } from './data/seed';
 import Dashboard from './components/Dashboard';
 import Pipeline from './components/Pipeline';
 import Companies from './components/Companies';
@@ -42,7 +42,7 @@ function updateStreak(streakData) {
 
 export default function App() {
   const [jobs, setJobs] = useLocalStorage('scout-jobs-v4', seedJobs);
-  const [companies, setCompanies] = useLocalStorage('scout-companies-v5', seedCompanies);
+  const [companies, setCompanies] = useLocalStorage('scout-companies-v5', []);
   const [profile, setProfile] = useLocalStorage('scout-profile-v4', defaultProfile);
   const [streakData, setStreakData] = useLocalStorage('scout-streak-v4', null);
   const [achievements, setAchievements] = useLocalStorage('scout-achievements-v4', []);
@@ -125,7 +125,7 @@ export default function App() {
       const data = await pullFromSupabase(userId);
       if (data) {
         if (data.jobs) setJobs(data.jobs);
-        if (data.companies) setCompanies(data.companies);
+        if (Array.isArray(data.companies) && data.companies.length > 0) setCompanies(data.companies);
         if (data.profile) setProfile(data.profile);
         if (data.streak) setStreakData(data.streak);
         if (data.achievements) setAchievements(data.achievements);
@@ -133,6 +133,9 @@ export default function App() {
         if (data.cv_name) localStorage.setItem('scout-cv-name', data.cv_name);
         if (data.cv_text) localStorage.setItem('scout-cv-text', data.cv_text);
         if (data.market_value) localStorage.setItem('scout-market-value', JSON.stringify(data.market_value));
+      } else {
+        // New authenticated user with no cloud data — push local state so other devices sync
+        scheduleSyncFor(userId);
       }
       setSyncStatus('synced');
     } catch {
@@ -229,6 +232,18 @@ export default function App() {
     triggerSync();
   };
 
+  const handleImportStarterPack = () => {
+    if (syncStatus === 'syncing') return;
+    // ID-based dedup — only add companies not already present
+    const existingIds = new Set(companies.map((c) => c.id));
+    const toAdd = starterPackCompanies.filter((c) => !existingIds.has(c.id));
+    if (toAdd.length === 0) return;
+    setCompanies((prev) => [...prev, ...toAdd]);
+    // Mark offered so the prompt doesn't reappear if user later empties their list
+    localStorage.setItem('scout-starter-pack-offered', 'true');
+    triggerSync();
+  };
+
   const openAddJob = (defaults = {}) => setJobModal({ open: true, job: null, defaults });
   const openEditJob = (job) => setJobModal({ open: true, job });
   const openAddCompany = () => setCompanyModal({ open: true, company: null });
@@ -320,6 +335,10 @@ export default function App() {
             onAddJob={openAddJob}
             onQuickAddJob={addJob}
             onUpdateCompany={updateCompany}
+            syncStatus={syncStatus}
+            onImportStarterPack={
+              localStorage.getItem('scout-starter-pack-offered') ? null : handleImportStarterPack
+            }
           />
         )}
         {activeView === 'profile' && !syncUser && (

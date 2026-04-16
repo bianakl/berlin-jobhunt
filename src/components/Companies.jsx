@@ -81,7 +81,7 @@ async function fetchPositionsForCompany(company) {
   return [];
 }
 
-export default function Companies({ companies, jobs, onAddCompany, onEditCompany, onDeleteCompany, onAddJob, onQuickAddJob, onUpdateCompany }) {
+export default function Companies({ companies, jobs, onAddCompany, onEditCompany, onDeleteCompany, onAddJob, onQuickAddJob, onUpdateCompany, onImportStarterPack, syncStatus }) {
   const [search, setSearch] = useState('');
   const [favOnly, setFavOnly] = useState(false);
   const [hasPmOnly, setHasPmOnly] = useState(false);
@@ -254,19 +254,42 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="text-center py-20">
+        <div className="text-center py-16">
           <Building2 size={32} style={{ color: 'var(--border)', margin: '0 auto 12px' }} />
-          <p className="text-sm mb-4" style={{ color: 'var(--text-4)' }}>
-            {companies.length === 0 ? 'No companies yet.' : 'Nothing matches your filter.'}
-          </p>
-          {companies.length === 0 && (
-            <button
-              onClick={onAddCompany}
-              className="px-4 py-2 rounded-lg text-sm font-medium"
-              style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
-            >
-              Add your first company
-            </button>
+          {companies.length === 0 ? (
+            <>
+              <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-2)' }}>No companies yet</p>
+              <p className="text-xs mb-6 max-w-xs mx-auto" style={{ color: 'var(--text-4)' }}>
+                Add companies manually, or import a curated list of 100+ Berlin tech companies to get started.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                {onImportStarterPack && (
+                  <button
+                    onClick={onImportStarterPack}
+                    disabled={syncStatus === 'syncing'}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                    style={{
+                      background: 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                      color: '#fff',
+                      opacity: syncStatus === 'syncing' ? 0.6 : 1,
+                      boxShadow: '0 4px 14px rgba(99,102,241,0.3)',
+                    }}
+                  >
+                    <Sparkles size={14} />
+                    {syncStatus === 'syncing' ? 'Syncing…' : 'Import Berlin starter pack'}
+                  </button>
+                )}
+                <button
+                  onClick={onAddCompany}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
+                  style={{ background: 'rgba(99,102,241,0.06)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.15)' }}
+                >
+                  <Plus size={14} /> Add manually
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm" style={{ color: 'var(--text-4)' }}>Nothing matches your filter.</p>
           )}
         </div>
       ) : (

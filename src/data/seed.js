@@ -280,4 +280,25 @@ export const seedCompanies = _seedCompanies.map((c) => ({
   ...c,
 }));
 
+// Sanitized version for new users — no personal notes, favorites, or tracking data
+export const starterPackCompanies = _seedCompanies.map((c) => ({
+  id: c.id,
+  name: c.name,
+  website: c.website || '',
+  industry: c.industry,
+  size: c.size,
+  atsType: c.atsType || '',
+  atsSlug: c.atsSlug || '',
+  // personal fields — all cleared
+  notes: '',
+  favorite: false,
+  referral: false,
+  viaForm: false,
+  email: '',
+  connections: '',
+  linkedinUrl: '',
+  positions: [],
+  atsCheckedAt: null,
+}));
+
 export const seedJobs = [];
