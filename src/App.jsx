@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import SyncBanner from './components/SyncBanner';
 import ProfileSignInGate from './components/ProfileSignInGate';
 import useLocalStorage from './hooks/useLocalStorage';
-import { seedJobs, starterPackCompanies } from './data/seed';
+import { seedJobs, starterPackCompanies, ROLES } from './data/seed';
 import Dashboard from './components/Dashboard';
 import Pipeline from './components/Pipeline';
 import Companies from './components/Companies';
@@ -54,6 +54,7 @@ export default function App() {
 
   // Dark mode
   const [dark, setDark] = useLocalStorage('scout-dark-mode', false);
+  const [targetRole, setTargetRole] = useLocalStorage('scout-target-role', 'pm');
   useEffect(() => {
     document.documentElement.classList.toggle('dark', !!dark);
   }, [dark]);
@@ -232,8 +233,10 @@ export default function App() {
     triggerSync();
   };
 
-  const handleImportStarterPack = () => {
+  const handleImportStarterPack = (roleId) => {
     if (syncStatus === 'syncing') return;
+    // Save chosen role
+    if (roleId && ROLES.find((r) => r.id === roleId)) setTargetRole(roleId);
     // ID-based dedup — only add companies not already present
     const existingIds = new Set(companies.map((c) => c.id));
     const toAdd = starterPackCompanies.filter((c) => !existingIds.has(c.id));
@@ -336,6 +339,8 @@ export default function App() {
             onQuickAddJob={addJob}
             onUpdateCompany={updateCompany}
             syncStatus={syncStatus}
+            targetRole={targetRole}
+            onRoleChange={setTargetRole}
             onImportStarterPack={
               localStorage.getItem('scout-starter-pack-offered') ? null : handleImportStarterPack
             }

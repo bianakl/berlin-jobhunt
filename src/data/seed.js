@@ -1,3 +1,42 @@
+export const ROLES = [
+  {
+    id: 'pm',
+    label: 'Product Manager',
+    short: 'PM',
+    regex: /\b(product manager|head of product|vp.{0,5}product|product lead|chief product|director.{0,5}product|group product manager)\b/i,
+  },
+  {
+    id: 'engineer',
+    label: 'Software Engineer',
+    short: 'Eng',
+    regex: /\b(software engineer|senior engineer|staff engineer|principal engineer|backend engineer|frontend engineer|full.?stack|engineering manager|tech lead|developer)\b/i,
+  },
+  {
+    id: 'designer',
+    label: 'UX / Product Designer',
+    short: 'Design',
+    regex: /\b(ux designer|product designer|ui designer|ux.?ui|design lead|head of design|senior designer)\b/i,
+  },
+  {
+    id: 'data',
+    label: 'Data Scientist / Analyst',
+    short: 'Data',
+    regex: /\b(data scientist|data analyst|data engineer|machine learning engineer|ml engineer|analytics engineer|business intelligence)\b/i,
+  },
+  {
+    id: 'marketing',
+    label: 'Marketing',
+    short: 'Marketing',
+    regex: /\b(marketing manager|growth manager|content manager|performance marketing|brand manager|head of marketing|cmo|seo)\b/i,
+  },
+  {
+    id: 'sales',
+    label: 'Sales / BizDev',
+    short: 'Sales',
+    regex: /\b(account executive|sales manager|business development|account manager|sales engineer|head of sales|vp.{0,5}sales)\b/i,
+  },
+];
+
 export const STAGES = [
   { id: 'saved', label: 'Saved', emoji: '📌', color: '#6366f1', bg: 'rgba(99,102,241,0.08)', border: 'rgba(99,102,241,0.2)' },
   { id: 'applied', label: 'Applied', emoji: '📬', color: '#f59e0b', bg: 'rgba(245,158,11,0.08)', border: 'rgba(245,158,11,0.2)' },

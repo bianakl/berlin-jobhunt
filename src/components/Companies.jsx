@@ -5,9 +5,9 @@ import {
   CheckSquare, Loader2, Link2, Mail, Users, Kanban, Sparkles, ChevronRight,
   FileText, Copy, Check,
 } from 'lucide-react';
-import { STAGES } from '../data/seed';
+import { STAGES, ROLES } from '../data/seed';
 
-const PM_REGEX = /\b(product manager|head of product|vp.{0,5}product|product lead|chief product|director.{0,5}product|group product manager)\b/i;
+const DEFAULT_ROLE = ROLES[0];
 
 async function fetchPositionsForCompany(company) {
   const { atsType, atsSlug } = company;
@@ -20,7 +20,7 @@ async function fetchPositionsForCompany(company) {
       const data = await res.json();
       const jobs = Array.isArray(data) ? data : [];
       return jobs
-        .filter((j) => PM_REGEX.test(j.text || ''))
+        .filter((j) => roleRegex.test(j.text || ''))
         .map((j) => {
           const plain = j.descriptionPlain || j.description || '';
           const snippet = plain.replace(/<[^>]+>/g, '').trim().slice(0, 160) || '';
@@ -41,7 +41,7 @@ async function fetchPositionsForCompany(company) {
       const data = await res.json();
       const jobs = data.jobs || [];
       return jobs
-        .filter((j) => PM_REGEX.test(j.title || ''))
+        .filter((j) => roleRegex.test(j.title || ''))
         .map((j) => {
           const dept = j.departments?.[0]?.name || '';
           const loc = j.location?.name || '';
@@ -63,7 +63,7 @@ async function fetchPositionsForCompany(company) {
       const data = await res.json();
       const jobs = data.jobs || data.jobPostings || [];
       return jobs
-        .filter((j) => PM_REGEX.test(j.title || ''))
+        .filter((j) => roleRegex.test(j.title || ''))
         .map((j) => ({
           id: j.id,
           title: j.title,
@@ -81,10 +81,14 @@ async function fetchPositionsForCompany(company) {
   return [];
 }
 
-export default function Companies({ companies, jobs, onAddCompany, onEditCompany, onDeleteCompany, onAddJob, onQuickAddJob, onUpdateCompany, onImportStarterPack, syncStatus }) {
+export default function Companies({ companies, jobs, onAddCompany, onEditCompany, onDeleteCompany, onAddJob, onQuickAddJob, onUpdateCompany, onImportStarterPack, syncStatus, targetRole, onRoleChange }) {
   const [search, setSearch] = useState('');
   const [favOnly, setFavOnly] = useState(false);
-  const [hasPmOnly, setHasPmOnly] = useState(false);
+  const [hasRoleOnly, setHasRoleOnly] = useState(false);
+  const [importRole, setImportRole] = useState(targetRole || 'pm');
+
+  const activeRole = ROLES.find((r) => r.id === targetRole) || DEFAULT_ROLE;
+  const roleRegex = activeRole.regex;
   const [sort, setSort] = useState('default');
   const [checkingAll, setCheckingAll] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
@@ -92,7 +96,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
   const filtered = companies
     .filter((c) => {
       if (favOnly && !c.favorite) return false;
-      if (hasPmOnly && !(c.positions?.length > 0)) return false;
+      if (hasRoleOnly && !(c.positions?.length > 0)) return false;
       if (search && !c.name.toLowerCase().includes(search.toLowerCase()) && !c.industry?.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
     })
@@ -223,17 +227,33 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           Favorites
         </button>
         <button
-          onClick={() => setHasPmOnly((v) => !v)}
+          onClick={() => setHasRoleOnly((v) => !v)}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm transition-all"
           style={{
-            background: hasPmOnly ? 'rgba(99,102,241,0.08)' : 'var(--surface)',
-            color: hasPmOnly ? '#6366f1' : 'var(--text-3)',
-            border: `1px solid ${hasPmOnly ? 'rgba(99,102,241,0.25)' : 'var(--border)'}`,
+            background: hasRoleOnly ? 'rgba(99,102,241,0.08)' : 'var(--surface)',
+            color: hasRoleOnly ? '#6366f1' : 'var(--text-3)',
+            border: `1px solid ${hasRoleOnly ? 'rgba(99,102,241,0.25)' : 'var(--border)'}`,
           }}
         >
           <Link2 size={13} />
-          Has PM roles
+          Has {activeRole.short} roles
         </button>
+        <select
+          value={targetRole || 'pm'}
+          onChange={(e) => onRoleChange(e.target.value)}
+          className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+          style={{
+            background: 'var(--surface)',
+            color: 'var(--text-3)',
+            border: '1px solid var(--border)',
+            outline: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          {ROLES.map((r) => (
+            <option key={r.id} value={r.id}>{r.label}</option>
+          ))}
+        </select>
         <div className="flex items-center gap-1">
           {['default', 'az', 'most'].map((s) => (
             <button
@@ -259,13 +279,29 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           {companies.length === 0 ? (
             <>
               <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-2)' }}>No companies yet</p>
-              <p className="text-xs mb-6 max-w-xs mx-auto" style={{ color: 'var(--text-4)' }}>
+              <p className="text-xs mb-5 max-w-xs mx-auto" style={{ color: 'var(--text-4)' }}>
                 Add companies manually, or import a curated list of 100+ Berlin tech companies to get started.
               </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                {onImportStarterPack && (
+              {onImportStarterPack && (
+                <div className="flex flex-col items-center gap-3 mb-3">
+                  <select
+                    value={importRole}
+                    onChange={(e) => setImportRole(e.target.value)}
+                    className="px-3 py-2 rounded-xl text-sm font-medium"
+                    style={{
+                      background: 'var(--surface)',
+                      color: 'var(--text-1)',
+                      border: '1px solid rgba(99,102,241,0.3)',
+                      outline: 'none',
+                      minWidth: 220,
+                    }}
+                  >
+                    {ROLES.map((r) => (
+                      <option key={r.id} value={r.id}>{r.label}</option>
+                    ))}
+                  </select>
                   <button
-                    onClick={onImportStarterPack}
+                    onClick={() => onImportStarterPack(importRole)}
                     disabled={syncStatus === 'syncing'}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
                     style={{
@@ -278,15 +314,15 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
                     <Sparkles size={14} />
                     {syncStatus === 'syncing' ? 'Syncing…' : 'Import Berlin starter pack'}
                   </button>
-                )}
-                <button
-                  onClick={onAddCompany}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all"
-                  style={{ background: 'rgba(99,102,241,0.06)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.15)' }}
-                >
-                  <Plus size={14} /> Add manually
-                </button>
-              </div>
+                </div>
+              )}
+              <button
+                onClick={onAddCompany}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                style={{ background: 'rgba(99,102,241,0.06)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.15)' }}
+              >
+                <Plus size={14} /> Add manually
+              </button>
             </>
           ) : (
             <p className="text-sm" style={{ color: 'var(--text-4)' }}>Nothing matches your filter.</p>
