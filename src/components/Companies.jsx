@@ -9,7 +9,7 @@ import { STAGES, ROLES } from '../data/seed';
 
 const DEFAULT_ROLE = ROLES[0];
 
-async function fetchPositionsForCompany(company) {
+async function fetchPositionsForCompany(company, roleRegex) {
   const { atsType, atsSlug } = company;
   if (!atsType || !atsSlug) return [];
 
@@ -74,6 +74,68 @@ async function fetchPositionsForCompany(company) {
           location: j.location || '',
           foundDate: new Date().toISOString(),
         }));
+    } else if (atsType === 'smartrecruiters') {
+      const res = await fetch(`https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(atsSlug)}/postings`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      const jobs = data.content || data.items || data.jobs || [];
+      return (Array.isArray(jobs) ? jobs : [])
+        .filter((j) => roleRegex.test(j.name || j.title || ''))
+        .map((j) => ({
+          id: j.id || String(j.id),
+          title: j.name || j.title,
+          url: j.ref || `https://jobs.smartrecruiters.com/${atsSlug}/${j.id}`,
+          source: 'smartrecruiters',
+          snippet: '',
+          team: j.department?.label || '',
+          location: j.location?.city || '',
+          foundDate: new Date().toISOString(),
+        }));
+    } else if (atsType === 'personio') {
+      // Personio XML feed
+      const res = await fetch(`https://${encodeURIComponent(atsSlug)}.jobs.personio.de/api/xml?language=en`);
+      if (!res.ok) return [];
+      const xml = await res.text();
+      const results = [];
+      const posMatches = xml.matchAll(/<position>([\s\S]*?)<\/position>/gi);
+      for (const match of posMatches) {
+        const block = match[1];
+        const title = (block.match(/<name>([\s\S]*?)<\/name>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+        const jobId = (block.match(/<job_id>([\s\S]*?)<\/job_id>/i)?.[1] || '').trim();
+        const jobUrl = (block.match(/<url>([\s\S]*?)<\/url>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+        const dept = (block.match(/<department>([\s\S]*?)<\/department>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+        const loc = (block.match(/<office>([\s\S]*?)<\/office>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+        if (title && roleRegex.test(title)) {
+          results.push({
+            id: `personio-${jobId || Date.now()}-${results.length}`,
+            title,
+            url: jobUrl || `https://${atsSlug}.jobs.personio.de/job/${jobId}`,
+            source: 'personio',
+            snippet: '',
+            team: dept,
+            location: loc,
+            foundDate: new Date().toISOString(),
+          });
+        }
+      }
+      return results;
+    } else if (atsType === 'recruitee') {
+      const res = await fetch(`https://${encodeURIComponent(atsSlug)}.recruitee.com/api/offers`);
+      if (!res.ok) return [];
+      const data = await res.json();
+      const offers = data.offers || data.jobs || (Array.isArray(data) ? data : []);
+      return (Array.isArray(offers) ? offers : [])
+        .filter((j) => roleRegex.test(j.title || j.position || ''))
+        .map((j) => ({
+          id: j.id ? String(j.id) : `recruitee-${Date.now()}-${Math.random()}`,
+          title: j.title || j.position,
+          url: j.careers_url || `https://${atsSlug}.recruitee.com/o/${j.slug || j.id}`,
+          source: 'recruitee',
+          snippet: (j.description || '').replace(/<[^>]+>/g, ' ').trim().slice(0, 160),
+          team: j.department || '',
+          location: j.location || j.city || '',
+          foundDate: new Date().toISOString(),
+        }));
     }
   } catch {
     return [];
@@ -127,7 +189,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
 
     // ATS companies — free, direct API
     for (const company of checkableCompanies) {
-      const autoFound = await fetchPositionsForCompany(company);
+      const autoFound = await fetchPositionsForCompany(company, roleRegex);
       const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
       onUpdateCompany(company.id, {
         positions: [...manualPositions, ...autoFound],
@@ -141,7 +203,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
         const res = await fetch('/api/crawl-careers', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-          body: JSON.stringify({ companyName: company.name }),
+          body: JSON.stringify({ companyName: company.name, roleId: targetRole }),
         });
           const data = await res.json();
           const found = Array.isArray(data.positions) ? data.positions : [];
@@ -343,6 +405,8 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
               onQuickAddJob={onQuickAddJob}
               onUpdateCompany={onUpdateCompany}
               isLast={idx === filtered.length - 1}
+              roleRegex={roleRegex}
+              targetRole={targetRole}
             />
           ))}
         </div>
@@ -351,7 +415,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
   );
 }
 
-function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDelete, onAddJob, onQuickAddJob, onUpdateCompany, isLast }) {
+function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDelete, onAddJob, onQuickAddJob, onUpdateCompany, isLast, roleRegex, targetRole }) {
   const [checking, setChecking] = useState(false);
   const [checkDone, setCheckDone] = useState(null); // null | 'found' | 'none'
   const [crawling, setCrawling] = useState(false);
@@ -417,7 +481,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       const res = await fetch('/api/crawl-careers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-        body: JSON.stringify({ companyName: company.name }),
+        body: JSON.stringify({ companyName: company.name, roleId: targetRole }),
       });
       const data = await res.json();
       const found = Array.isArray(data.positions) ? data.positions : [];
@@ -446,7 +510,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
     if (!canCheck || checking) return;
     setChecking(true);
     setCheckDone(null);
-    const autoFound = await fetchPositionsForCompany(company);
+    const autoFound = await fetchPositionsForCompany(company, roleRegex);
     const manualPositions = positions.filter((p) => p.source === 'manual');
     onUpdateCompany(company.id, {
       positions: [...manualPositions, ...autoFound],

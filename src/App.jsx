@@ -87,6 +87,31 @@ export default function App() {
     localStorage.setItem(key, 'done');
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // One-time migration: add new ATS configs discovered for Berlin companies
+  useEffect(() => {
+    const key = 'scout-ats-migration-v2';
+    if (localStorage.getItem(key)) return;
+    const fixes = {
+      'c-aleph-alpha': { atsType: 'personio',       atsSlug: 'alephalpha' },
+      'c-deepset':     { atsType: 'personio',       atsSlug: 'deepset' },
+      'c-parloa':      { atsType: 'greenhouse',     atsSlug: 'parloa' },
+      'c-solarisbank': { atsType: 'greenhouse',     atsSlug: 'solarisbank' },
+      'c-spendesk':    { atsType: 'lever',          atsSlug: 'spendesk' },
+      'c-taxfix':      { atsType: 'greenhouse',     atsSlug: 'taxfix2' },
+      'c-wefox':       { atsType: 'personio',       atsSlug: 'wefox-jobs' },
+      'c-about-you':   { atsType: 'smartrecruiters', atsSlug: 'ABOUTYOUGmbH' },
+      'c-auto1':       { atsType: 'smartrecruiters', atsSlug: 'Auto1' },
+      'c-flink':       { atsType: 'smartrecruiters', atsSlug: 'Flink3' },
+      'c-enpal':       { atsType: 'smartrecruiters', atsSlug: 'Enpal' },
+      'c-mcmakler':    { atsType: 'smartrecruiters', atsSlug: 'McMakler' },
+      'c-mcmakler2':   { atsType: 'smartrecruiters', atsSlug: 'McMakler' },
+    };
+    setCompanies((prev) =>
+      prev.map((c) => (fixes[c.id] && !c.atsType ? { ...c, ...fixes[c.id] } : c))
+    );
+    localStorage.setItem(key, 'done');
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // On mount: check for existing session and pull cloud data
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {

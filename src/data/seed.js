@@ -56,9 +56,9 @@ export const COMPANY_SIZES = ['1–10', '11–50', '51–200', '201–500', '500
 
 const _seedCompanies = [
   // --- AI / ML ---
-  { id: 'c-aleph-alpha', name: 'Aleph Alpha', website: '', industry: 'AI / ML', size: '201–500', notes: 'European AI research company. On-prem and cloud environments.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-aleph-alpha', name: 'Aleph Alpha', website: '', industry: 'AI / ML', size: '201–500', notes: 'European AI research company. On-prem and cloud environments.', favorite: false, positions: [], atsType: 'personio', atsSlug: 'alephalpha', atsCheckedAt: null },
   { id: 'c-deepl', name: 'DeepL', website: '', industry: 'AI / ML', size: '500–1000', notes: 'Neural machine translation. Strong language AI focus.', favorite: false, positions: [], atsType: 'ashby', atsSlug: 'DeepL', atsCheckedAt: null },
-  { id: 'c-deepset', name: 'deepset', website: '', industry: 'AI / ML', size: '51–200', notes: 'NLP / LLM infrastructure. Makers of Haystack.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-deepset', name: 'deepset', website: '', industry: 'AI / ML', size: '51–200', notes: 'NLP / LLM infrastructure. Makers of Haystack.', favorite: false, positions: [], atsType: 'personio', atsSlug: 'deepset', atsCheckedAt: null },
   { id: 'c-prior-labs', name: 'Prior Labs', website: '', industry: 'AI / ML', size: '1–10', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-synthflow', name: 'Synthflow AI', website: '', industry: 'AI / ML', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-unframe', name: 'Unframe AI', website: '', industry: 'AI / ML', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -69,7 +69,7 @@ const _seedCompanies = [
   { id: 'c-motor-ai', name: 'MOTOR Ai', website: '', industry: 'AI / ML', size: '11–50', notes: 'Submitted spontaneous application.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-liveperson', name: 'LivePerson', website: '', industry: 'AI / ML', size: '500–1000', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-dataiku', name: 'Dataiku', website: '', industry: 'AI / ML', size: '500–1000', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'dataiku', atsCheckedAt: null },
-  { id: 'c-parloa', name: 'Parloa', website: '', industry: 'AI / ML', size: '51–200', notes: 'Conversational AI for customer service.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-parloa', name: 'Parloa', website: '', industry: 'AI / ML', size: '51–200', notes: 'Conversational AI for customer service.', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'parloa', atsCheckedAt: null },
   { id: 'c-textcortex', name: 'Text Cortex AI', website: '', industry: 'AI / ML', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-twain', name: 'Twain', website: '', industry: 'AI / ML', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-peec', name: 'Peec AI', website: '', industry: 'AI / ML', size: '1–10', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -82,12 +82,12 @@ const _seedCompanies = [
   { id: 'c-trade-republic', name: 'Trade Republic', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'traderepublic', atsCheckedAt: null },
   { id: 'c-scalable', name: 'Scalable Capital', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'scalablecapital', atsCheckedAt: null },
   { id: 'c-raisin', name: 'Raisin', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'raisin', atsCheckedAt: null },
-  { id: 'c-solarisbank', name: 'Solarisbank', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-solarisbank', name: 'Solarisbank', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'solarisbank', atsCheckedAt: null },
   { id: 'c-stripe', name: 'Stripe', website: '', industry: 'FinTech', size: '1000+', notes: '', favorite: true, positions: [], atsType: 'greenhouse', atsSlug: 'stripe', atsCheckedAt: null },
   { id: 'c-klarna', name: 'Klarna', website: '', industry: 'FinTech', size: '1000+', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'klarna', atsCheckedAt: null },
   { id: 'c-smava', name: 'smava', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-tide', name: 'Tide', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-spendesk', name: 'Spendesk', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-spendesk', name: 'Spendesk', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'lever', atsSlug: 'spendesk', atsCheckedAt: null },
   { id: 'c-upvest', name: 'Upvest', website: '', industry: 'FinTech', size: '51–200', notes: '', favorite: false, positions: [], atsType: 'ashby', atsSlug: 'upvest', atsCheckedAt: null },
   { id: 'c-payrails', name: 'Payrails', website: '', industry: 'FinTech', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-banxware', name: 'Banxware', website: '', industry: 'FinTech', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -96,8 +96,8 @@ const _seedCompanies = [
   { id: 'c-mondu', name: 'Mondu', website: '', industry: 'FinTech', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-recap', name: 're:cap', website: '', industry: 'FinTech', size: '11–50', notes: 'Also remote in Germany.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-clark', name: 'Clark', website: '', industry: 'FinTech', size: '201–500', notes: 'Significant layoffs in May 2025.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-taxfix', name: 'Taxfix', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-wefox', name: 'wefox', website: '', industry: 'FinTech', size: '500–1000', notes: 'Might only publish openings on LinkedIn.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-taxfix', name: 'Taxfix', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'taxfix2', atsCheckedAt: null },
+  { id: 'c-wefox', name: 'wefox', website: '', industry: 'FinTech', size: '500–1000', notes: '', favorite: false, positions: [], atsType: 'personio', atsSlug: 'wefox-jobs', atsCheckedAt: null },
   { id: 'c-baobab', name: 'Baobab Insurance', website: '', industry: 'FinTech', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-pair-finance', name: 'PAIR Finance', website: '', industry: 'FinTech', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-unzer', name: 'Unzer', website: '', industry: 'FinTech', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -138,8 +138,8 @@ const _seedCompanies = [
 
   // --- E-commerce ---
   { id: 'c-zalando', name: 'Zalando', website: '', industry: 'E-commerce', size: '1000+', notes: "Europe's largest fashion platform. Strong data and AI investment.", favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'zalando', atsCheckedAt: null },
-  { id: 'c-about-you', name: 'ABOUT YOU (SCAYLE)', website: '', industry: 'E-commerce', size: '500–1000', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-auto1', name: 'Auto1', website: '', industry: 'E-commerce', size: '1000+', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-about-you', name: 'ABOUT YOU (SCAYLE)', website: '', industry: 'E-commerce', size: '500–1000', notes: '', favorite: false, positions: [], atsType: 'smartrecruiters', atsSlug: 'ABOUTYOUGmbH', atsCheckedAt: null },
+  { id: 'c-auto1', name: 'Auto1', website: '', industry: 'E-commerce', size: '1000+', notes: '', favorite: false, positions: [], atsType: 'smartrecruiters', atsSlug: 'Auto1', atsCheckedAt: null },
   { id: 'c-vinted', name: 'Vinted', website: '', industry: 'E-commerce', size: '500–1000', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'vinted', atsCheckedAt: null },
   { id: 'c-razor', name: 'Razor Group GmbH', website: '', industry: 'E-commerce', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-outfittery', name: 'OUTFITTERY', website: '', industry: 'E-commerce', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -159,7 +159,7 @@ const _seedCompanies = [
   { id: 'c-hellofresh', name: 'HelloFresh', website: '', industry: 'Consumer Apps', size: '1000+', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'hellofresh', atsCheckedAt: null },
   { id: 'c-wolt', name: 'Wolt', website: '', industry: 'Consumer Apps', size: '1000+', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'woltteam', atsCheckedAt: null },
   { id: 'c-strava', name: 'Strava', website: '', industry: 'Consumer Apps', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-flink', name: 'Flink', website: '', industry: 'Consumer Apps', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-flink', name: 'Flink', website: '', industry: 'Consumer Apps', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'smartrecruiters', atsSlug: 'Flink3', atsCheckedAt: null },
   { id: 'c-hometogo', name: 'HomeToGo', website: '', industry: 'Consumer Apps', size: '201–500', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'hometogo', atsCheckedAt: null },
   { id: 'c-delivery-hero', name: 'Delivery Hero', website: '', industry: 'Consumer Apps', size: '1000+', notes: '', favorite: false, positions: [], atsType: 'greenhouse', atsSlug: 'deliveryhero', atsCheckedAt: null },
   { id: 'c-helpling', name: 'Helpling', website: '', industry: 'Consumer Apps', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -199,7 +199,7 @@ const _seedCompanies = [
 
   // --- Climate Tech ---
   { id: 'c-climatiq', name: 'Climatiq', website: '', industry: 'Climate Tech', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-enpal', name: 'Enpal', website: '', industry: 'Climate Tech', size: '500–1000', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-enpal', name: 'Enpal', website: '', industry: 'Climate Tech', size: '500–1000', notes: '', favorite: false, positions: [], atsType: 'smartrecruiters', atsSlug: 'Enpal', atsCheckedAt: null },
   { id: 'c-1komma5', name: '1KOMMA5°', website: '', industry: 'Climate Tech', size: '201–500', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-cloover', name: 'Cloover', website: '', industry: 'Climate Tech', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-ceezer', name: 'CEEZER', website: '', industry: 'Climate Tech', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -276,7 +276,7 @@ const _seedCompanies = [
   { id: 'c-soba', name: 'Soba Studios', website: '', industry: 'Gaming', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-ceartas', name: 'Ceartas', website: '', industry: 'Other', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-cariqa', name: 'cariqa', website: '', industry: 'Mobility', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-mcmakler', name: 'McMakler', website: '', industry: 'Consumer Apps', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-mcmakler', name: 'McMakler', website: '', industry: 'Consumer Apps', size: '51–200', notes: '', favorite: false, positions: [], atsType: 'smartrecruiters', atsSlug: 'McMakler', atsCheckedAt: null },
   { id: 'c-spread', name: 'SPREAD', website: '', industry: 'SaaS / B2B', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-kugu', name: 'KUGU', website: '', industry: 'Climate Tech', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-wallround', name: 'WALLROUND', website: '', industry: 'Other', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
@@ -307,7 +307,7 @@ const _seedCompanies = [
   { id: 'c-swobbee', name: 'Swobbee', website: '', industry: 'Mobility', size: '11–50', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-sphaira', name: 'Sphaira / Moby', website: '', industry: 'HealthTech', size: '11–50', notes: 'Some jobs require German.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
   { id: 'c-caronsale', name: 'CarOnSale', website: '', industry: 'E-commerce', size: '51–200', notes: 'Some jobs require German.', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
-  { id: 'c-mcmakler2', name: 'McMakler', website: '', industry: 'Consumer Apps', size: '51–200', notes: '', favorite: false, positions: [], atsType: '', atsSlug: '', atsCheckedAt: null },
+  { id: 'c-mcmakler2', name: 'McMakler', website: '', industry: 'Consumer Apps', size: '51–200', notes: '', favorite: false, positions: [], atsType: 'smartrecruiters', atsSlug: 'McMakler', atsCheckedAt: null },
 ];
 
 export const seedCompanies = _seedCompanies.map((c) => ({

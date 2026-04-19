@@ -25,7 +25,14 @@ function setCors(req, res) {
   res.setHeader('Vary', 'Origin');
 }
 
-const PM_REGEX = /\b(product manager|head of product|vp.{0,5}product|product lead|chief product|director.{0,5}product|group product manager|principal pm|group pm)\b/i;
+const ROLE_REGEXES = {
+  pm:        /\b(product manager|head of product|vp.{0,5}product|product lead|chief product|director.{0,5}product|group product manager|principal pm|group pm)\b/i,
+  engineer:  /\b(software engineer|senior engineer|staff engineer|principal engineer|backend engineer|frontend engineer|full.?stack|engineering manager|tech lead|developer)\b/i,
+  designer:  /\b(ux designer|product designer|ui designer|ux.?ui|design lead|head of design|senior designer)\b/i,
+  data:      /\b(data scientist|data analyst|data engineer|machine learning engineer|ml engineer|analytics engineer|business intelligence)\b/i,
+  marketing: /\b(marketing manager|growth manager|content manager|performance marketing|brand manager|head of marketing|cmo|seo)\b/i,
+  sales:     /\b(account executive|sales manager|business development|account manager|sales engineer|head of sales|vp.{0,5}sales)\b/i,
+};
 
 // SSRF protection: block private/loopback ranges and only allow http/https
 function isSafeUrl(urlStr) {
@@ -42,18 +49,15 @@ function normalizeSlug(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
-async function tryLever(slug) {
+async function tryLever(slug, roleRegex) {
   const res = await fetch(`https://api.lever.co/v0/postings/${slug}?mode=json`, { signal: AbortSignal.timeout(6000) });
   if (!res.ok) return null;
   const data = await res.json();
   if (!Array.isArray(data) || data.length === 0) return null;
-  const pmRoles = data.filter((p) => PM_REGEX.test(p.text || ''));
-  if (pmRoles.length === 0 && data.length > 0) {
-    // Company is on Lever but no PM roles — still return detectedAts so we can save the config
-    return { positions: [], detectedAts: { type: 'lever', slug } };
-  }
+  const matched = data.filter((p) => roleRegex.test(p.text || ''));
+  if (matched.length === 0) return { positions: [], detectedAts: { type: 'lever', slug } };
   return {
-    positions: pmRoles.slice(0, 10).map((p, i) => ({
+    positions: matched.slice(0, 10).map((p, i) => ({
       id: `crawl-lever-${Date.now()}-${i}`,
       title: p.text,
       url: p.hostedUrl || p.applyUrl || '',
@@ -67,15 +71,15 @@ async function tryLever(slug) {
   };
 }
 
-async function tryGreenhouse(slug) {
+async function tryGreenhouse(slug, roleRegex) {
   const res = await fetch(`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs`, { signal: AbortSignal.timeout(6000) });
   if (!res.ok) return null;
   const data = await res.json();
   if (!data.jobs || !Array.isArray(data.jobs) || data.jobs.length === 0) return null;
-  const pmRoles = data.jobs.filter((p) => PM_REGEX.test(p.title || ''));
-  if (pmRoles.length === 0) return { positions: [], detectedAts: { type: 'greenhouse', slug } };
+  const matched = data.jobs.filter((p) => roleRegex.test(p.title || ''));
+  if (matched.length === 0) return { positions: [], detectedAts: { type: 'greenhouse', slug } };
   return {
-    positions: pmRoles.slice(0, 10).map((p, i) => ({
+    positions: matched.slice(0, 10).map((p, i) => ({
       id: `crawl-gh-${Date.now()}-${i}`,
       title: p.title,
       url: p.absolute_url || '',
@@ -89,7 +93,7 @@ async function tryGreenhouse(slug) {
   };
 }
 
-async function tryAshby(slug) {
+async function tryAshby(slug, roleRegex) {
   const res = await fetch('https://jobs.ashbyhq.com/api/non-user-graphql?op=ApiJobBoardWithTeams', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -104,10 +108,10 @@ async function tryAshby(slug) {
   const data = await res.json();
   const postings = data?.data?.jobBoard?.jobPostings;
   if (!Array.isArray(postings) || postings.length === 0) return null;
-  const pmRoles = postings.filter((p) => PM_REGEX.test(p.title || ''));
-  if (pmRoles.length === 0) return { positions: [], detectedAts: { type: 'ashby', slug } };
+  const matched = postings.filter((p) => roleRegex.test(p.title || ''));
+  if (matched.length === 0) return { positions: [], detectedAts: { type: 'ashby', slug } };
   return {
-    positions: pmRoles.slice(0, 10).map((p, i) => ({
+    positions: matched.slice(0, 10).map((p, i) => ({
       id: `crawl-ashby-${Date.now()}-${i}`,
       title: p.title,
       url: `https://jobs.ashbyhq.com/${slug}/${p.id}`,
@@ -120,7 +124,95 @@ async function tryAshby(slug) {
   };
 }
 
-async function fetchAndParseCustomUrl(url, client) {
+async function trySmartRecruiters(slug, roleRegex) {
+  const res = await fetch(`https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(slug)}/postings`, {
+    signal: AbortSignal.timeout(6000),
+    headers: { 'Accept': 'application/json' },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const jobs = data.content || data.items || data.jobs || [];
+  if (!Array.isArray(jobs) || jobs.length === 0) return null;
+  const matched = jobs.filter((p) => roleRegex.test(p.name || p.title || ''));
+  if (matched.length === 0) return { positions: [], detectedAts: { type: 'smartrecruiters', slug } };
+  return {
+    positions: matched.slice(0, 10).map((p, i) => ({
+      id: `crawl-sr-${Date.now()}-${i}`,
+      title: p.name || p.title,
+      url: p.ref || `https://jobs.smartrecruiters.com/${slug}/${p.id}`,
+      snippet: (p.customField?.find?.((f) => f.fieldId === 'summary')?.valueLabel || '').slice(0, 200),
+      team: p.department?.label || '',
+      location: p.location?.city || '',
+      source: 'smartrecruiters',
+      foundDate: new Date().toISOString(),
+    })),
+    detectedAts: { type: 'smartrecruiters', slug },
+  };
+}
+
+async function tryPersonio(subdomain, roleRegex) {
+  // Personio public XML feed — available without auth
+  const url = `https://${encodeURIComponent(subdomain)}.jobs.personio.de/api/xml?language=en`;
+  const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+  if (!res.ok) return null;
+  const xml = await res.text();
+  // Simple XML parse — extract <position> elements
+  const positions = [];
+  const posMatches = xml.matchAll(/<position>([\s\S]*?)<\/position>/gi);
+  for (const match of posMatches) {
+    const block = match[1];
+    const title = (block.match(/<name>([\s\S]*?)<\/name>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+    const jobId = (block.match(/<job_id>([\s\S]*?)<\/job_id>/i)?.[1] || '').trim();
+    const jobUrl = (block.match(/<url>([\s\S]*?)<\/url>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+    const dept = (block.match(/<department>([\s\S]*?)<\/department>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+    const loc = (block.match(/<office>([\s\S]*?)<\/office>/i)?.[1] || '').replace(/<!\[CDATA\[|\]\]>/g, '').trim();
+    if (title) positions.push({ title, id: jobId, url: jobUrl, department: dept, location: loc });
+  }
+  if (positions.length === 0) return null;
+  const matched = positions.filter((p) => roleRegex.test(p.title));
+  if (matched.length === 0) return { positions: [], detectedAts: { type: 'personio', slug: subdomain } };
+  return {
+    positions: matched.slice(0, 10).map((p, i) => ({
+      id: `crawl-personio-${Date.now()}-${i}`,
+      title: p.title,
+      url: p.url || `https://${subdomain}.jobs.personio.de/job/${p.id}`,
+      snippet: '',
+      team: p.department || '',
+      location: p.location || '',
+      source: 'personio',
+      foundDate: new Date().toISOString(),
+    })),
+    detectedAts: { type: 'personio', slug: subdomain },
+  };
+}
+
+async function tryRecruitee(subdomain, roleRegex) {
+  const res = await fetch(`https://${encodeURIComponent(subdomain)}.recruitee.com/api/offers`, {
+    signal: AbortSignal.timeout(6000),
+    headers: { 'Accept': 'application/json' },
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  const offers = data.offers || data.jobs || data;
+  if (!Array.isArray(offers) || offers.length === 0) return null;
+  const matched = offers.filter((p) => roleRegex.test(p.title || p.position || ''));
+  if (matched.length === 0) return { positions: [], detectedAts: { type: 'recruitee', slug: subdomain } };
+  return {
+    positions: matched.slice(0, 10).map((p, i) => ({
+      id: `crawl-recruitee-${Date.now()}-${i}`,
+      title: p.title || p.position,
+      url: p.careers_url || `https://${subdomain}.recruitee.com/o/${p.slug || p.id}`,
+      snippet: (p.description || '').replace(/<[^>]+>/g, ' ').trim().slice(0, 200),
+      team: p.department || '',
+      location: p.location || p.city || '',
+      source: 'recruitee',
+      foundDate: new Date().toISOString(),
+    })),
+    detectedAts: { type: 'recruitee', slug: subdomain },
+  };
+}
+
+async function fetchAndParseCustomUrl(url, client, roleLabel) {
   const validated = new URL(url); // throws if invalid
   if (!['http:', 'https:'].includes(validated.protocol)) return { positions: [], detectedAts: null };
 
@@ -144,12 +236,12 @@ async function fetchAndParseCustomUrl(url, client) {
     max_tokens: 700,
     messages: [{
       role: 'user',
-      content: `Extract Product Manager job listings from this careers page.
+      content: `Extract ${roleLabel} job listings from this careers page.
 
 Return ONLY a JSON array (max 10 items, empty [] if none):
-[{"title":"Senior PM","url":"https://...","snippet":"brief description under 150 chars"}]
+[{"title":"Senior ${roleLabel}","url":"https://...","snippet":"brief description under 150 chars"}]
 
-Only include roles matching: Product Manager, Head of Product, Director of Product, VP Product, CPO, Group PM, Principal PM.
+Only include roles relevant to: ${roleLabel}.
 Make URLs absolute (base: "${url}").
 
 Page text:
@@ -188,25 +280,40 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API not configured.' });
 
-  const { companyName } = req.body || {};
+  const { companyName, roleId } = req.body || {};
   if (!companyName || typeof companyName !== 'string') return res.status(400).json({ error: 'Missing companyName.' });
   if (companyName.length > 200) return res.status(400).json({ error: 'Company name too long.' });
 
+  const roleRegex = ROLE_REGEXES[roleId] || ROLE_REGEXES.pm;
+  const ROLE_LABELS = {
+    pm: 'Product Manager', engineer: 'Software Engineer', designer: 'UX / Product Designer',
+    data: 'Data Scientist / Analyst', marketing: 'Marketing Manager', sales: 'Account Executive / Sales',
+  };
+  const roleLabel = ROLE_LABELS[roleId] || 'Product Manager';
+
   const slug = normalizeSlug(companyName);
 
-  // Step 1: Try all three ATS APIs in parallel with guessed slug
+  // Step 1: Try all ATS APIs in parallel with guessed slug
   try {
-    const [leverRes, ghRes, ashbyRes] = await Promise.allSettled([
-      tryLever(slug),
-      tryGreenhouse(slug),
-      tryAshby(companyName), // Ashby often uses the original name casing
+    const [leverRes, ghRes, ashbyRes, srRes] = await Promise.allSettled([
+      tryLever(slug, roleRegex),
+      tryGreenhouse(slug, roleRegex),
+      tryAshby(companyName, roleRegex), // Ashby often uses the original name casing
+      trySmartRecruiters(companyName.replace(/\s+/g, ''), roleRegex), // SmartRecruiters often strips spaces
     ]);
-    for (const r of [leverRes, ghRes, ashbyRes]) {
+    for (const r of [leverRes, ghRes, ashbyRes, srRes]) {
       if (r.status === 'fulfilled' && r.value) return res.status(200).json(r.value);
     }
-    // Also try Ashby with the slug variant
-    const ashbySlugRes = await tryAshby(slug).catch(() => null);
-    if (ashbySlugRes) return res.status(200).json(ashbySlugRes);
+    // Also try Ashby and SmartRecruiters with the slug variant
+    const [ashbySlugRes, srSlugRes, personioRes, recruiteeRes] = await Promise.allSettled([
+      tryAshby(slug, roleRegex),
+      trySmartRecruiters(slug, roleRegex),
+      tryPersonio(slug, roleRegex),
+      tryRecruitee(slug, roleRegex),
+    ]);
+    for (const r of [ashbySlugRes, srSlugRes, personioRes, recruiteeRes]) {
+      if (r.status === 'fulfilled' && r.value) return res.status(200).json(r.value);
+    }
   } catch { /* fall through to Claude */ }
 
   // Step 2: Ask Claude to identify the correct ATS slug or careers URL
@@ -223,6 +330,9 @@ Response format:
 If Lever: {"ats":"lever","slug":"slug-from-jobs.lever.co/SLUG"}
 If Greenhouse: {"ats":"greenhouse","slug":"slug-from-boards.greenhouse.io/SLUG"}
 If Ashby: {"ats":"ashby","slug":"slug-from-jobs.ashbyhq.com/SLUG"}
+If SmartRecruiters: {"ats":"smartrecruiters","slug":"CompanyIdentifier-from-jobs.smartrecruiters.com/CompanyIdentifier"}
+If Personio: {"ats":"personio","slug":"subdomain-from-subdomain.jobs.personio.de"}
+If Recruitee: {"ats":"recruitee","slug":"subdomain-from-subdomain.recruitee.com"}
 If custom careers page: {"ats":"custom","url":"https://exact-url"}
 If unknown: {"ats":"unknown"}`,
       messages: [{ role: 'user', content: companyName }],
@@ -235,9 +345,12 @@ If unknown: {"ats":"unknown"}`,
   if (identified.ats !== 'unknown' && identified.ats !== 'custom' && identified.slug) {
     try {
       let result = null;
-      if (identified.ats === 'lever') result = await tryLever(identified.slug);
-      else if (identified.ats === 'greenhouse') result = await tryGreenhouse(identified.slug);
-      else if (identified.ats === 'ashby') result = await tryAshby(identified.slug);
+      if (identified.ats === 'lever') result = await tryLever(identified.slug, roleRegex);
+      else if (identified.ats === 'greenhouse') result = await tryGreenhouse(identified.slug, roleRegex);
+      else if (identified.ats === 'ashby') result = await tryAshby(identified.slug, roleRegex);
+      else if (identified.ats === 'smartrecruiters') result = await trySmartRecruiters(identified.slug, roleRegex);
+      else if (identified.ats === 'personio') result = await tryPersonio(identified.slug, roleRegex);
+      else if (identified.ats === 'recruitee') result = await tryRecruitee(identified.slug, roleRegex);
       if (result) return res.status(200).json(result);
     } catch { /* fall through */ }
   }
@@ -245,7 +358,7 @@ If unknown: {"ats":"unknown"}`,
   // Step 4: Crawl custom URL — validate hostname before fetching (SSRF protection)
   if (identified.ats === 'custom' && identified.url && isSafeUrl(identified.url)) {
     try {
-      const result = await fetchAndParseCustomUrl(identified.url, client);
+      const result = await fetchAndParseCustomUrl(identified.url, client, roleLabel);
       return res.status(200).json(result);
     } catch (err) {
       console.error('crawl-careers fetch error:', err);
