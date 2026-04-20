@@ -36,12 +36,36 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API not configured.' });
 
-  const { cvText, cvBase64 } = req.body || {};
+  const { cvText, cvBase64, mode } = req.body || {};
   if (!cvText && !cvBase64) return res.status(400).json({ error: 'No CV content provided.' });
-  if (cvText && cvText.length > 50000) return res.status(400).json({ error: 'CV text too large.' });
   if (cvBase64 && cvBase64.length > 10 * 1024 * 1024) return res.status(400).json({ error: 'PDF too large.' });
 
   const client = new Anthropic({ apiKey });
+
+  // Skills-only mode: fast, cheap, focused
+  if (mode === 'skills') {
+    const text = (cvText || '').slice(0, 6000);
+    const prompt = `Extract a list of professional skills, tools, and technologies from this CV. Return ONLY a JSON array of strings, max 25 items, most relevant first.\n\nCV:\n${text}`;
+    try {
+      const message = await client.messages.create({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 300,
+        messages: [
+          { role: 'user', content: prompt },
+          { role: 'assistant', content: '[' },
+        ],
+      });
+      const raw = ('[' + message.content[0].text).trim();
+      const skills = JSON.parse(raw.replace(/,\s*$/, '').replace(/\n?```$/, '').trim());
+      return res.status(200).json({ skills: Array.isArray(skills) ? skills : [] });
+    } catch (err) {
+      console.error('extract-profile skills error:', err);
+      return res.status(500).json({ error: 'Skill extraction failed.' });
+    }
+  }
+
+  // Full profile extraction
+  const truncated = cvText ? cvText.slice(0, 8000) : null;
 
   const PROMPT = `You are a CV parser. Extract structured profile information and return ONLY valid JSON with this exact structure (no markdown, no explanation):
 {
@@ -70,17 +94,20 @@ Rules:
       { type: 'text', text: PROMPT },
     ];
   } else {
-    content = `${cvText}\n\n---\n\n${PROMPT}`;
+    content = `${truncated}\n\n---\n\n${PROMPT}`;
   }
 
   try {
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
-      messages: [{ role: 'user', content }],
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 600,
+      messages: [
+        { role: 'user', content },
+        { role: 'assistant', content: '{' },
+      ],
     });
 
-    const raw = message.content[0].text.trim();
+    const raw = ('{' + message.content[0].text).trim();
     const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
     const profile = JSON.parse(jsonStr);
     return res.status(200).json(profile);

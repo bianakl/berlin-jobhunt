@@ -75,7 +75,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
     setSkillExtracting(true);
     setSkillExtractMsg('');
     try {
-      const body = cvB64 ? { cvBase64: cvB64 } : { cvText };
+      const body = cvB64 ? { cvBase64: cvB64, mode: 'skills' } : { cvText, mode: 'skills' };
       const res = await fetch('/api/extract-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
