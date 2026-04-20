@@ -188,39 +188,48 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
 
   const handleCheckAll = async () => {
     setCheckingAll(true);
+    const now = new Date().toISOString();
 
-    // ATS companies — free, direct API
-    for (const company of checkableCompanies) {
-      const autoFound = await fetchPositionsForCompany(company, roleRegex);
-      const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
-      onUpdateCompany(company.id, {
-        positions: [...manualPositions, ...autoFound],
-        atsCheckedAt: new Date().toISOString(),
-      });
-    }
-
-    // Non-ATS companies — crawl via Claude
-    for (const company of crawlableCompanies) {
-      try {
-        const res = await fetch('/api/crawl-careers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-          body: JSON.stringify({ companyName: company.name, roleId: targetRole }),
+    // ATS companies — run all in parallel
+    await Promise.allSettled(
+      checkableCompanies.map(async (company) => {
+        const autoFound = await fetchPositionsForCompany(company, roleRegex);
+        const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
+        onUpdateCompany(company.id, {
+          positions: [...manualPositions, ...autoFound],
+          atsCheckedAt: now,
         });
-          const data = await res.json();
-          const found = Array.isArray(data.positions) ? data.positions : [];
-          const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
-          const updates = {
-            positions: [...manualPositions, ...found],
-            atsCheckedAt: new Date().toISOString(),
-          };
-          if (data.detectedAts?.type && data.detectedAts?.slug) {
-            updates.atsType = data.detectedAts.type;
-            updates.atsSlug = data.detectedAts.slug;
-          }
-          onUpdateCompany(company.id, updates);
-        } catch { /* skip failed companies */ }
-      }
+      })
+    );
+
+    // Non-ATS companies — crawl in batches of 3 to avoid rate limits
+    const header = await authHeader();
+    const BATCH = 3;
+    for (let i = 0; i < crawlableCompanies.length; i += BATCH) {
+      await Promise.allSettled(
+        crawlableCompanies.slice(i, i + BATCH).map(async (company) => {
+          try {
+            const res = await fetch('/api/crawl-careers', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...header },
+              body: JSON.stringify({ companyName: company.name, roleId: targetRole }),
+            });
+            const data = await res.json();
+            const found = Array.isArray(data.positions) ? data.positions : [];
+            const manualPositions = (company.positions || []).filter((p) => p.source === 'manual');
+            const updates = {
+              positions: [...manualPositions, ...found],
+              atsCheckedAt: now,
+            };
+            if (data.detectedAts?.type && data.detectedAts?.slug) {
+              updates.atsType = data.detectedAts.type;
+              updates.atsSlug = data.detectedAts.slug;
+            }
+            onUpdateCompany(company.id, updates);
+          } catch { /* skip failed companies */ }
+        })
+      );
+    }
 
     setCheckingAll(false);
   };
