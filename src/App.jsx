@@ -164,8 +164,6 @@ export default function App() {
         if (data.achievements) setAchievements(data.achievements);
         if (data.dark_mode !== undefined) setDark(data.dark_mode);
         if (data.cv_name) localStorage.setItem('scout-cv-name', data.cv_name);
-        if (data.cv_text) localStorage.setItem('scout-cv-text', data.cv_text);
-        if (data.market_value) localStorage.setItem('scout-market-value', JSON.stringify(data.market_value));
       } else {
         // New authenticated user with no cloud data — push local state so other devices sync
         scheduleSyncFor(userId);
@@ -191,10 +189,6 @@ export default function App() {
           achievements: s.achievements,
           dark_mode: s.dark,
           cv_name: localStorage.getItem('scout-cv-name') || '',
-          cv_text: localStorage.getItem('scout-cv-text') || '',
-          market_value: (() => {
-            try { return JSON.parse(localStorage.getItem('scout-market-value') || 'null'); } catch { return null; }
-          })(),
         });
         setSyncStatus('synced');
       } catch {

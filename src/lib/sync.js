@@ -8,8 +8,8 @@ export const SYNC_FIELDS = [
   'achievements',
   'dark_mode',
   'cv_name',
-  'cv_text',
-  'market_value',
+  // cv_text and market_value are localStorage-only:
+  // cv_text is high-sensitivity PII (full CV); market_value is regeneratable.
 ];
 
 /**
@@ -35,7 +35,7 @@ export async function pushToSupabase(userId, data) {
 export async function pullFromSupabase(userId) {
   const { data, error } = await supabase
     .from('scout_user_data')
-    .select('*')
+    .select('jobs, companies, profile, streak, achievements, dark_mode, cv_name')
     .eq('id', userId)
     .maybeSingle();
   if (error) throw error;

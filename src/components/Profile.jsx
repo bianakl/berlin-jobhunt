@@ -289,8 +289,22 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
     }
   };
 
-  const handleClearData = () => {
-    if (!window.confirm('This will permanently delete all your Scout data: jobs, companies, profile, and API key. Continue?')) return;
+  const handleClearData = async () => {
+    if (!window.confirm('This will permanently delete all your Scout data — including cloud sync. Continue?')) return;
+
+    if (syncUser) {
+      try {
+        await fetch('/api/delete-account', {
+          method: 'DELETE',
+          headers: { ...(await authHeader()) },
+        });
+      } catch { /* proceed with local clear even if server fails */ }
+      try {
+        const { supabase: sb } = await import('../lib/supabase');
+        await sb.auth.signOut();
+      } catch { /* ignore */ }
+    }
+
     Object.keys(localStorage).forEach((k) => {
       if (k.startsWith('scout-')) localStorage.removeItem(k);
     });
