@@ -31,6 +31,8 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
   const [form, setForm] = useState({ ...profile });
   const [skillInput, setSkillInput] = useState('');
   const [saved, setSaved] = useState(false);
+  const [skillExtracting, setSkillExtracting] = useState(false);
+  const [skillExtractMsg, setSkillExtractMsg] = useState('');
 
   // Market value state
   const [marketValue, setMarketValue] = useState(() => {
@@ -62,6 +64,34 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
   };
 
   const removeSkill = (sk) => set('skills', form.skills.filter((s) => s !== sk));
+
+  const extractSkillsFromCv = async () => {
+    const cvText = localStorage.getItem('scout-cv-text');
+    const cvB64 = localStorage.getItem('scout-cv-b64');
+    if (!cvText && !cvB64) { setSkillExtractMsg('Upload a CV first.'); return; }
+    setSkillExtracting(true);
+    setSkillExtractMsg('');
+    try {
+      const body = cvB64 ? { cvBase64: cvB64 } : { cvText };
+      const res = await fetch('/api/extract-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.error) { setSkillExtractMsg(data.error); }
+      else if (data.skills?.length) {
+        set('skills', data.skills);
+        setSkillExtractMsg(`${data.skills.length} skills extracted`);
+        setTimeout(() => setSkillExtractMsg(''), 3000);
+      } else {
+        setSkillExtractMsg('No skills found in CV.');
+      }
+    } catch (err) {
+      setSkillExtractMsg(err.message);
+    }
+    setSkillExtracting(false);
+  };
 
   const toggleIndustry = (ind) => {
     const current = form.preferredIndustries || [];
@@ -378,7 +408,28 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
 
         {/* Skills card */}
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Skills</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Skills</h2>
+            <button
+              onClick={extractSkillsFromCv}
+              disabled={skillExtracting}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+              style={{
+                background: skillExtracting ? 'var(--surface-5)' : 'rgba(99,102,241,0.06)',
+                color: skillExtracting ? 'var(--text-4)' : '#6366f1',
+                border: '1px solid rgba(99,102,241,0.15)',
+              }}
+              title="Extract skills from your uploaded CV"
+            >
+              {skillExtracting ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
+              {skillExtracting ? 'Extracting…' : 'Extract from CV'}
+            </button>
+          </div>
+          {skillExtractMsg && (
+            <p className="text-xs mb-2" style={{ color: skillExtractMsg.includes('extracted') ? '#22c55e' : '#ef4444' }}>
+              {skillExtractMsg}
+            </p>
+          )}
           <p className="text-xs mb-3" style={{ color: 'var(--text-4)' }}>
             Add skills that match job tags for compatibility scoring
           </p>
