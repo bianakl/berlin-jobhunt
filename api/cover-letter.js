@@ -38,54 +38,35 @@ export default async function handler(req, res) {
 
   const { cvText, jobTitle, companyName, jobSnippet, candidateName, skills } = req.body || {};
   if (!cvText || !jobTitle) return res.status(400).json({ error: 'Missing cvText or jobTitle.' });
-  if (cvText.length > 50000) return res.status(400).json({ error: 'CV text too large.' });
+
+  const cv = cvText.slice(0, 6000);
+  const snippet = (jobSnippet || '').slice(0, 1500);
 
   const client = new Anthropic({ apiKey });
 
-  const skillsContext = skills?.length ? `\nCandidate's key skills: ${skills.join(', ')}` : '';
-  const jobContext = jobSnippet
-    ? `Role: ${jobTitle} at ${companyName}\nJob description:\n${jobSnippet}`
-    : `Role: ${jobTitle} at ${companyName}`;
-
   try {
     const message = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 500,
+      system: `You are a senior product leader in Berlin who occasionally helps colleagues write job applications. You write the way you speak: clear, specific, grounded. You never write anything you wouldn't say in a real conversation, and you never claim experience that isn't backed by what's on the candidate's CV. Your letters are 200–250 words, three paragraphs, no greeting line, signed off with "Kind regards,".`,
       messages: [{
         role: 'user',
-        content: `You are a career coach who writes cover letters for European tech and product roles. Your letters are read by both humans and ATS bots — they must work for both.
+        content: `Write a cover letter for this application.
 
-${jobContext}
-${skillsContext}
+ROLE: ${jobTitle} at ${companyName || 'the company'}
+${snippet ? `JOB AD:\n${snippet}\n` : ''}CV:
+${cv}
+${skills?.length ? `KEY SKILLS: ${skills.join(', ')}` : ''}
 
-Candidate CV:
-${cvText}
+Three paragraphs:
+1. Why this specific role at this specific company — one concrete detail from the job ad or what you know about them
+2. Two or three experiences from the CV that directly match what they're asking for — use real numbers or outcomes where the CV has them
+3. One sentence close, genuine but not effusive
 
-Write a cover letter following these rules exactly:
+Sign off: Kind regards,\n${candidateName || '[Your Name]'}
 
-STYLE:
-- European tech tone: warm, direct, confident — not American over-enthusiasm
-- Polished and professional, but sounds like a real person wrote it
-- No clichés: never use "I am writing to express my interest", "passion for", "dynamic team", "fast-paced environment"
-- Short paragraphs, natural flow
-
-STRUCTURE (3 short paragraphs + sign-off):
-1. Opening (2-3 sentences): Why THIS role at THIS company — reference something specific about the company or role
-2. Value (3-4 sentences): The 2-3 most relevant experiences or achievements from their CV that directly match this role — use concrete numbers or outcomes where available
-3. Close (1-2 sentences): Brief, genuine enthusiasm + availability
-
-SIGN-OFF:
-Kind regards,
-${candidateName || '[Your Name]'}
-
-ATS OPTIMIZATION:
-- Naturally include key terms and skills from the job description
-- Mirror the role's exact title somewhere in the letter
-
-FORMAT:
-- Total length: 200-250 words maximum
-- Start directly with the opening sentence (no "Dear Hiring Team," header)
-- Return ONLY the letter text, nothing else`,
+Only use what's in the CV — nothing else. No "I am writing to express my interest." No "passion for." No clichés.
+Return only the letter.`,
       }],
     });
 
