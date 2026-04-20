@@ -1,25 +1,27 @@
 import { useMemo } from 'react';
 import { LayoutDashboard, Kanban, Building2, User, Plus, Sun, Moon } from 'lucide-react';
 import { STAGES } from '../data/seed';
+import { useT } from '../lib/LanguageContext';
 
 const MILESTONES = [5, 10, 20, 50];
 
 function getLevel(count) {
-  if (count >= 50) return { name: 'Berlin Boss', emoji: '🏆', min: 50, max: Infinity };
-  if (count >= 30) return { name: 'Pro', emoji: '💎', min: 30, max: 50 };
-  if (count >= 15) return { name: 'Hunter', emoji: '🎯', min: 15, max: 30 };
-  if (count >= 5)  return { name: 'Networker', emoji: '🤝', min: 5, max: 15 };
-  return { name: 'Rookie', emoji: '🌱', min: 0, max: 5 };
+  if (count >= 50) return { key: 'level_boss', emoji: '🏆', min: 50, max: Infinity };
+  if (count >= 30) return { key: 'level_pro', emoji: '💎', min: 30, max: 50 };
+  if (count >= 15) return { key: 'level_hunter', emoji: '🎯', min: 15, max: 30 };
+  if (count >= 5)  return { key: 'level_networker', emoji: '🤝', min: 5, max: 15 };
+  return { key: 'level_rookie', emoji: '🌱', min: 0, max: 5 };
 }
 
 const NAV = [
-  { id: 'dashboard', label: 'Overview', Icon: LayoutDashboard },
-  { id: 'pipeline',  label: 'Pipeline', Icon: Kanban },
-  { id: 'companies', label: 'Companies', Icon: Building2 },
-  { id: 'profile',   label: 'Profile',  Icon: User },
+  { id: 'dashboard', labelKey: 'nav_overview', Icon: LayoutDashboard },
+  { id: 'pipeline',  labelKey: 'nav_pipeline', Icon: Kanban },
+  { id: 'companies', labelKey: 'nav_companies', Icon: Building2 },
+  { id: 'profile',   labelKey: 'nav_profile',  Icon: User },
 ];
 
 export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achievements, jobs, companies, dark, onToggleDark }) {
+  const t = useT();
   const activeJobs    = jobs.filter((j) => j.stage !== 'rejected' && j.stage !== 'company_rejected');
   const appliedCount  = jobs.filter((j) => ['applied', 'interview', 'offer'].includes(j.stage)).length;
   const level         = getLevel(appliedCount);
@@ -60,7 +62,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
 
         {/* Nav */}
         <nav className="flex flex-col gap-0.5 px-2">
-          {NAV.map(({ id, label, Icon }) => {
+          {NAV.map(({ id, labelKey, Icon }) => {
             const active = activeView === id;
             const badge  = navBadges[id];
             return (
@@ -77,7 +79,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
                 onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-3)'; } }}
               >
                 <Icon size={15} />
-                <span className="flex-1">{label}</span>
+                <span className="flex-1">{t(labelKey)}</span>
                 {badge > 0 && (
                   <span
                     className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
@@ -102,7 +104,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-sm">{level.emoji}</span>
-              <span className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{level.name}</span>
+              <span className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{t(level.key)}</span>
             </div>
           </div>
           <div className="mb-1.5">
@@ -114,7 +116,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             </div>
           </div>
           <p className="text-[10px]" style={{ color: 'var(--text-4)' }}>
-            {next ? `${appliedCount}/${next} to next level` : 'Max level!'}
+            {next ? t('nav_level_to_next', { applied: appliedCount, next }) : t('nav_max_level')}
           </p>
         </div>
 
@@ -126,7 +128,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             style={{ background: 'var(--surface-2)', color: 'var(--text-3)', border: '1px solid var(--border-2)' }}
           >
             {dark ? <Sun size={13} /> : <Moon size={13} />}
-            {dark ? 'Light mode' : 'Dark mode'}
+            {dark ? t('nav_light_mode') : t('nav_dark_mode')}
           </button>
           <button
             onClick={() => onAddJob()}
@@ -135,7 +137,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
-            <Plus size={15} /> Add Job
+            <Plus size={15} /> {t('nav_add_job')}
           </button>
         </div>
       </aside>
@@ -146,7 +148,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
         style={{ height: 60, background: 'var(--surface)', borderTop: '2px solid var(--border-2)' }}
       >
         {/* Left 2: Overview, Pipeline */}
-        {NAV.slice(0, 2).map(({ id, Icon }) => {
+        {NAV.slice(0, 2).map(({ id, labelKey, Icon }) => {
           const active = activeView === id;
           return (
             <button
@@ -157,7 +159,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             >
               <Icon size={18} />
               <span className="text-[9px] font-medium">
-                {id === 'dashboard' ? 'Overview' : 'Pipeline'}
+                {t(labelKey)}
               </span>
             </button>
           );
@@ -165,7 +167,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
         {/* Center gap for floating + button */}
         <div className="w-14 shrink-0" />
         {/* Right 2: Companies, Profile */}
-        {NAV.slice(2).map(({ id, Icon }) => {
+        {NAV.slice(2).map(({ id, labelKey, Icon }) => {
           const active = activeView === id;
           return (
             <button
@@ -176,7 +178,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             >
               <Icon size={18} />
               <span className="text-[9px] font-medium">
-                {id === 'companies' ? 'Companies' : 'Profile'}
+                {t(labelKey)}
               </span>
             </button>
           );

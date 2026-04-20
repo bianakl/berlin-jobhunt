@@ -6,6 +6,7 @@ import {
   FileText, Copy, Check,
 } from 'lucide-react';
 import { STAGES, ROLES } from '../data/seed';
+import { useT } from '../lib/LanguageContext';
 
 const DEFAULT_ROLE = ROLES[0];
 
@@ -144,6 +145,7 @@ async function fetchPositionsForCompany(company, roleRegex) {
 }
 
 export default function Companies({ companies, jobs, onAddCompany, onEditCompany, onDeleteCompany, onAddJob, onQuickAddJob, onUpdateCompany, onImportStarterPack, syncStatus, targetRole, onRoleChange }) {
+  const t = useT();
   const [search, setSearch] = useState('');
   const [favOnly, setFavOnly] = useState(false);
   const [hasRoleOnly, setHasRoleOnly] = useState(false);
@@ -228,9 +230,9 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4 md:mb-6">
         <div>
-          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Companies</h1>
+          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>{t('companies_title')}</h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
-            {companies.length} tracked · {filtered.length} shown
+            {t('companies_tracked', { n: companies.length, shown: filtered.length })}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -246,7 +248,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
               }}
             >
               {checkingAll ? <Loader2 size={12} className="animate-spin" /> : <CheckSquare size={12} />}
-              {checkingAll ? 'Checking…' : 'Check all'}
+              {checkingAll ? t('companies_checking') : t('companies_check_all')}
             </button>
           )}
           <button
@@ -254,7 +256,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all"
             style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
           >
-            <Plus size={13} /><span className="hidden sm:inline">Add company</span><span className="sm:hidden">Add</span>
+            <Plus size={13} /><span className="hidden sm:inline">{t('companies_add')}</span><span className="sm:hidden">{t('companies_add')}</span>
           </button>
         </div>
       </div>
@@ -264,7 +266,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-4)' }} />
         <input
           type="text"
-          placeholder="Search companies or industry..."
+          placeholder={t('companies_search_placeholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full pl-8 pr-3 py-2 rounded-lg text-sm"
@@ -286,7 +288,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           }}
         >
           <Star size={13} fill={favOnly ? '#f59e0b' : 'none'} />
-          Favorites
+          {t('companies_favorites')}
         </button>
         <button
           onClick={() => setHasRoleOnly((v) => !v)}
@@ -298,7 +300,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           }}
         >
           <Link2 size={13} />
-          Has {activeRole.short} roles
+          {t('companies_has_roles', { role: activeRole.short })}
         </button>
         <select
           value={targetRole || 'pm'}
@@ -328,7 +330,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
                 border: `1px solid ${sort === s ? 'rgba(99,102,241,0.2)' : 'transparent'}`,
               }}
             >
-              {s === 'default' ? 'Relevant' : s === 'az' ? 'A–Z' : 'Most'}
+              {s === 'default' ? t('companies_sort_relevant') : s === 'az' ? t('companies_sort_az') : t('companies_sort_most')}
             </button>
           ))}
         </div>
@@ -340,9 +342,9 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
           <Building2 size={32} style={{ color: 'var(--border)', margin: '0 auto 12px' }} />
           {companies.length === 0 ? (
             <>
-              <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-2)' }}>No companies yet</p>
+              <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-2)' }}>{t('companies_empty_title')}</p>
               <p className="text-xs mb-5 max-w-xs mx-auto" style={{ color: 'var(--text-4)' }}>
-                Add companies manually, or import a curated list of 100+ Berlin tech companies to get started.
+                {t('companies_empty_desc')}
               </p>
               {onImportStarterPack && (
                 <div className="flex flex-col items-center gap-3 mb-3">
@@ -374,7 +376,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
                     }}
                   >
                     <Sparkles size={14} />
-                    {syncStatus === 'syncing' ? 'Syncing…' : 'Import Berlin starter pack'}
+                    {syncStatus === 'syncing' ? 'Syncing…' : t('companies_import_btn')}
                   </button>
                 </div>
               )}
@@ -383,11 +385,11 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
                 className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
                 style={{ background: 'rgba(99,102,241,0.06)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.15)' }}
               >
-                <Plus size={14} /> Add manually
+                <Plus size={14} /> {t('companies_add_manually')}
               </button>
             </>
           ) : (
-            <p className="text-sm" style={{ color: 'var(--text-4)' }}>Nothing matches your filter.</p>
+            <p className="text-sm" style={{ color: 'var(--text-4)' }}>{t('companies_no_match')}</p>
           )}
         </div>
       ) : (
@@ -416,6 +418,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
 }
 
 function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDelete, onAddJob, onQuickAddJob, onUpdateCompany, isLast, roleRegex, targetRole }) {
+  const t = useT();
   const [checking, setChecking] = useState(false);
   const [checkDone, setCheckDone] = useState(null); // null | 'found' | 'none'
   const [crawling, setCrawling] = useState(false);
@@ -710,16 +713,16 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                       ? <span style={{ fontSize: 10 }}>!</span>
                       : <Search size={10} />}
               {crawling
-                ? 'Searching…'
+                ? t('companies_searching')
                 : crawlDone === 'found'
-                  ? `${activePositions.filter((p) => p.source !== 'manual').length} role${activePositions.filter((p) => p.source !== 'manual').length !== 1 ? 's' : ''} found!`
+                  ? (() => { const n = activePositions.filter((p) => p.source !== 'manual').length; return t('companies_roles_found', { n, s: n !== 1 ? 's' : '' }); })()
                   : crawlDone === 'none'
-                    ? 'None found'
+                    ? t('companies_none_found')
                     : crawlDone === 'error'
-                      ? 'Failed'
+                      ? t('companies_failed')
                       : activePositions.filter((p) => p.source !== 'manual').length > 0
-                        ? `${activePositions.filter((p) => p.source !== 'manual').length} role${activePositions.filter((p) => p.source !== 'manual').length !== 1 ? 's' : ''}`
-                        : 'Check'}
+                        ? (() => { const n = activePositions.filter((p) => p.source !== 'manual').length; return t('companies_roles_count', { n, s: n !== 1 ? 's' : '' }); })()
+                        : t('companies_scan')}
             </button>
           </div>
         )}
@@ -766,14 +769,14 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   ? <span style={{ fontSize: 10 }}>–</span>
                   : <RefreshCw size={10} />}
             {checking
-              ? 'Checking…'
+              ? t('companies_checking')
               : checkDone === 'found'
-                ? `${activePositions.length} role${activePositions.length > 1 ? 's' : ''} found!`
+                ? t('companies_roles_found', { n: activePositions.length, s: activePositions.length > 1 ? 's' : '' })
                 : checkDone === 'none'
-                  ? 'None found'
+                  ? t('companies_none_found')
                   : activePositions.length > 0
-                    ? `${activePositions.length} role${activePositions.length > 1 ? 's' : ''}`
-                    : 'Check'}
+                    ? t('companies_roles_count', { n: activePositions.length, s: activePositions.length > 1 ? 's' : '' })
+                    : t('companies_check')}
           </button>
           </div>
         )}
@@ -795,7 +798,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         <div className="px-4 py-3 fade-in" style={{ background: 'var(--surface-3)', borderTop: '1px solid var(--border-3)' }}>
           <div className="flex items-center justify-between mb-2">
             <span className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--text-4)' }}>
-              {activePositions.filter((p) => p.source !== 'manual').length} PM {activePositions.filter((p) => p.source !== 'manual').length === 1 ? 'role' : 'roles'} found
+              {(() => { const n = activePositions.filter((p) => p.source !== 'manual').length; return t('companies_roles_found', { n, s: n !== 1 ? 's' : '' }); })()}
             </span>
             <button
               onClick={() => setShowInlineResults(false)}
@@ -845,7 +848,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-4)'; e.currentTarget.style.borderColor = 'var(--border-2)'; }}
                     title="Mark as not a fit — hides this role"
                   >
-                    Not a fit
+                    {t('companies_disqualify')}
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); quickAddToPipeline(pos); }}
@@ -858,7 +861,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     }}
                     title="Add this specific role to your pipeline"
                   >
-                    {addedIds.has(pos.id) ? '✓ Added' : '+ Pipeline'}
+                    {addedIds.has(pos.id) ? `✓ ${t('companies_added')}` : `+ ${t('companies_add_to_pipeline')}`}
                   </button>
                   {pos.url && (
                     <a
@@ -911,7 +914,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             style={{ color: 'var(--text-5)' }}
                             onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
                             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
-                          >undo</button>
+                          >{t('companies_undo')}</button>
                         </div>
                       );
                     }
@@ -952,7 +955,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                               style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)', textDecoration: 'none' }}
                               onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
                               onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-4)')}
-                            ><ExternalLink size={9} /> View</a>
+                            ><ExternalLink size={9} /> {t('companies_open')}</a>
                           )}
                           <button
                             onClick={() => analyzePosition(pos)}
@@ -965,7 +968,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             }}
                           >
                             {analysis?.loading ? <Loader2 size={9} className="animate-spin" /> : <Sparkles size={9} />}
-                            {analysis?.score != null ? `${analysis.score}%` : 'Analyze'}
+                            {analysis?.score != null ? `${analysis.score}%` : t('companies_analyze')}
                           </button>
                           {(() => {
                             const cl = coverLetters[pos.id];
@@ -981,7 +984,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                                 }}
                               >
                                 {cl?.loading ? <Loader2 size={9} className="animate-spin" /> : <FileText size={9} />}
-                                {cl?.letter ? 'Re-draft' : 'Cover letter'}
+                                {cl?.letter ? t('companies_redraft') : t('companies_draft_letter')}
                               </button>
                             );
                           })()}
@@ -994,14 +997,14 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                               color: addedIds.has(pos.id) ? '#16a34a' : '#6366f1',
                               border: `1px solid ${addedIds.has(pos.id) ? 'rgba(34,197,94,0.2)' : 'rgba(99,102,241,0.2)'}`,
                             }}
-                          >{addedIds.has(pos.id) ? '✓ Added' : '+ Pipeline'}</button>
+                          >{addedIds.has(pos.id) ? `✓ ${t('companies_added')}` : `+ ${t('companies_add_to_pipeline')}`}</button>
                           <button
                             onClick={() => handleDisqualify(pos.id)}
                             className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] font-medium transition-all"
                             style={{ background: 'var(--surface-5)', color: 'var(--text-4)', border: '1px solid var(--border-2)' }}
                             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(239,68,68,0.06)'; e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)'; }}
                             onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--surface-5)'; e.currentTarget.style.color = 'var(--text-4)'; e.currentTarget.style.borderColor = 'var(--border-2)'; }}
-                          >Not a fit</button>
+                          >{t('companies_disqualify')}</button>
                           <button
                             onClick={() => handleRemovePosition(pos.id)}
                             className="flex items-center gap-0.5 px-1.5 py-1 rounded text-[10px] transition-all"
@@ -1035,7 +1038,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             {/* What to highlight */}
                             {analysis.highlights?.length > 0 && (
                               <div>
-                                <p className="text-[9px] font-semibold mb-0.5" style={{ color: 'var(--text-4)' }}>LEAD WITH</p>
+                                <p className="text-[9px] font-semibold mb-0.5" style={{ color: 'var(--text-4)' }}>{t('job_lead_with')}</p>
                                 <div className="flex flex-wrap gap-1">
                                   {analysis.highlights.map((h, i) => (
                                     <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(99,102,241,0.07)', color: '#6366f1' }}>→ {h}</span>
@@ -1046,7 +1049,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                             {/* Watch outs */}
                             {analysis.watchouts?.length > 0 && (
                               <div>
-                                <p className="text-[9px] font-semibold mb-0.5" style={{ color: 'var(--text-4)' }}>WATCH OUT</p>
+                                <p className="text-[9px] font-semibold mb-0.5" style={{ color: 'var(--text-4)' }}>{t('job_watch_out')}</p>
                                 <div className="flex flex-wrap gap-1">
                                   {analysis.watchouts.map((w, i) => (
                                     <span key={i} className="text-[9px] px-1.5 py-0.5 rounded" style={{ background: 'rgba(245,158,11,0.08)', color: '#b45309' }}>⚠ {w}</span>
@@ -1078,7 +1081,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                                   }}
                                 >
                                   {copiedId === pos.id ? <Check size={8} /> : <Copy size={8} />}
-                                  {copiedId === pos.id ? 'Copied!' : 'Copy'}
+                                  {copiedId === pos.id ? t('companies_copied') : t('companies_copy')}
                                 </button>
                               </div>
                               <div
@@ -1101,7 +1104,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                 <div className="flex flex-col gap-1.5 p-2.5 rounded-lg" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
                   <input
                     autoFocus
-                    placeholder="Job title"
+                    placeholder={t('companies_position_title')}
                     value={manualTitle}
                     onChange={(e) => setManualTitle(e.target.value)}
                     className="text-xs px-2 py-1.5 rounded"
@@ -1109,7 +1112,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                     onKeyDown={(e) => e.key === 'Enter' && handleAddManual()}
                   />
                   <input
-                    placeholder="URL (optional)"
+                    placeholder={t('companies_position_url')}
                     value={manualUrl}
                     onChange={(e) => setManualUrl(e.target.value)}
                     className="text-xs px-2 py-1.5 rounded"
@@ -1118,9 +1121,9 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   />
                   <div className="flex gap-1.5">
                     <button onClick={handleAddManual} className="flex-1 text-xs py-1 rounded font-medium"
-                      style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>Save</button>
+                      style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>{t('companies_save')}</button>
                     <button onClick={() => { setAddingManual(false); setManualTitle(''); setManualUrl(''); }}
-                      className="flex-1 text-xs py-1 rounded" style={{ background: 'var(--surface-5)', color: 'var(--text-3)' }}>Cancel</button>
+                      className="flex-1 text-xs py-1 rounded" style={{ background: 'var(--surface-5)', color: 'var(--text-3)' }}>{t('companies_cancel')}</button>
                   </div>
                 </div>
               ) : (
@@ -1131,7 +1134,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   onMouseEnter={(e) => (e.currentTarget.style.color = '#6366f1')}
                   onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
                 >
-                  <Plus size={11} /> Add manually
+                  <Plus size={11} /> {t('companies_add_position')}
                 </button>
               )}
             </div>
@@ -1195,7 +1198,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
                   onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-4)')}
                   title="Add a job manually (opens form)"
                 >
-                  <Kanban size={11} /> Add job manually
+                  <Kanban size={11} /> {t('job_add')}
                 </button>
                 {company.website && (
                   <a href={company.website} target="_blank" rel="noreferrer"

@@ -2,13 +2,14 @@ import { useState, useRef } from 'react';
 import { authHeader } from '../lib/authHeader';
 import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles } from 'lucide-react';
 import { STAGES } from '../data/seed';
+import { useT } from '../lib/LanguageContext';
 
-const COMPAT_FACTORS = [
-  { key: 'roleMatch', label: 'Role fit', hint: 'Does the job match what you want to do?' },
-  { key: 'skillsMatch', label: 'Skills match', hint: 'Do you have the required skills?' },
-  { key: 'culture', label: 'Culture fit', hint: 'Does the company feel right for you?' },
-  { key: 'compensation', label: 'Compensation', hint: 'Does the salary range work for you?' },
-  { key: 'growth', label: 'Growth potential', hint: 'Room to grow and advance?' },
+const COMPAT_FACTOR_KEYS = [
+  { key: 'roleMatch', labelKey: 'job_role_fit', hintKey: 'job_role_fit_hint' },
+  { key: 'skillsMatch', labelKey: 'job_skills_match', hintKey: 'job_skills_match_hint' },
+  { key: 'culture', labelKey: 'job_culture_fit', hintKey: 'job_culture_fit_hint' },
+  { key: 'compensation', labelKey: 'job_compensation', hintKey: 'job_compensation_hint' },
+  { key: 'growth', labelKey: 'job_growth', hintKey: 'job_growth_hint' },
 ];
 
 function StarRow({ value, onChange }) {
@@ -37,7 +38,7 @@ function Field({ label, children, hint }) {
     <div>
       <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-2)' }}>
         {label}
-        {hint && <span className="ml-1 font-normal" style={{ color: 'var(--text-4)' }}>— {hint}</span>}
+        {hint && <span className="ml-1 font-normal" style={{ color: 'var(--text-4)' }}>{hint}</span>}
       </label>
       {children}
     </div>
@@ -57,6 +58,7 @@ const inputStyle = {
 };
 
 export default function JobModal({ job, defaults = {}, companies, profile, onNeedCv, onAnalyzed, onSave, onClose }) {
+  const t = useT();
   const isEdit = !!job;
 
   const [form, setForm] = useState({
@@ -104,7 +106,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
   const analyzeFit = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
     if (!cvText) { onNeedCv?.(() => analyzeFit()); return; }
-    if (!form.title.trim()) { setFitError('Add a job title first.'); return; }
+    if (!form.title.trim()) { setFitError(t('job_no_title_err')); return; }
     setFitLoading(true);
     setFitError(null);
     try {
@@ -138,7 +140,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
   const draftCoverLetter = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
     if (!cvText) { onNeedCv?.(() => draftCoverLetter()); return; }
-    if (!form.title.trim()) { setCoverLetterError('Add a job title first.'); return; }
+    if (!form.title.trim()) { setCoverLetterError(t('job_no_title_err')); return; }
     setCoverLetterLoading(true);
     setCoverLetterError(null);
     try {
@@ -209,10 +211,10 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
           <div>
             <h2 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>
-              {isEdit ? 'Edit job' : 'Add job'}
+              {isEdit ? t('job_modal_edit') : t('job_modal_add')}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
-              {isEdit ? `Editing ${job.title}` : 'Track a new opportunity'}
+              {isEdit ? t('job_modal_edit_sub', { title: job.title }) : t('job_modal_add_sub')}
             </p>
           </div>
           <button
@@ -233,7 +235,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             {/* Required section — always visible */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
               <div className="col-span-2">
-                <Field label="Job title *">
+                <Field label={t('job_title_label')}>
                   <input
                     required
                     placeholder="Senior Product Manager"
@@ -246,10 +248,10 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 </Field>
               </div>
 
-              <Field label="Company">
+              <Field label={t('job_company_label')}>
                 <input
                   list="company-list"
-                  placeholder="Type or select..."
+                  placeholder={t('job_company_placeholder')}
                   value={form.company}
                   onChange={(e) => {
                     const val = e.target.value;
@@ -266,7 +268,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 </datalist>
               </Field>
 
-              <Field label="Stage">
+              <Field label={t('job_stage_label')}>
                 <div className="relative">
                   <select
                     value={form.stage}
@@ -290,7 +292,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 className="w-full flex items-center justify-between px-4 py-3 text-left transition-all"
                 style={{ background: detailsOpen ? 'var(--surface-2)' : 'var(--surface-2)' }}
               >
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Details</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_details')}</span>
                 <ChevronDown
                   size={14}
                   style={{
@@ -304,7 +306,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
               {detailsOpen && (
                 <div className="px-3 sm:px-4 pb-4 pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4" style={{ borderTop: '1px solid var(--surface-5)' }}>
                   <div className="col-span-2">
-                    <Field label="Job posting URL">
+                    <Field label={t('job_url_label')}>
                       <div className="relative">
                         <input
                           type="url"
@@ -324,9 +326,9 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                     </Field>
                   </div>
 
-                  <Field label="Salary range">
+                  <Field label={t('job_salary_label')}>
                     <input
-                      placeholder="80–100k EUR"
+                      placeholder={t('job_salary_placeholder')}
                       value={form.salary}
                       onChange={(e) => set('salary', e.target.value)}
                       style={inputStyle}
@@ -335,9 +337,9 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                     />
                   </Field>
 
-                  <Field label="Location">
+                  <Field label={t('job_location_label')}>
                     <input
-                      placeholder="Berlin (Hybrid)"
+                      placeholder={t('job_location_placeholder')}
                       value={form.location}
                       onChange={(e) => set('location', e.target.value)}
                       style={inputStyle}
@@ -360,12 +362,12 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                         />
                       </button>
                       <span className="text-sm" style={{ color: form.remote ? '#6366f1' : 'var(--text-4)' }}>
-                        {form.remote ? 'Remote / Hybrid' : 'On-site only'}
+                        {form.remote ? t('job_remote_label') : t('job_onsite_label')}
                       </span>
                     </div>
                   </Field>
 
-                  <Field label="Applied date">
+                  <Field label={t('job_applied_date')}>
                     <input
                       type="date"
                       value={form.appliedDate}
@@ -376,7 +378,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                     />
                   </Field>
 
-                  <Field label="Follow-up date">
+                  <Field label={t('job_followup_date')}>
                     <input
                       type="date"
                       value={form.followUpDate}
@@ -387,9 +389,9 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                     />
                   </Field>
 
-                  <Field label="Tags" hint="comma-separated">
+                  <Field label={t('job_tags_label')} hint={t('job_tags_hint')}>
                     <input
-                      placeholder="ai, b2b, remote"
+                      placeholder={t('job_tags_placeholder')}
                       value={form.tags}
                       onChange={(e) => set('tags', e.target.value)}
                       style={inputStyle}
@@ -399,9 +401,9 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                   </Field>
 
                   <div className="col-span-2">
-                    <Field label="Notes">
+                    <Field label={t('job_notes_label')}>
                       <textarea
-                        placeholder="Research notes, interview prep, anything relevant..."
+                        placeholder={t('job_notes_placeholder')}
                         value={form.notes}
                         onChange={(e) => set('notes', e.target.value)}
                         rows={3}
@@ -415,17 +417,17 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                   {/* Compatibility */}
                   <div className="col-span-2 rounded-xl p-4 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-2)' }}>
                     <div className="flex items-center justify-between mb-3">
-                      <h3 className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Compatibility rating</h3>
+                      <h3 className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_compat')}</h3>
                       {compatScore > 0 && (
-                        <span className="text-sm font-bold" style={{ color: scoreColor }}>{compatScore}% match</span>
+                        <span className="text-sm font-bold" style={{ color: scoreColor }}>{t('job_compat_match', { score: compatScore })}</span>
                       )}
                     </div>
                     <div className="space-y-3">
-                      {COMPAT_FACTORS.map(({ key, label, hint }) => (
+                      {COMPAT_FACTOR_KEYS.map(({ key, labelKey, hintKey }) => (
                         <div key={key} className="flex items-center gap-3">
                           <div className="w-32 shrink-0">
-                            <div className="text-xs font-medium" style={{ color: 'var(--text-2)' }}>{label}</div>
-                            <div className="text-[10px]" style={{ color: 'var(--text-4)' }}>{hint}</div>
+                            <div className="text-xs font-medium" style={{ color: 'var(--text-2)' }}>{t(labelKey)}</div>
+                            <div className="text-[10px]" style={{ color: 'var(--text-4)' }}>{t(hintKey)}</div>
                           </div>
                           <StarRow value={form.compatibility[key]} onChange={(v) => setCompat(key, v)} />
                         </div>
@@ -439,7 +441,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
           <div className="mt-4">
             <div className="flex items-center gap-2 mb-2.5">
               <MessageSquare size={13} style={{ color: '#6366f1' }} />
-              <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Activity log</span>
+              <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_activity')}</span>
               {form.activityLog.length > 0 && (
                 <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>
                   {form.activityLog.length}
@@ -451,7 +453,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             <div className="flex gap-2 mb-3">
               <input
                 ref={entryRef}
-                placeholder="Log a call, update, or note..."
+                placeholder={t('job_activity_placeholder')}
                 value={newEntry}
                 onChange={(e) => setNewEntry(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addLogEntry(); } }}
@@ -470,7 +472,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                   border: 'none',
                 }}
               >
-                <Plus size={12} /> Log
+                <Plus size={12} /> {t('job_activity_btn')}
               </button>
             </div>
 
@@ -509,7 +511,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 })}
               </div>
             ) : (
-              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>No activity yet. Log your first update above.</p>
+              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>{t('job_activity_empty')}</p>
             )}
           </div>
 
@@ -518,7 +520,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
                 <Sparkles size={13} style={{ color: '#6366f1' }} />
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>CV fit analysis</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_cv_fit')}</span>
                 {fitAnalysis?.score != null && (
                   <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{
                     background: fitAnalysis.score >= 80 ? 'rgba(34,197,94,0.12)' : fitAnalysis.score >= 60 ? 'rgba(99,102,241,0.1)' : fitAnalysis.score >= 40 ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)',
@@ -536,7 +538,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }}
               >
                 {fitLoading ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
-                {fitLoading ? 'Analyzing…' : fitAnalysis ? 'Re-analyze' : 'Analyze fit'}
+                {fitLoading ? t('job_analyzing') : fitAnalysis ? t('job_reanalyze') : t('job_analyze_fit')}
               </button>
             </div>
 
@@ -567,7 +569,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 )}
                 {fitAnalysis.highlights?.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>LEAD WITH</p>
+                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>{t('job_lead_with')}</p>
                     {fitAnalysis.highlights.map((h, i) => (
                       <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#6366f1' }}>→</span><span style={{ color: 'var(--text-2)' }}>{h}</span></div>
                     ))}
@@ -575,7 +577,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 )}
                 {fitAnalysis.watchouts?.length > 0 && (
                   <div>
-                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>WATCH OUT</p>
+                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>{t('job_watch_out')}</p>
                     {fitAnalysis.watchouts.map((w, i) => (
                       <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#f59e0b' }}>⚠</span><span style={{ color: 'var(--text-3)' }}>{w}</span></div>
                     ))}
@@ -586,7 +588,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
 
             {!fitAnalysis && !fitLoading && !fitError && (
               <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
-                Analyze how well your CV matches this role.
+                {t('job_analyze_hint')}
               </p>
             )}
           </div>
@@ -596,7 +598,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             <div className="flex items-center justify-between mb-2.5">
               <div className="flex items-center gap-2">
                 <FileText size={13} style={{ color: '#7c3aed' }} />
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>Cover letter</span>
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_cover_letter')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 {coverLetter && (
@@ -611,7 +613,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                     }}
                   >
                     {copied ? <Check size={10} /> : <Copy size={10} />}
-                    {copied ? 'Copied!' : 'Copy'}
+                    {copied ? t('job_copied') : t('job_copy')}
                   </button>
                 )}
                 <button
@@ -626,7 +628,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                   }}
                 >
                   {coverLetterLoading ? <Loader2 size={10} className="animate-spin" /> : <FileText size={10} />}
-                  {coverLetterLoading ? 'Drafting…' : coverLetter ? 'Re-draft' : 'Draft letter'}
+                  {coverLetterLoading ? t('job_drafting') : coverLetter ? t('job_redraft') : t('job_draft_letter')}
                 </button>
               </div>
             </div>
@@ -646,7 +648,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
 
             {!coverLetter && !coverLetterLoading && !coverLetterError && (
               <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
-                Draft a tailored cover letter based on your CV and this role.
+                {t('job_draft_hint')}
               </p>
             )}
           </div>
@@ -662,7 +664,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-1)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-3)')}
           >
-            Cancel
+            {t('job_cancel')}
           </button>
           <button
             type="submit" form="job-form"
@@ -671,7 +673,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
-            {isEdit ? 'Save changes' : 'Add to pipeline'}
+            {isEdit ? t('job_save') : t('job_add')}
           </button>
         </div>
       </div>

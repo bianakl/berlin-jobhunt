@@ -13,6 +13,12 @@ import CompanyModal from './components/CompanyModal';
 import CvUploadModal from './components/CvUploadModal';
 import { supabase } from './lib/supabase';
 import { pushToSupabase, pullFromSupabase } from './lib/sync';
+import { LanguageContext } from './lib/LanguageContext';
+
+function detectBrowserLang() {
+  const bl = (navigator.language || navigator.languages?.[0] || 'en').toLowerCase();
+  return bl.startsWith('de') ? 'de' : 'en';
+}
 
 const defaultProfile = {
   name: '',
@@ -55,6 +61,7 @@ export default function App() {
   // Dark mode
   const [dark, setDark] = useLocalStorage('scout-dark-mode', false);
   const [targetRole, setTargetRole] = useLocalStorage('scout-target-role', 'pm');
+  const [lang, setLang] = useLocalStorage('scout-lang', detectBrowserLang());
   useEffect(() => {
     document.documentElement.classList.toggle('dark', !!dark);
   }, [dark]);
@@ -299,6 +306,7 @@ export default function App() {
   const streak = streakData?.count || 0;
 
   return (
+    <LanguageContext.Provider value={{ lang, setLang }}>
     <div className="flex min-h-screen" style={{ background: 'var(--bg)' }}>
       <Sidebar
         activeView={activeView}
@@ -429,5 +437,6 @@ export default function App() {
         />
       )}
     </div>
+    </LanguageContext.Provider>
   );
 }

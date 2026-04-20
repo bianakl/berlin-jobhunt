@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useContext } from 'react';
 import { authHeader } from '../lib/authHeader';
 import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon, Cloud, LogOut } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
+import { LanguageContext, useT } from '../lib/LanguageContext';
 
 const inputStyle = {
   width: '100%',
@@ -28,6 +29,8 @@ function Field({ label, children, hint }) {
 }
 
 export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUser, syncStatus, onSyncRequest, onSignOut, onSyncNow }) {
+  const t = useT();
+  const { lang, setLang } = useContext(LanguageContext);
   const [form, setForm] = useState({ ...profile });
   const [skillInput, setSkillInput] = useState('');
   const [saved, setSaved] = useState(false);
@@ -299,9 +302,9 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
       {/* Header */}
       <div className="flex items-center justify-between mb-6 md:mb-8">
         <div>
-          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Profile</h1>
+          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>{t('profile_title')}</h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
-            Your profile powers compatibility scoring on job cards
+            {t('profile_subtitle')}
           </p>
         </div>
         <button
@@ -312,7 +315,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
           onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
         >
           <Save size={13} />
-          {saved ? 'Saved!' : 'Save profile'}
+          {saved ? t('profile_saved') : t('profile_save')}
         </button>
       </div>
 
@@ -322,10 +325,10 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
             <User size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Basic info</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{t('profile_basic_info')}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Your name">
+            <Field label={t('profile_name')}>
               <input
                 placeholder="Biana K."
                 value={form.name}
@@ -335,7 +338,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
-            <Field label="Current role">
+            <Field label={t('profile_role')}>
               <input
                 placeholder="Senior Product Manager"
                 value={form.currentRole}
@@ -345,7 +348,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
-            <Field label="LinkedIn URL">
+            <Field label={t('profile_linkedin')}>
               <input
                 type="url"
                 placeholder="https://linkedin.com/in/..."
@@ -356,7 +359,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
-            <Field label="CV / Portfolio URL">
+            <Field label={t('profile_cv_url')}>
               <input
                 type="url"
                 placeholder="https://..."
@@ -367,7 +370,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
-            <Field label="Years of experience">
+            <Field label={t('profile_years_exp')}>
               <input
                 type="number"
                 min="0"
@@ -380,7 +383,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                 onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
               />
             </Field>
-            <Field label="Preferred locations" hint="— comma-separated">
+            <Field label={t('profile_locations')} hint={t('profile_locations_hint')}>
               <input
                 placeholder="Berlin, Remote"
                 value={form.preferredLocations}
@@ -391,9 +394,9 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               />
             </Field>
             <div className="col-span-2">
-              <Field label="Bio / Summary">
+              <Field label={t('profile_bio')}>
                 <textarea
-                  placeholder="Brief summary of your background, what you're looking for..."
+                  placeholder={t('profile_bio_placeholder')}
                   value={form.bio}
                   onChange={(e) => set('bio', e.target.value)}
                   rows={3}
@@ -409,7 +412,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         {/* Skills card */}
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Skills</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{t('profile_skills')}</h2>
             <button
               onClick={extractSkillsFromCv}
               disabled={skillExtracting}
@@ -422,7 +425,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               title="Extract skills from your uploaded CV"
             >
               {skillExtracting ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
-              {skillExtracting ? 'Extracting…' : 'Extract from CV'}
+              {skillExtracting ? t('profile_extracting') : t('profile_extract_cv')}
             </button>
           </div>
           {skillExtractMsg && (
@@ -431,7 +434,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
             </p>
           )}
           <p className="text-xs mb-3" style={{ color: 'var(--text-4)' }}>
-            Add skills that match job tags for compatibility scoring
+            {t('profile_skills_desc')}
           </p>
           <div className="flex flex-wrap gap-2 mb-3">
             {form.skills.map((sk) => (
@@ -447,12 +450,12 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               </span>
             ))}
             {form.skills.length === 0 && (
-              <span className="text-xs" style={{ color: 'var(--text-5)' }}>No skills added yet</span>
+              <span className="text-xs" style={{ color: 'var(--text-5)' }}>{t('profile_no_skills')}</span>
             )}
           </div>
           <div className="flex gap-2">
             <input
-              placeholder="Add a skill (e.g. B2B, AI, fintech)"
+              placeholder={t('profile_add_skill')}
               value={skillInput}
               onChange={(e) => setSkillInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
@@ -466,7 +469,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               className="flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-medium"
               style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
             >
-              <Plus size={12} /> Add
+              <Plus size={12} /> {t('profile_add_btn')}
             </button>
           </div>
         </div>
@@ -476,7 +479,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
               <TrendingUp size={14} style={{ color: '#6366f1' }} />
-              <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Your market value</h2>
+              <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{t('profile_market_title')}</h2>
             </div>
             <button
               onClick={handleAnalyzeWorth}
@@ -485,11 +488,11 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               style={{ background: marketLoading ? 'var(--surface-5)' : 'rgba(99,102,241,0.08)', color: marketLoading ? 'var(--text-4)' : '#6366f1', border: '1px solid rgba(99,102,241,0.15)' }}
             >
               {marketLoading ? <Loader2 size={11} className="animate-spin" /> : <RefreshCw size={11} />}
-              {marketLoading ? 'Analyzing…' : marketValue ? 'Re-analyze' : 'Analyze my worth'}
+              {marketLoading ? t('profile_analyzing') : marketValue ? t('profile_reanalyze') : t('profile_analyze_worth')}
             </button>
           </div>
           <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
-            Based on your CV and current Berlin PM market data (Glassdoor, Levels.fyi, Handpickedberlin 2026)
+            {t('profile_market_desc')}
           </p>
 
           {marketError && <p className="text-xs mb-3" style={{ color: '#ef4444' }}>{marketError}</p>}
@@ -557,7 +560,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
           {!marketValue && !marketLoading && (
             <div className="rounded-xl border-2 border-dashed p-6 text-center" style={{ borderColor: 'rgba(99,102,241,0.15)' }}>
               <TrendingUp size={24} style={{ color: 'var(--border)', margin: '0 auto 8px' }} />
-              <p className="text-xs" style={{ color: 'var(--text-4)' }}>Upload your CV and click "Analyze my worth" to see your Berlin market value</p>
+              <p className="text-xs" style={{ color: 'var(--text-4)' }}>{t('profile_market_empty')}</p>
             </div>
           )}
         </div>
@@ -566,9 +569,9 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Salary */}
           <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-            <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Salary expectations</h2>
+            <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>{t('profile_salary')}</h2>
             <div className="flex flex-col gap-3">
-              <Field label="Minimum (EUR/yr)">
+              <Field label={t('profile_salary_min')}>
                 <input
                   type="number"
                   min="0"
@@ -581,7 +584,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                 />
               </Field>
-              <Field label="Maximum (EUR/yr)">
+              <Field label={t('profile_salary_max')}>
                 <input
                   type="number"
                   min="0"
@@ -599,7 +602,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
 
           {/* Preferred industries */}
           <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-            <h2 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Preferred industries</h2>
+            <h2 className="text-sm font-semibold mb-1" style={{ color: 'var(--text-1)' }}>{t('profile_industries')}</h2>
             <p className="text-xs mb-3" style={{ color: 'var(--text-4)' }}>Select all that interest you</p>
             <div className="flex flex-wrap gap-1.5 max-h-44 overflow-y-auto">
               {INDUSTRIES.map((ind) => {
@@ -629,7 +632,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
             <Sparkles size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>AI profile extraction</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{t('profile_cv_section')}</h2>
           </div>
           <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
             Upload your CV and let Claude fill in your profile automatically. Also powers job compatibility analysis.
@@ -683,8 +686,8 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               </div>
             ) : (
               <div>
-                <p className="text-xs font-medium" style={{ color: 'var(--text-3)' }}>Drop your CV here or click to upload</p>
-                <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-4)' }}>PDF or TXT · max 5 MB</p>
+                <p className="text-xs font-medium" style={{ color: 'var(--text-3)' }}>{t('profile_cv_drop')}</p>
+                <p className="text-[10px] mt-0.5" style={{ color: 'var(--text-4)' }}>{t('profile_cv_formats')}</p>
               </div>
             )}
           </div>
@@ -698,7 +701,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               style={{ background: extracting ? 'var(--text-4)' : 'linear-gradient(135deg, #6366f1, #4f46e5)', cursor: extracting ? 'not-allowed' : 'pointer' }}
             >
               {extracting ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
-              {extracting ? 'Extracting...' : 'Extract profile from CV'}
+              {extracting ? t('profile_cv_extracting') : t('profile_cv_extract_btn')}
             </button>
             {extractMsg && (
               <p className="text-xs flex-1" style={{ color: extractMsg.startsWith('Error') ? '#ef4444' : extractMsg.includes('extracted') ? '#22c55e' : 'var(--text-3)' }}>
@@ -711,20 +714,39 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
 
         {/* Appearance */}
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <h2 className="text-sm font-semibold mb-3" style={{ color: 'var(--text-1)' }}>Appearance</h2>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--text-2)' }}>{dark ? 'Dark mode' : 'Light mode'}</p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>Applies to all views</p>
+          <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>{t('profile_appearance')}</h2>
+          <div className="flex flex-col gap-4">
+            {/* Dark/light toggle */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-2)' }}>{dark ? t('profile_dark') : t('profile_light')}</p>
+              <button
+                onClick={onToggleDark}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border-2)' }}
+              >
+                {dark ? <Sun size={14} /> : <Moon size={14} />}
+                {dark ? t('profile_light') : t('profile_dark')}
+              </button>
             </div>
-            <button
-              onClick={onToggleDark}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
-              style={{ background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--border-2)' }}
-            >
-              {dark ? <Sun size={14} /> : <Moon size={14} />}
-              {dark ? 'Switch to light' : 'Switch to dark'}
-            </button>
+            {/* Language toggle */}
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-medium" style={{ color: 'var(--text-2)' }}>{t('profile_language')}</p>
+              <div className="flex rounded-lg overflow-hidden" style={{ border: '1px solid var(--border-2)' }}>
+                {['en', 'de'].map((l) => (
+                  <button
+                    key={l}
+                    onClick={() => setLang(l)}
+                    className="px-4 py-2 text-xs font-semibold transition-all"
+                    style={{
+                      background: lang === l ? '#6366f1' : 'var(--surface-2)',
+                      color: lang === l ? '#fff' : 'var(--text-3)',
+                    }}
+                  >
+                    {l === 'en' ? 'EN' : 'DE'}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -732,7 +754,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         <div className="rounded-xl border p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-1">
             <Cloud size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Cross-device sync</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{t('profile_sync_title')}</h2>
             {syncStatus === 'syncing' && (
               <span className="ml-auto flex items-center gap-1 text-[10px]" style={{ color: 'var(--text-4)' }}>
                 <Loader2 size={10} className="animate-spin" /> Syncing…
@@ -766,7 +788,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                     className="text-xs flex items-center gap-1"
                     style={{ color: 'var(--text-4)' }}
                   >
-                    <RefreshCw size={11} /> Sync now
+                    <RefreshCw size={11} /> {t('profile_sync_now')}
                   </button>
                 )}
                 <button
@@ -774,7 +796,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
                   className="flex items-center gap-1 text-xs"
                   style={{ color: 'var(--text-4)' }}
                 >
-                  <LogOut size={11} /> Sign out
+                  <LogOut size={11} /> {t('profile_sign_out')}
                 </button>
               </div>
             </div>

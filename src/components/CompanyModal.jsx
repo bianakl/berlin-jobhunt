@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Star, ChevronDown, Linkedin, Mail } from 'lucide-react';
 import { INDUSTRIES, COMPANY_SIZES } from '../data/seed';
+import { useT } from '../lib/LanguageContext';
 
 const inputStyle = {
   width: '100%',
@@ -27,6 +28,7 @@ function Field({ label, children, hint }) {
 }
 
 export default function CompanyModal({ company, onSave, onClose }) {
+  const t = useT();
   const isEdit = !!company;
 
   const [form, setForm] = useState({
@@ -55,7 +57,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
     e.preventDefault();
     if (!form.name.trim()) return;
     if (form.atsSlug && !/^[a-zA-Z0-9_-]{1,100}$/.test(form.atsSlug)) {
-      setSlugError('Slug can only contain letters, numbers, hyphens, and underscores');
+      setSlugError(t('co_slug_error'));
       return;
     }
     onSave(form);
@@ -83,10 +85,10 @@ export default function CompanyModal({ company, onSave, onClose }) {
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b" style={{ borderColor: 'var(--surface-5)' }}>
           <div>
             <h2 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>
-              {isEdit ? 'Edit company' : 'Add company'}
+              {isEdit ? t('co_modal_edit') : t('co_modal_add')}
             </h2>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
-              {isEdit ? `Editing ${company.name}` : 'Add a company to your research list'}
+              {isEdit ? t('co_modal_edit_sub', { name: company.name }) : t('co_modal_add_sub')}
             </p>
           </div>
           <button
@@ -104,10 +106,10 @@ export default function CompanyModal({ company, onSave, onClose }) {
         <div className="px-4 sm:px-6 py-4 sm:py-5 overflow-y-auto flex-1">
           <form id="company-form" onSubmit={handleSubmit}>
             <div className="space-y-4">
-              <Field label="Company name *">
+              <Field label={t('co_name_label')}>
                 <input
                   required
-                  placeholder="N26, Zalando, ..."
+                  placeholder={t('co_name_placeholder')}
                   value={form.name}
                   onChange={(e) => set('name', e.target.value)}
                   style={inputStyle}
@@ -116,10 +118,10 @@ export default function CompanyModal({ company, onSave, onClose }) {
                 />
               </Field>
 
-              <Field label="Careers page URL">
+              <Field label={t('co_website_label')}>
                 <input
                   type="url"
-                  placeholder="https://company.com/careers"
+                  placeholder={t('co_website_placeholder')}
                   value={form.website}
                   onChange={(e) => set('website', e.target.value)}
                   style={inputStyle}
@@ -129,7 +131,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
               </Field>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Field label="Industry">
+                <Field label={t('co_industry_label')}>
                   <div className="relative">
                     <select
                       value={form.industry}
@@ -138,14 +140,14 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     >
-                      <option value="">Select...</option>
+                      <option value="">{t('co_select')}</option>
                       {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
                     </select>
                     <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
                   </div>
                 </Field>
 
-                <Field label="Company size">
+                <Field label={t('co_size_label')}>
                   <div className="relative">
                     <select
                       value={form.size}
@@ -154,7 +156,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                       onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                       onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                     >
-                      <option value="">Select...</option>
+                      <option value="">{t('co_select')}</option>
                       {COMPANY_SIZES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
                     <ChevronDown size={11} className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--text-4)' }} />
@@ -164,9 +166,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
 
               {/* ATS Integration */}
               <div className="rounded-xl p-3.5 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-2)' }}>
-                <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>Job board integration</p>
+                <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>{t('co_ats_label')}</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Field label="ATS type">
+                  <Field label={t('co_ats_type')}>
                     <div className="relative">
                       <select
                         value={form.atsType}
@@ -175,7 +177,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
                         onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       >
-                        <option value="">None</option>
+                        <option value="">{t('co_ats_none')}</option>
                         <option value="lever">Lever</option>
                         <option value="greenhouse">Greenhouse</option>
                         <option value="ashby">Ashby</option>
@@ -184,9 +186,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                     </div>
                   </Field>
 
-                  <Field label="Slug" hint={atsHint ? `— ${atsHint}` : ''}>
+                  <Field label={t('co_ats_slug')} hint={atsHint ? `— ${atsHint}` : ''}>
                     <input
-                      placeholder={form.atsType ? 'company-slug' : '—'}
+                      placeholder={form.atsType ? t('co_slug_placeholder') : '—'}
                       value={form.atsSlug}
                       onChange={(e) => set('atsSlug', e.target.value)}
                       disabled={!form.atsType}
@@ -199,9 +201,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                 </div>
               </div>
 
-              <Field label="Research notes">
+              <Field label={t('co_notes_label')}>
                 <textarea
-                  placeholder="Culture, tech stack, why you're interested, people to connect with..."
+                  placeholder={t('co_notes_placeholder')}
                   value={form.notes}
                   onChange={(e) => set('notes', e.target.value)}
                   rows={3}
@@ -213,12 +215,12 @@ export default function CompanyModal({ company, onSave, onClose }) {
 
               {/* Outreach tracking */}
               <div className="rounded-xl p-3.5 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-2)' }}>
-                <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>Outreach tracking</p>
+                <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>{t('co_outreach')}</p>
                 <div className="space-y-3">
-                  <Field label="Company LinkedIn URL">
+                  <Field label={t('co_linkedin_label')}>
                     <input
                       type="url"
-                      placeholder="https://linkedin.com/company/..."
+                      placeholder={t('co_linkedin_placeholder')}
                       value={form.linkedinUrl}
                       onChange={(e) => set('linkedinUrl', e.target.value)}
                       style={inputStyle}
@@ -227,9 +229,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                     />
                   </Field>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Field label="Connections" hint="— 1st, 2nd, name...">
+                    <Field label={t('co_connections_label')} hint={t('co_connections_hint')}>
                       <input
-                        placeholder="e.g. 2nd degree"
+                        placeholder={t('co_connections_placeholder')}
                         value={form.connections}
                         onChange={(e) => set('connections', e.target.value)}
                         style={inputStyle}
@@ -237,10 +239,10 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
                       />
                     </Field>
-                    <Field label="Contact email">
+                    <Field label={t('co_email_label')}>
                       <input
                         type="email"
-                        placeholder="hiring@company.com"
+                        placeholder={t('co_email_placeholder')}
                         value={form.email}
                         onChange={(e) => set('email', e.target.value)}
                         style={inputStyle}
@@ -260,7 +262,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         color: form.referral ? '#22c55e' : 'var(--text-3)',
                       }}
                     >
-                      <span>{form.referral ? '✅' : '⬜'}</span> Referral
+                      <span>{form.referral ? '✅' : '⬜'}</span> {t('co_referral')}
                     </button>
                     <button
                       type="button"
@@ -272,7 +274,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
                         color: form.viaForm ? '#6366f1' : 'var(--text-3)',
                       }}
                     >
-                      <span>{form.viaForm ? '✅' : '⬜'}</span> Applied via form
+                      <span>{form.viaForm ? '✅' : '⬜'}</span> {t('co_via_form')}
                     </button>
                   </div>
                 </div>
@@ -291,9 +293,9 @@ export default function CompanyModal({ company, onSave, onClose }) {
                 <Star size={15} fill={form.favorite ? '#f59e0b' : 'none'} style={{ color: form.favorite ? '#f59e0b' : 'var(--text-4)' }} />
                 <div>
                   <div className="text-sm font-medium" style={{ color: form.favorite ? '#f59e0b' : 'var(--text-2)' }}>
-                    {form.favorite ? 'Favorited' : 'Mark as favorite'}
+                    {form.favorite ? t('co_favorited') : t('co_favorite')}
                   </div>
-                  <div className="text-xs" style={{ color: 'var(--text-4)' }}>Favorites are highlighted across the app</div>
+                  <div className="text-xs" style={{ color: 'var(--text-4)' }}>{t('co_favorite_hint')}</div>
                 </div>
               </button>
             </div>
@@ -309,7 +311,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
             onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--text-1)')}
             onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-3)')}
           >
-            Cancel
+            {t('co_cancel')}
           </button>
           <button
             type="submit" form="company-form"
@@ -318,7 +320,7 @@ export default function CompanyModal({ company, onSave, onClose }) {
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.9')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
-            {isEdit ? 'Save changes' : 'Add company'}
+            {isEdit ? t('co_save') : t('co_add')}
           </button>
         </div>
       </div>

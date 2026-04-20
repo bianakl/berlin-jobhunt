@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Send, CheckCircle } from 'lucide-react';
+import { useT } from '../lib/LanguageContext';
 
 export default function ProfileSignInGate({ onSyncRequest }) {
+  const t = useT();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -10,7 +12,7 @@ export default function ProfileSignInGate({ onSyncRequest }) {
   const handleSend = async () => {
     setError('');
     if (!email.trim() || !email.includes('@')) {
-      setError('Enter a valid email.');
+      setError(t('gate_invalid_email'));
       return;
     }
     setLoading(true);
@@ -18,7 +20,7 @@ export default function ProfileSignInGate({ onSyncRequest }) {
       await onSyncRequest(email.trim());
       setSent(true);
     } catch {
-      setError('Could not send link. Try again.');
+      setError(t('gate_error'));
     } finally {
       setLoading(false);
     }
@@ -33,21 +35,21 @@ export default function ProfileSignInGate({ onSyncRequest }) {
         🔒
       </div>
       <h2 className="text-base font-semibold mb-2" style={{ color: 'var(--text-1)' }}>
-        Sign in to access your profile
+        {t('gate_title')}
       </h2>
       <p className="text-sm mb-6 max-w-xs leading-relaxed" style={{ color: 'var(--text-3)' }}>
-        Your profile, CV, and settings are saved to your account.
+        {t('gate_desc')}
       </p>
 
       {sent ? (
         <div className="flex items-center gap-2 text-sm font-medium" style={{ color: '#22c55e' }}>
-          <CheckCircle size={16} /> Check your inbox for the sign-in link.
+          <CheckCircle size={16} /> {t('gate_sent')}
         </div>
       ) : (
         <div className="flex flex-col items-center gap-3 w-full max-w-xs">
           <input
             type="email"
-            placeholder="your@email.com"
+            placeholder={t('gate_email_placeholder')}
             value={email}
             onChange={(e) => { setEmail(e.target.value); setError(''); }}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -75,7 +77,7 @@ export default function ProfileSignInGate({ onSyncRequest }) {
             onMouseEnter={(e) => { if (!loading) e.currentTarget.style.opacity = '0.88'; }}
             onMouseLeave={(e) => { if (!loading) e.currentTarget.style.opacity = '1'; }}
           >
-            <Send size={13} /> {loading ? 'Sending…' : 'Send sign-in link'}
+            <Send size={13} /> {loading ? t('gate_sending') : t('gate_send')}
           </button>
         </div>
       )}

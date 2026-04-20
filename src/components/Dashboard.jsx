@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { STAGES } from '../data/seed';
 import { CalendarClock, TrendingUp, Briefcase, Star, AlertCircle } from 'lucide-react';
 import Gamification from './Gamification';
+import { useT } from '../lib/LanguageContext';
 
 function compatScore(compatibility) {
   if (!compatibility) return 0;
@@ -15,26 +16,9 @@ function isOverdue(date) {
   return new Date(date) < new Date();
 }
 
-function daysAgo(dateStr) {
-  if (!dateStr) return null;
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const d = Math.floor(diff / 86400000);
-  if (d === 0) return 'Today';
-  if (d === 1) return 'Yesterday';
-  return `${d}d ago`;
-}
-
-function daysUntil(dateStr) {
-  if (!dateStr) return null;
-  const diff = new Date(dateStr).getTime() - Date.now();
-  const d = Math.ceil(diff / 86400000);
-  if (d < 0) return `${Math.abs(d)}d overdue`;
-  if (d === 0) return 'Today';
-  if (d === 1) return 'Tomorrow';
-  return `in ${d}d`;
-}
-
 export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak, achievements, onUnlockAchievement }) {
+  const t = useT();
+
   const activeJobs = jobs.filter((j) => j.stage !== 'rejected' && j.stage !== 'company_rejected');
   const applied = jobs.filter((j) => ['applied', 'interview', 'offer'].includes(j.stage));
   const interviews = jobs.filter((j) => j.stage === 'interview');
@@ -64,29 +48,52 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
   }));
   const maxCount = Math.max(...stageCounts.map((s) => s.count), 1);
 
+  function daysAgo(dateStr) {
+    if (!dateStr) return null;
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const d = Math.floor(diff / 86400000);
+    if (d === 0) return t('dash_today');
+    if (d === 1) return t('dash_yesterday');
+    return t('dash_days_ago', { n: d });
+  }
+
+  function daysUntil(dateStr) {
+    if (!dateStr) return null;
+    const diff = new Date(dateStr).getTime() - Date.now();
+    const d = Math.ceil(diff / 86400000);
+    if (d < 0) return t('dash_days_overdue', { n: Math.abs(d) });
+    if (d === 0) return t('dash_today');
+    if (d === 1) return t('dash_tomorrow');
+    return t('dash_in_days', { n: d });
+  }
+
   const statCards = [
     {
-      label: 'Active pipeline',
+      label: t('dash_active'),
       value: activeJobs.length,
-      sub: addedThisWeek > 0 ? `+${addedThisWeek} this week` : 'No new this week',
+      sub: addedThisWeek > 0 ? t('dash_this_week', { n: addedThisWeek }) : t('dash_no_new_week'),
       icon: Briefcase,
       color: '#6366f1',
     },
     {
-      label: 'Applied',
+      label: t('dash_applied'),
       value: applied.length,
-      sub: `${conversionRate}% interview rate`,
+      sub: t('dash_interview_rate', { n: conversionRate }),
       icon: TrendingUp,
       color: '#f59e0b',
     },
     {
-      label: 'Interviews',
+      label: t('dash_interviews'),
       value: interviews.length,
-      sub: offers.length > 0 ? `${offers.length} offer${offers.length > 1 ? 's' : ''} received` : 'Keep going!',
+      sub: offers.length > 0
+        ? t('dash_offers', { n: offers.length, s: offers.length > 1 ? 's' : '' })
+        : t('dash_keep_going'),
       icon: Star,
       color: '#22c55e',
     },
   ];
+
+  const motivateLines = t('dash_motivate').split('\n');
 
   const stableUnlock = useCallback(onUnlockAchievement, [onUnlockAchievement]);
 
@@ -94,11 +101,14 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-8 fade-in">
       {/* Greeting */}
       <div className="mb-4 md:mb-8">
-        <h1 className="text-xl md:text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>Your Berlin Job Search</h1>
+        <h1 className="text-xl md:text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>{t('dash_title')}</h1>
         <p className="text-sm" style={{ color: 'var(--text-4)' }}>
           {activeJobs.length === 0
-            ? 'Nothing tracked yet — add your first job to get started.'
-            : `${activeJobs.length} active ${activeJobs.length === 1 ? 'opportunity' : 'opportunities'} in your pipeline.`}
+            ? t('dash_empty')
+            : t('dash_active_ops', {
+                n: activeJobs.length,
+                op: t(activeJobs.length === 1 ? 'dash_opportunity' : 'dash_opportunities'),
+              })}
         </p>
       </div>
 
@@ -126,7 +136,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
           className="col-span-2 md:col-span-1 rounded-xl p-4 border"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
         >
-          <span className="text-xs font-medium block mb-3" style={{ color: 'var(--text-4)' }}>Stage funnel</span>
+          <span className="text-xs font-medium block mb-3" style={{ color: 'var(--text-4)' }}>{t('dash_funnel')}</span>
           <div className="space-y-2">
             {stageCounts.map((s) => {
               const pct = (s.count / maxCount) * 100;
@@ -153,10 +163,10 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5 mb-5">
         {/* Pipeline mini */}
         <div className="md:col-span-2 rounded-xl border p-4 md:p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>Recently added</h2>
+          <h2 className="text-sm font-semibold mb-4" style={{ color: 'var(--text-1)' }}>{t('dash_recent')}</h2>
           {recentJobs.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-xs" style={{ color: 'var(--text-5)' }}>No jobs tracked yet</p>
+              <p className="text-xs" style={{ color: 'var(--text-5)' }}>{t('dash_no_jobs')}</p>
             </div>
           ) : (
             <div className="space-y-1">
@@ -202,12 +212,12 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
         <div className="rounded-xl border p-4 md:p-5" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2 mb-4">
             <CalendarClock size={14} style={{ color: '#6366f1' }} />
-            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>Follow-ups</h2>
+            <h2 className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{t('dash_followups')}</h2>
           </div>
           {followUps.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-2xl mb-2">📅</div>
-              <p className="text-xs" style={{ color: 'var(--text-5)' }}>No follow-ups scheduled</p>
+              <p className="text-xs" style={{ color: 'var(--text-5)' }}>{t('dash_no_followups')}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -249,7 +259,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
           >
             <div className="text-lg mb-1">🐻</div>
             <p className="text-xs" style={{ color: '#6366f1' }}>
-              Berlin is yours.<br />Keep pushing.
+              {motivateLines[0]}<br />{motivateLines[1]}
             </p>
           </div>
         </div>

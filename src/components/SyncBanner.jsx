@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Cloud, Send, CheckCircle, X } from 'lucide-react';
+import { useT } from '../lib/LanguageContext';
 
 export default function SyncBanner({ onSyncRequest }) {
+  const t = useT();
   const [email, setEmail] = useState('');
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
@@ -12,14 +14,14 @@ export default function SyncBanner({ onSyncRequest }) {
   const handleSend = async () => {
     setError('');
     if (!email.trim() || !email.includes('@')) {
-      setError('Enter a valid email.');
+      setError(t('sync_invalid_email'));
       return;
     }
     try {
       await onSyncRequest(email.trim());
       setSent(true);
     } catch {
-      setError('Could not send link. Try again.');
+      setError(t('sync_error'));
     }
   };
 
@@ -35,16 +37,16 @@ export default function SyncBanner({ onSyncRequest }) {
 
       {sent ? (
         <span className="flex items-center gap-2 text-xs" style={{ color: '#22c55e' }}>
-          <CheckCircle size={13} /> Check your inbox for the sign-in link.
+          <CheckCircle size={13} /> {t('sync_sent')}
         </span>
       ) : (
         <>
           <span className="text-xs shrink-0" style={{ color: 'var(--text-3)' }}>
-            Sign in to sync across devices:
+            {t('sync_prompt')}
           </span>
           <input
             type="email"
-            placeholder="your@email.com"
+            placeholder={t('sync_email_placeholder')}
             value={email}
             onChange={(e) => { setEmail(e.target.value); setError(''); }}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -66,7 +68,7 @@ export default function SyncBanner({ onSyncRequest }) {
             onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
-            <Send size={11} /> Send link
+            <Send size={11} /> {t('sync_send')}
           </button>
           {error && <span className="text-xs shrink-0" style={{ color: '#ef4444' }}>{error}</span>}
         </>

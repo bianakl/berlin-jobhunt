@@ -5,6 +5,7 @@ import {
 import { STAGES } from '../data/seed';
 import JobCard from './JobCard';
 import { Plus } from 'lucide-react';
+import { useT } from '../lib/LanguageContext';
 
 // Confetti
 function Confetti({ active }) {
@@ -76,6 +77,7 @@ function DroppableColumn({ stage, children }) {
 }
 
 function StageColumn({ stage, jobs, onEdit, onDelete, onMove, onAddJob }) {
+  const t = useT();
   const stageJobs = jobs.filter((j) => j.stage === stage.id);
 
   return (
@@ -121,7 +123,7 @@ function StageColumn({ stage, jobs, onEdit, onDelete, onMove, onAddJob }) {
               className="rounded-xl border-2 border-dashed p-6 text-center"
               style={{ borderColor: `${stage.color}25` }}
             >
-              <p className="text-xs" style={{ color: 'var(--text-5)' }}>Nothing here yet</p>
+              <p className="text-xs" style={{ color: 'var(--text-5)' }}>{t('pipeline_empty')}</p>
             </div>
           )}
         </div>
@@ -132,6 +134,7 @@ function StageColumn({ stage, jobs, onEdit, onDelete, onMove, onAddJob }) {
 
 // Mobile: simple vertical stack, no DnD
 function MobileStageSection({ stage, jobs, onEdit, onDelete, onMove, onAddJob }) {
+  const t = useT();
   const stageJobs = jobs.filter((j) => j.stage === stage.id);
   return (
     <div>
@@ -173,7 +176,7 @@ function MobileStageSection({ stage, jobs, onEdit, onDelete, onMove, onAddJob })
             className="rounded-xl border-2 border-dashed p-4 text-center"
             style={{ borderColor: `${stage.color}25` }}
           >
-            <p className="text-xs" style={{ color: 'var(--text-5)' }}>Nothing here yet</p>
+            <p className="text-xs" style={{ color: 'var(--text-5)' }}>{t('pipeline_empty')}</p>
           </div>
         )}
       </div>
@@ -182,6 +185,7 @@ function MobileStageSection({ stage, jobs, onEdit, onDelete, onMove, onAddJob })
 }
 
 export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onEditJob }) {
+  const t = useT();
   const [confetti, setConfetti] = useState(false);
   const [activeId, setActiveId] = useState(null);
 
@@ -231,9 +235,13 @@ export default function Pipeline({ jobs, onUpdateJob, onDeleteJob, onAddJob, onE
       {/* Content header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>Pipeline</h1>
+          <h1 className="text-base font-semibold" style={{ color: 'var(--text-1)' }}>{t('pipeline_title')}</h1>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text-4)' }}>
-            {jobs.length} {jobs.length === 1 ? 'job' : 'jobs'} tracked across {STAGES.length} stages
+            {t('pipeline_subtitle', {
+              n: jobs.length,
+              job: t(jobs.length === 1 ? 'pipeline_job' : 'pipeline_jobs'),
+              stages: STAGES.length,
+            })}
           </p>
         </div>
       </div>
