@@ -80,6 +80,7 @@ export default async function handler(req, res) {
   let prompt;
 
   if (mode === 'profile') {
+    const cvSummary = cvText.slice(0, 4000);
     prompt = `You are a senior talent advisor specializing in European tech product management. You give honest, calibrated assessments — not inflated ones.
 
 ${MARKET_CONTEXT}
@@ -87,7 +88,7 @@ ${MARKET_CONTEXT}
 Analyze this candidate's CV/profile and give them a realistic, specific picture of their market value for PM roles in Berlin / Europe.
 
 CV / Profile:
-${cvText}
+${cvSummary}
 
 Return ONLY valid JSON (no markdown, no explanation):
 {
@@ -96,23 +97,18 @@ Return ONLY valid JSON (no markdown, no explanation):
   "rangeMax": 110000,
   "midpoint": 97000,
   "confidence": "high",
-  "headline": "One punchy, honest sentence on their positioning — what makes them stand out or what holds them back",
-  "strengths": [
-    "specific, sellable strength with evidence from their CV",
-    "another concrete strength relevant to Berlin PM market",
-    "third strength"
-  ],
-  "limitingFactors": [
-    "honest factor keeping them from top of range — be specific"
-  ],
-  "positioning": "2-3 sentences on how they should position themselves in the Berlin market — which companies, industries, or roles are the best fit given their background",
-  "tip": "One very specific, actionable negotiation tip based on their actual profile — not generic advice"
+  "headline": "One punchy sentence on their positioning",
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "limitingFactors": ["one honest limiting factor"],
+  "positioning": "2-3 sentences on best-fit companies and roles in Berlin",
+  "tip": "One specific, actionable negotiation tip"
 }
 
 Rules:
 - Be calibrated to real Berlin market data above
-- Do not inflate numbers to make the candidate feel good
+- Do not inflate numbers
 - Reference specific details from their CV
+- Keep strings concise — headline ≤ 15 words, each strength/factor ≤ 15 words, tip ≤ 20 words
 - Return ONLY JSON`;
   } else {
     // Per-role estimate
@@ -142,14 +138,20 @@ Return ONLY valid JSON (no markdown):
 Be realistic and grounded in the market data. Return ONLY JSON.`;
   }
 
+  const maxTokens = mode === 'profile' ? 600 : 200;
+
   try {
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 400,
-      messages: [{ role: 'user', content: prompt }],
+      max_tokens: maxTokens,
+      messages: [
+        { role: 'user', content: prompt },
+        { role: 'assistant', content: '{' },
+      ],
     });
 
-    const raw = message.content[0].text.trim();
+    // Prepend the prefill character we provided as assistant turn
+    const raw = ('{' + message.content[0].text).trim();
     const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
     return res.status(200).json(JSON.parse(jsonStr));
   } catch (err) {
