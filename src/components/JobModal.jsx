@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { authHeader } from '../lib/authHeader';
-import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles, BookOpen } from 'lucide-react';
+import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles, BookOpen, Linkedin } from 'lucide-react';
 import { STAGES } from '../data/seed';
 import { useT } from '../lib/LanguageContext';
 
@@ -142,6 +142,12 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
   const [interviewPrepLoading, setInterviewPrepLoading] = useState(false);
   const [interviewPrepError, setInterviewPrepError] = useState(null);
 
+  // LinkedIn outreach
+  const [outreachMsg, setOutreachMsg] = useState(null);
+  const [outreachLoading, setOutreachLoading] = useState(false);
+  const [outreachError, setOutreachError] = useState(null);
+  const [outreachCopied, setOutreachCopied] = useState(false);
+
   const draftCoverLetter = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
     if (!cvText) { onNeedCv?.(() => draftCoverLetter()); return; }
@@ -175,6 +181,42 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
     navigator.clipboard.writeText(coverLetter).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  const draftOutreach = async () => {
+    const cvText = localStorage.getItem('scout-cv-text');
+    if (!cvText) { onNeedCv?.(() => draftOutreach()); return; }
+    if (!form.title.trim()) { setOutreachError(t('job_no_title_err')); return; }
+    setOutreachLoading(true);
+    setOutreachError(null);
+    try {
+      const res = await fetch('/api/linkedin-outreach', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+        body: JSON.stringify({
+          cvText,
+          jobTitle: form.title,
+          companyName: form.company,
+          jobSnippet: form.notes || '',
+          candidateName: profile?.name || '',
+          skills: profile?.skills || [],
+        }),
+      });
+      const data = await res.json();
+      if (data.error) setOutreachError(data.error);
+      else setOutreachMsg(data.message);
+    } catch (err) {
+      setOutreachError(err.message);
+    }
+    setOutreachLoading(false);
+  };
+
+  const copyOutreach = () => {
+    if (!outreachMsg) return;
+    navigator.clipboard.writeText(outreachMsg).then(() => {
+      setOutreachCopied(true);
+      setTimeout(() => setOutreachCopied(false), 2000);
     });
   };
 
@@ -682,6 +724,62 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             {!coverLetter && !coverLetterLoading && !coverLetterError && (
               <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
                 {t('job_draft_hint')}
+              </p>
+            )}
+          </div>
+
+          {/* LinkedIn outreach */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <Linkedin size={13} style={{ color: '#0a66c2' }} />
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_linkedin_outreach')}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {outreachMsg && (
+                  <button
+                    type="button"
+                    onClick={copyOutreach}
+                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
+                    style={{
+                      background: outreachCopied ? 'rgba(34,197,94,0.1)' : 'var(--surface-5)',
+                      color: outreachCopied ? '#16a34a' : 'var(--text-4)',
+                      border: `1px solid ${outreachCopied ? 'rgba(34,197,94,0.2)' : 'var(--border-2)'}`,
+                    }}
+                  >
+                    {outreachCopied ? <Check size={10} /> : <Copy size={10} />}
+                    {outreachCopied ? t('job_outreach_copied') : t('job_outreach_copy')}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={draftOutreach}
+                  disabled={outreachLoading}
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
+                  style={{ background: 'rgba(10,102,194,0.08)', color: '#0a66c2', border: '1px solid rgba(10,102,194,0.2)' }}
+                >
+                  {outreachLoading ? <Loader2 size={10} className="animate-spin" /> : <Linkedin size={10} />}
+                  {outreachLoading ? t('job_outreaching') : outreachMsg ? t('job_reoutreach_btn') : t('job_outreach_btn')}
+                </button>
+              </div>
+            </div>
+
+            {outreachError && (
+              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{outreachError}</p>
+            )}
+
+            {outreachMsg && (
+              <div className="rounded-xl p-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}>
+                <p className="text-[11px] leading-relaxed whitespace-pre-wrap mb-2" style={{ color: 'var(--text-2)' }}>{outreachMsg}</p>
+                <p className="text-[10px]" style={{ color: outreachMsg.length > 300 ? '#ef4444' : 'var(--text-5)' }}>
+                  {t('job_char_count', { count: outreachMsg.length })}
+                </p>
+              </div>
+            )}
+
+            {!outreachMsg && !outreachLoading && !outreachError && (
+              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
+                {t('job_outreach_hint')}
               </p>
             )}
           </div>
