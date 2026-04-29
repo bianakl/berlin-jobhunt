@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { authHeader } from '../lib/authHeader';
-import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles } from 'lucide-react';
+import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles, BookOpen } from 'lucide-react';
 import { STAGES } from '../data/seed';
 import { useT } from '../lib/LanguageContext';
 
@@ -137,6 +137,11 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
   const [coverLetterError, setCoverLetterError] = useState(null);
   const [copied, setCopied] = useState(false);
 
+  // Interview prep
+  const [interviewPrep, setInterviewPrep] = useState(job?.interviewPrep || null);
+  const [interviewPrepLoading, setInterviewPrepLoading] = useState(false);
+  const [interviewPrepError, setInterviewPrepError] = useState(null);
+
   const draftCoverLetter = async () => {
     const cvText = localStorage.getItem('scout-cv-text');
     if (!cvText) { onNeedCv?.(() => draftCoverLetter()); return; }
@@ -173,6 +178,33 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
     });
   };
 
+  const prepInterview = async () => {
+    const cvText = localStorage.getItem('scout-cv-text');
+    if (!cvText) { onNeedCv?.(() => prepInterview()); return; }
+    if (!form.title.trim()) { setInterviewPrepError(t('job_no_title_err')); return; }
+    setInterviewPrepLoading(true);
+    setInterviewPrepError(null);
+    try {
+      const res = await fetch('/api/interview-prep', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+        body: JSON.stringify({
+          cvText,
+          jobTitle: form.title,
+          companyName: form.company,
+          jobSnippet: form.notes || '',
+          skills: profile?.skills || [],
+        }),
+      });
+      const data = await res.json();
+      if (data.error) setInterviewPrepError(data.error);
+      else setInterviewPrep(data);
+    } catch (err) {
+      setInterviewPrepError(err.message);
+    }
+    setInterviewPrepLoading(false);
+  };
+
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
   const setCompat = (key, val) => setForm((f) => ({ ...f, compatibility: { ...f.compatibility, [key]: val } }));
 
@@ -192,6 +224,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
       appliedDate: form.appliedDate ? new Date(form.appliedDate).toISOString() : null,
       activityLog: form.activityLog,
       fitAnalysis: fitAnalysis || undefined,
+      interviewPrep: interviewPrep || undefined,
     });
   };
 
@@ -649,6 +682,71 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
             {!coverLetter && !coverLetterLoading && !coverLetterError && (
               <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
                 {t('job_draft_hint')}
+              </p>
+            )}
+          </div>
+
+          {/* Interview prep */}
+          <div className="mt-4">
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <BookOpen size={13} style={{ color: '#0891b2' }} />
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_interview_prep')}</span>
+              </div>
+              <button
+                type="button"
+                onClick={prepInterview}
+                disabled={interviewPrepLoading}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
+                style={{ background: 'rgba(8,145,178,0.08)', color: '#0891b2', border: '1px solid rgba(8,145,178,0.2)' }}
+              >
+                {interviewPrepLoading ? <Loader2 size={10} className="animate-spin" /> : <BookOpen size={10} />}
+                {interviewPrepLoading ? t('job_prepping') : interviewPrep ? t('job_reprep_btn') : t('job_prep_btn')}
+              </button>
+            </div>
+
+            {interviewPrepError && (
+              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{interviewPrepError}</p>
+            )}
+
+            {interviewPrep && !interviewPrepLoading && (
+              <div className="rounded-xl p-3 space-y-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}>
+                {interviewPrep.talkingPoints?.length > 0 && (
+                  <div>
+                    <p className="text-[10px] font-semibold mb-1.5" style={{ color: 'var(--text-4)' }}>{t('job_talking_points')}</p>
+                    {interviewPrep.talkingPoints.map((tp, i) => (
+                      <div key={i} className="flex gap-1.5 text-[11px] mb-1">
+                        <span style={{ color: '#0891b2' }}>→</span>
+                        <span style={{ color: 'var(--text-2)' }}>{tp}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {['Role fit', 'Behavioral', 'Tough'].map((cat) => {
+                  const qs = interviewPrep.questions?.filter((q) => q.category === cat) || [];
+                  if (!qs.length) return null;
+                  const labelKey = cat === 'Role fit' ? 'job_role_fit_q' : cat === 'Behavioral' ? 'job_behavioral_q' : 'job_tough_q';
+                  return (
+                    <div key={cat}>
+                      <p className="text-[10px] font-semibold mb-1.5" style={{ color: 'var(--text-4)' }}>{t(labelKey)}</p>
+                      <div className="space-y-2">
+                        {qs.map((item, i) => (
+                          <div key={i} className="rounded-lg p-2.5" style={{ background: 'var(--surface)', border: '1px solid var(--surface-5)' }}>
+                            <p className="text-[11px] font-medium mb-1" style={{ color: 'var(--text-1)' }}>{item.q}</p>
+                            <p className="text-[10px]" style={{ color: 'var(--text-4)' }}>{item.hint}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {!interviewPrep && !interviewPrepLoading && !interviewPrepError && (
+              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
+                {t('job_prep_hint')}
               </p>
             )}
           </div>
