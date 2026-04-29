@@ -4,13 +4,81 @@ import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Co
 import { STAGES } from '../data/seed';
 import { useT } from '../lib/LanguageContext';
 
-const COMPAT_FACTOR_KEYS = [
-  { key: 'roleMatch', labelKey: 'job_role_fit', hintKey: 'job_role_fit_hint' },
-  { key: 'skillsMatch', labelKey: 'job_skills_match', hintKey: 'job_skills_match_hint' },
-  { key: 'culture', labelKey: 'job_culture_fit', hintKey: 'job_culture_fit_hint' },
-  { key: 'compensation', labelKey: 'job_compensation', hintKey: 'job_compensation_hint' },
-  { key: 'growth', labelKey: 'job_growth', hintKey: 'job_growth_hint' },
-];
+// ── Shared hooks ──────────────────────────────────────────────────────────────
+
+function useAiFeature(initial = null) {
+  const [result, setResult] = useState(initial);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  return { result, setResult, loading, setLoading, error, setError };
+}
+
+function useCopy() {
+  const [copied, setCopied] = useState(false);
+  const copy = (text) => navigator.clipboard.writeText(text).then(() => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  });
+  return { copied, copy };
+}
+
+// ── Shared components ─────────────────────────────────────────────────────────
+
+function AiSection({ Icon, color, label, loading, error, hasResult, emptyHint, onGenerate, generateLabel, badge, secondary, children }) {
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="flex items-center gap-2">
+          <Icon size={13} style={{ color }} />
+          <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{label}</span>
+          {badge}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {secondary}
+          <button
+            type="button"
+            onClick={onGenerate}
+            disabled={loading}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
+            style={{
+              background: `color-mix(in srgb, ${color} 8%, transparent)`,
+              color,
+              border: `1px solid color-mix(in srgb, ${color} 20%, transparent)`,
+            }}
+          >
+            {loading ? <Loader2 size={10} className="animate-spin" /> : <Icon size={10} />}
+            {generateLabel}
+          </button>
+        </div>
+      </div>
+      {error && <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{error}</p>}
+      {hasResult && !loading && children}
+      {!hasResult && !loading && !error && (
+        <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>{emptyHint}</p>
+      )}
+    </div>
+  );
+}
+
+function CopyButton({ text, copyLabel, copiedLabel }) {
+  const { copied, copy } = useCopy();
+  if (!text) return null;
+  return (
+    <button
+      type="button"
+      onClick={() => copy(text)}
+      className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
+      style={{
+        background: copied ? 'rgba(34,197,94,0.1)' : 'var(--surface-5)',
+        color: copied ? '#16a34a' : 'var(--text-4)',
+        border: `1px solid ${copied ? 'rgba(34,197,94,0.2)' : 'var(--border-2)'}`,
+      }}
+    >
+      {copied ? <Check size={10} /> : <Copy size={10} />}
+      {copied ? copiedLabel : copyLabel}
+    </button>
+  );
+}
 
 function StarRow({ value, onChange }) {
   const [hover, setHover] = useState(0);
@@ -57,6 +125,16 @@ const inputStyle = {
   transition: 'border-color 0.15s',
 };
 
+const COMPAT_FACTOR_KEYS = [
+  { key: 'roleMatch', labelKey: 'job_role_fit', hintKey: 'job_role_fit_hint' },
+  { key: 'skillsMatch', labelKey: 'job_skills_match', hintKey: 'job_skills_match_hint' },
+  { key: 'culture', labelKey: 'job_culture_fit', hintKey: 'job_culture_fit_hint' },
+  { key: 'compensation', labelKey: 'job_compensation', hintKey: 'job_compensation_hint' },
+  { key: 'growth', labelKey: 'job_growth', hintKey: 'job_growth_hint' },
+];
+
+// ── Main component ────────────────────────────────────────────────────────────
+
 export default function JobModal({ job, defaults = {}, companies, profile, onNeedCv, onAnalyzed, onSave, onClose }) {
   const t = useT();
   const isEdit = !!job;
@@ -78,12 +156,61 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
     compatibility: job?.compatibility || { roleMatch: 0, skillsMatch: 0, culture: 0, compensation: 0, growth: 0 },
   });
 
-  // Details accordion: expanded by default for edits, collapsed for new jobs
   const [detailsOpen, setDetailsOpen] = useState(isEdit);
-
-  // Activity log
   const [newEntry, setNewEntry] = useState('');
   const entryRef = useRef(null);
+
+  const fitFeature = useAiFeature(job?.fitAnalysis || null);
+  const clFeature = useAiFeature(null);
+  const outreachFeature = useAiFeature(null);
+  const prepFeature = useAiFeature(job?.interviewPrep || null);
+
+  // ── Shared AI call helper ──────────────────────────────────────────────────
+
+  const callAi = async (endpoint, extraBody, feature, onSuccess) => {
+    const cvText = localStorage.getItem('scout-cv-text');
+    if (!cvText) { onNeedCv?.(() => callAi(endpoint, extraBody, feature, onSuccess)); return; }
+    if (!form.title.trim()) { feature.setError(t('job_no_title_err')); return; }
+    feature.setLoading(true);
+    feature.setError(null);
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
+        body: JSON.stringify({
+          cvText,
+          jobTitle: form.title,
+          companyName: form.company,
+          jobSnippet: form.notes || '',
+          skills: profile?.skills || [],
+          ...extraBody,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) feature.setError(data.error);
+      else onSuccess(data);
+    } catch (err) {
+      feature.setError(err.message);
+    }
+    feature.setLoading(false);
+  };
+
+  const analyzeFit = () => callAi('/api/analyze-job', {}, fitFeature, (data) => {
+    fitFeature.setResult(data);
+    onAnalyzed?.(data);
+  });
+
+  const draftCoverLetter = () => callAi('/api/cover-letter', {
+    candidateName: profile?.name || '',
+  }, clFeature, (data) => clFeature.setResult(data.letter));
+
+  const draftOutreach = () => callAi('/api/linkedin-outreach', {
+    candidateName: profile?.name || '',
+  }, outreachFeature, (data) => outreachFeature.setResult(data.message));
+
+  const prepInterview = () => callAi('/api/interview-prep', {}, prepFeature, (data) => prepFeature.setResult(data));
+
+  // ── Activity log ──────────────────────────────────────────────────────────
 
   const addLogEntry = () => {
     const text = newEntry.trim();
@@ -94,158 +221,9 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
     entryRef.current?.focus();
   };
 
-  const deleteLogEntry = (id) => {
-    setForm((f) => ({ ...f, activityLog: f.activityLog.filter((e) => e.id !== id) }));
-  };
+  const deleteLogEntry = (id) => setForm((f) => ({ ...f, activityLog: f.activityLog.filter((e) => e.id !== id) }));
 
-  // Fit analysis — init from saved job data so results persist across sessions
-  const [fitAnalysis, setFitAnalysis] = useState(job?.fitAnalysis || null);
-  const [fitLoading, setFitLoading] = useState(false);
-  const [fitError, setFitError] = useState(null);
-
-  const analyzeFit = async () => {
-    const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { onNeedCv?.(() => analyzeFit()); return; }
-    if (!form.title.trim()) { setFitError(t('job_no_title_err')); return; }
-    setFitLoading(true);
-    setFitError(null);
-    try {
-      const skills = profile?.skills || [];
-      const res = await fetch('/api/analyze-job', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-        body: JSON.stringify({
-          cvText,
-          jobTitle: form.title,
-          companyName: form.company,
-          jobSnippet: form.notes || '',
-          skills,
-        }),
-      });
-      const data = await res.json();
-      if (data.error) setFitError(data.error);
-      else { setFitAnalysis(data); onAnalyzed?.(data); }
-    } catch (err) {
-      setFitError(err.message);
-    }
-    setFitLoading(false);
-  };
-
-  // Cover letter
-  const [coverLetter, setCoverLetter] = useState(null);
-  const [coverLetterLoading, setCoverLetterLoading] = useState(false);
-  const [coverLetterError, setCoverLetterError] = useState(null);
-  const [copied, setCopied] = useState(false);
-
-  // Interview prep
-  const [interviewPrep, setInterviewPrep] = useState(job?.interviewPrep || null);
-  const [interviewPrepLoading, setInterviewPrepLoading] = useState(false);
-  const [interviewPrepError, setInterviewPrepError] = useState(null);
-
-  // LinkedIn outreach
-  const [outreachMsg, setOutreachMsg] = useState(null);
-  const [outreachLoading, setOutreachLoading] = useState(false);
-  const [outreachError, setOutreachError] = useState(null);
-  const [outreachCopied, setOutreachCopied] = useState(false);
-
-  const draftCoverLetter = async () => {
-    const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { onNeedCv?.(() => draftCoverLetter()); return; }
-    if (!form.title.trim()) { setCoverLetterError(t('job_no_title_err')); return; }
-    setCoverLetterLoading(true);
-    setCoverLetterError(null);
-    try {
-      const res = await fetch('/api/cover-letter', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-        body: JSON.stringify({
-          cvText,
-          jobTitle: form.title,
-          companyName: form.company,
-          jobSnippet: form.notes || '',
-          candidateName: profile?.name || '',
-          skills: profile?.skills || [],
-        }),
-      });
-      const data = await res.json();
-      if (data.error) setCoverLetterError(data.error);
-      else setCoverLetter(data.letter);
-    } catch (err) {
-      setCoverLetterError(err.message);
-    }
-    setCoverLetterLoading(false);
-  };
-
-  const copyLetter = () => {
-    if (!coverLetter) return;
-    navigator.clipboard.writeText(coverLetter).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
-  };
-
-  const draftOutreach = async () => {
-    const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { onNeedCv?.(() => draftOutreach()); return; }
-    if (!form.title.trim()) { setOutreachError(t('job_no_title_err')); return; }
-    setOutreachLoading(true);
-    setOutreachError(null);
-    try {
-      const res = await fetch('/api/linkedin-outreach', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-        body: JSON.stringify({
-          cvText,
-          jobTitle: form.title,
-          companyName: form.company,
-          jobSnippet: form.notes || '',
-          candidateName: profile?.name || '',
-          skills: profile?.skills || [],
-        }),
-      });
-      const data = await res.json();
-      if (data.error) setOutreachError(data.error);
-      else setOutreachMsg(data.message);
-    } catch (err) {
-      setOutreachError(err.message);
-    }
-    setOutreachLoading(false);
-  };
-
-  const copyOutreach = () => {
-    if (!outreachMsg) return;
-    navigator.clipboard.writeText(outreachMsg).then(() => {
-      setOutreachCopied(true);
-      setTimeout(() => setOutreachCopied(false), 2000);
-    });
-  };
-
-  const prepInterview = async () => {
-    const cvText = localStorage.getItem('scout-cv-text');
-    if (!cvText) { onNeedCv?.(() => prepInterview()); return; }
-    if (!form.title.trim()) { setInterviewPrepError(t('job_no_title_err')); return; }
-    setInterviewPrepLoading(true);
-    setInterviewPrepError(null);
-    try {
-      const res = await fetch('/api/interview-prep', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-        body: JSON.stringify({
-          cvText,
-          jobTitle: form.title,
-          companyName: form.company,
-          jobSnippet: form.notes || '',
-          skills: profile?.skills || [],
-        }),
-      });
-      const data = await res.json();
-      if (data.error) setInterviewPrepError(data.error);
-      else setInterviewPrep(data);
-    } catch (err) {
-      setInterviewPrepError(err.message);
-    }
-    setInterviewPrepLoading(false);
-  };
+  // ── Form helpers ──────────────────────────────────────────────────────────
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
   const setCompat = (key, val) => setForm((f) => ({ ...f, compatibility: { ...f.compatibility, [key]: val } }));
@@ -256,6 +234,8 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
     return Math.round((vals.reduce((a, b) => a + b, 0) / (vals.length * 5)) * 100);
   })();
 
+  const scoreColor = compatScore >= 80 ? '#22c55e' : compatScore >= 60 ? '#f59e0b' : compatScore >= 40 ? '#6366f1' : '#ef4444';
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!form.title.trim()) return;
@@ -265,12 +245,16 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
       followUpDate: form.followUpDate ? new Date(form.followUpDate).toISOString() : null,
       appliedDate: form.appliedDate ? new Date(form.appliedDate).toISOString() : null,
       activityLog: form.activityLog,
-      fitAnalysis: fitAnalysis || undefined,
-      interviewPrep: interviewPrep || undefined,
+      fitAnalysis: fitFeature.result || undefined,
+      interviewPrep: prepFeature.result || undefined,
     });
   };
 
-  const scoreColor = compatScore >= 80 ? '#22c55e' : compatScore >= 60 ? '#f59e0b' : compatScore >= 40 ? '#6366f1' : '#ef4444';
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  const fitScore = fitFeature.result?.score;
+  const fitScoreColor = fitScore >= 80 ? '#16a34a' : fitScore >= 60 ? '#6366f1' : fitScore >= 40 ? '#b45309' : '#dc2626';
+  const fitScoreBg = fitScore >= 80 ? 'rgba(34,197,94,0.12)' : fitScore >= 60 ? 'rgba(99,102,241,0.1)' : fitScore >= 40 ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)';
 
   return (
     <div
@@ -307,7 +291,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
         <div className="overflow-y-auto flex-1 px-4 sm:px-6 py-4 sm:py-5">
           <form id="job-form" onSubmit={handleSubmit}>
 
-            {/* Required section — always visible */}
+            {/* Required fields */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
               <div className="col-span-2">
                 <Field label={t('job_title_label')}>
@@ -365,16 +349,12 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 type="button"
                 onClick={() => setDetailsOpen((v) => !v)}
                 className="w-full flex items-center justify-between px-4 py-3 text-left transition-all"
-                style={{ background: detailsOpen ? 'var(--surface-2)' : 'var(--surface-2)' }}
+                style={{ background: 'var(--surface-2)' }}
               >
                 <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_details')}</span>
                 <ChevronDown
                   size={14}
-                  style={{
-                    color: 'var(--text-4)',
-                    transform: detailsOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.2s',
-                  }}
+                  style={{ color: 'var(--text-4)', transform: detailsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }}
                 />
               </button>
 
@@ -512,307 +492,200 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                 </div>
               )}
             </div>
-          {/* Activity Log */}
-          <div className="mt-4">
-            <div className="flex items-center gap-2 mb-2.5">
-              <MessageSquare size={13} style={{ color: '#6366f1' }} />
-              <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_activity')}</span>
-              {form.activityLog.length > 0 && (
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>
-                  {form.activityLog.length}
-                </span>
+
+            {/* Activity log */}
+            <div className="mt-4">
+              <div className="flex items-center gap-2 mb-2.5">
+                <MessageSquare size={13} style={{ color: '#6366f1' }} />
+                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_activity')}</span>
+                {form.activityLog.length > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium" style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1' }}>
+                    {form.activityLog.length}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-2 mb-3">
+                <input
+                  ref={entryRef}
+                  placeholder={t('job_activity_placeholder')}
+                  value={newEntry}
+                  onChange={(e) => setNewEntry(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addLogEntry(); } }}
+                  style={{ ...inputStyle, flex: 1 }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
+                />
+                <button
+                  type="button"
+                  onClick={addLogEntry}
+                  disabled={!newEntry.trim()}
+                  className="px-3 rounded-lg text-xs font-medium transition-all flex items-center gap-1"
+                  style={{
+                    background: newEntry.trim() ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'var(--surface-5)',
+                    color: newEntry.trim() ? '#fff' : 'var(--text-5)',
+                    border: 'none',
+                  }}
+                >
+                  <Plus size={12} /> {t('job_activity_btn')}
+                </button>
+              </div>
+              {form.activityLog.length > 0 ? (
+                <div className="space-y-2">
+                  {form.activityLog.map((entry) => {
+                    const d = new Date(entry.date);
+                    const dateLabel = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                    const timeLabel = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                    return (
+                      <div
+                        key={entry.id}
+                        className="group flex gap-2.5 p-2.5 rounded-lg"
+                        style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}
+                      >
+                        <div className="shrink-0 mt-0.5">
+                          <div className="w-1.5 h-1.5 rounded-full mt-1.5" style={{ background: '#6366f1' }} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{entry.text}</p>
+                          <span className="text-[10px]" style={{ color: 'var(--text-5)' }}>{dateLabel} at {timeLabel}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => deleteLogEntry(entry.id)}
+                          className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                          style={{ color: 'var(--text-5)' }}
+                          onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+                          onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>{t('job_activity_empty')}</p>
               )}
             </div>
 
-            {/* New entry input */}
-            <div className="flex gap-2 mb-3">
-              <input
-                ref={entryRef}
-                placeholder={t('job_activity_placeholder')}
-                value={newEntry}
-                onChange={(e) => setNewEntry(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); addLogEntry(); } }}
-                style={{ ...inputStyle, flex: 1 }}
-                onFocus={(e) => (e.currentTarget.style.borderColor = '#6366f1')}
-                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
-              />
-              <button
-                type="button"
-                onClick={addLogEntry}
-                disabled={!newEntry.trim()}
-                className="px-3 rounded-lg text-xs font-medium transition-all flex items-center gap-1"
-                style={{
-                  background: newEntry.trim() ? 'linear-gradient(135deg, #6366f1, #4f46e5)' : 'var(--surface-5)',
-                  color: newEntry.trim() ? '#fff' : 'var(--text-5)',
-                  border: 'none',
-                }}
-              >
-                <Plus size={12} /> {t('job_activity_btn')}
-              </button>
-            </div>
-
-            {/* Entries */}
-            {form.activityLog.length > 0 ? (
-              <div className="space-y-2">
-                {form.activityLog.map((entry) => {
-                  const d = new Date(entry.date);
-                  const dateLabel = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-                  const timeLabel = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-                  return (
-                    <div
-                      key={entry.id}
-                      className="group flex gap-2.5 p-2.5 rounded-lg"
-                      style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}
-                    >
-                      <div className="shrink-0 mt-0.5">
-                        <div className="w-1.5 h-1.5 rounded-full mt-1.5" style={{ background: '#6366f1' }} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-1)' }}>{entry.text}</p>
-                        <span className="text-[10px]" style={{ color: 'var(--text-5)' }}>{dateLabel} at {timeLabel}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => deleteLogEntry(entry.id)}
-                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ color: 'var(--text-5)' }}
-                        onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
-                        onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-5)')}
-                      >
-                        <Trash2 size={11} />
-                      </button>
+            {/* CV fit analysis */}
+            <AiSection
+              Icon={Sparkles}
+              color="#6366f1"
+              label={t('job_cv_fit')}
+              loading={fitFeature.loading}
+              error={fitFeature.error}
+              hasResult={!!fitFeature.result}
+              emptyHint={t('job_analyze_hint')}
+              onGenerate={analyzeFit}
+              generateLabel={fitFeature.loading ? t('job_analyzing') : fitFeature.result ? t('job_reanalyze') : t('job_analyze_fit')}
+              badge={fitScore != null && (
+                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: fitScoreBg, color: fitScoreColor }}>
+                  {fitScore}%
+                </span>
+              )}
+            >
+              {fitFeature.result && (
+                <div className="rounded-xl p-3 space-y-2.5" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}>
+                  {fitFeature.result.verdict && (
+                    <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide" style={{
+                      background: fitFeature.result.verdict === 'strong match' ? 'rgba(34,197,94,0.1)' : fitFeature.result.verdict === 'good match' ? 'rgba(99,102,241,0.1)' : fitFeature.result.verdict === 'possible match' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
+                      color: fitFeature.result.verdict === 'strong match' ? '#16a34a' : fitFeature.result.verdict === 'good match' ? '#6366f1' : fitFeature.result.verdict === 'possible match' ? '#b45309' : '#dc2626',
+                    }}>
+                      {fitFeature.result.verdict}
+                    </span>
+                  )}
+                  {fitFeature.result.summary && (
+                    <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-2)' }}>{fitFeature.result.summary}</p>
+                  )}
+                  {(fitFeature.result.strengths?.length > 0 || fitFeature.result.gaps?.length > 0) && (
+                    <div className="space-y-1">
+                      {fitFeature.result.strengths?.map((s, i) => (
+                        <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#16a34a' }}>✓</span><span style={{ color: 'var(--text-2)' }}>{s}</span></div>
+                      ))}
+                      {fitFeature.result.gaps?.map((g, i) => (
+                        <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#ef4444' }}>✗</span><span style={{ color: 'var(--text-3)' }}>{g}</span></div>
+                      ))}
                     </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>{t('job_activity_empty')}</p>
-            )}
-          </div>
+                  )}
+                  {fitFeature.result.highlights?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>{t('job_lead_with')}</p>
+                      {fitFeature.result.highlights.map((h, i) => (
+                        <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#6366f1' }}>→</span><span style={{ color: 'var(--text-2)' }}>{h}</span></div>
+                      ))}
+                    </div>
+                  )}
+                  {fitFeature.result.watchouts?.length > 0 && (
+                    <div>
+                      <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>{t('job_watch_out')}</p>
+                      {fitFeature.result.watchouts.map((w, i) => (
+                        <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#f59e0b' }}>⚠</span><span style={{ color: 'var(--text-3)' }}>{w}</span></div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </AiSection>
 
-          {/* Fit analysis */}
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <Sparkles size={13} style={{ color: '#6366f1' }} />
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_cv_fit')}</span>
-                {fitAnalysis?.score != null && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{
-                    background: fitAnalysis.score >= 80 ? 'rgba(34,197,94,0.12)' : fitAnalysis.score >= 60 ? 'rgba(99,102,241,0.1)' : fitAnalysis.score >= 40 ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.1)',
-                    color: fitAnalysis.score >= 80 ? '#16a34a' : fitAnalysis.score >= 60 ? '#6366f1' : fitAnalysis.score >= 40 ? '#b45309' : '#dc2626',
-                  }}>
-                    {fitAnalysis.score}%
-                  </span>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={analyzeFit}
-                disabled={fitLoading}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
-                style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)' }}
-              >
-                {fitLoading ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
-                {fitLoading ? t('job_analyzing') : fitAnalysis ? t('job_reanalyze') : t('job_analyze_fit')}
-              </button>
-            </div>
-
-            {fitError && <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{fitError}</p>}
-
-            {fitAnalysis && !fitLoading && (
-              <div className="rounded-xl p-3 space-y-2.5" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}>
-                {fitAnalysis.verdict && (
-                  <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wide" style={{
-                    background: fitAnalysis.verdict === 'strong match' ? 'rgba(34,197,94,0.1)' : fitAnalysis.verdict === 'good match' ? 'rgba(99,102,241,0.1)' : fitAnalysis.verdict === 'possible match' ? 'rgba(245,158,11,0.1)' : 'rgba(239,68,68,0.08)',
-                    color: fitAnalysis.verdict === 'strong match' ? '#16a34a' : fitAnalysis.verdict === 'good match' ? '#6366f1' : fitAnalysis.verdict === 'possible match' ? '#b45309' : '#dc2626',
-                  }}>
-                    {fitAnalysis.verdict}
-                  </span>
-                )}
-                {fitAnalysis.summary && (
-                  <p className="text-[11px] leading-relaxed" style={{ color: 'var(--text-2)' }}>{fitAnalysis.summary}</p>
-                )}
-                {(fitAnalysis.strengths?.length > 0 || fitAnalysis.gaps?.length > 0) && (
-                  <div className="space-y-1">
-                    {fitAnalysis.strengths?.map((s, i) => (
-                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#16a34a' }}>✓</span><span style={{ color: 'var(--text-2)' }}>{s}</span></div>
-                    ))}
-                    {fitAnalysis.gaps?.map((g, i) => (
-                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#ef4444' }}>✗</span><span style={{ color: 'var(--text-3)' }}>{g}</span></div>
-                    ))}
-                  </div>
-                )}
-                {fitAnalysis.highlights?.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>{t('job_lead_with')}</p>
-                    {fitAnalysis.highlights.map((h, i) => (
-                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#6366f1' }}>→</span><span style={{ color: 'var(--text-2)' }}>{h}</span></div>
-                    ))}
-                  </div>
-                )}
-                {fitAnalysis.watchouts?.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-semibold mb-1" style={{ color: 'var(--text-4)' }}>{t('job_watch_out')}</p>
-                    {fitAnalysis.watchouts.map((w, i) => (
-                      <div key={i} className="flex gap-1.5 text-[11px]"><span style={{ color: '#f59e0b' }}>⚠</span><span style={{ color: 'var(--text-3)' }}>{w}</span></div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {!fitAnalysis && !fitLoading && !fitError && (
-              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
-                {t('job_analyze_hint')}
-              </p>
-            )}
-          </div>
-
-          {/* Cover letter */}
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <FileText size={13} style={{ color: '#7c3aed' }} />
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_cover_letter')}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {coverLetter && (
-                  <button
-                    type="button"
-                    onClick={copyLetter}
-                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
-                    style={{
-                      background: copied ? 'rgba(34,197,94,0.1)' : 'var(--surface-5)',
-                      color: copied ? '#16a34a' : 'var(--text-4)',
-                      border: `1px solid ${copied ? 'rgba(34,197,94,0.2)' : 'var(--border-2)'}`,
-                    }}
-                  >
-                    {copied ? <Check size={10} /> : <Copy size={10} />}
-                    {copied ? t('job_copied') : t('job_copy')}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={draftCoverLetter}
-                  disabled={coverLetterLoading}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
-                  style={{
-                    background: coverLetter ? 'rgba(139,92,246,0.06)' : 'rgba(139,92,246,0.08)',
-                    color: '#7c3aed',
-                    border: '1px solid rgba(139,92,246,0.2)',
-                  }}
-                >
-                  {coverLetterLoading ? <Loader2 size={10} className="animate-spin" /> : <FileText size={10} />}
-                  {coverLetterLoading ? t('job_drafting') : coverLetter ? t('job_redraft') : t('job_draft_letter')}
-                </button>
-              </div>
-            </div>
-
-            {coverLetterError && (
-              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{coverLetterError}</p>
-            )}
-
-            {coverLetter && (
+            {/* Cover letter */}
+            <AiSection
+              Icon={FileText}
+              color="#7c3aed"
+              label={t('job_cover_letter')}
+              loading={clFeature.loading}
+              error={clFeature.error}
+              hasResult={!!clFeature.result}
+              emptyHint={t('job_draft_hint')}
+              onGenerate={draftCoverLetter}
+              generateLabel={clFeature.loading ? t('job_drafting') : clFeature.result ? t('job_redraft') : t('job_draft_letter')}
+              secondary={<CopyButton text={clFeature.result} copyLabel={t('job_copy')} copiedLabel={t('job_copied')} />}
+            >
               <div
                 className="text-xs leading-relaxed whitespace-pre-wrap rounded-xl p-4 max-h-64 overflow-y-auto"
                 style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-2)' }}
               >
-                {coverLetter}
+                {clFeature.result}
               </div>
-            )}
+            </AiSection>
 
-            {!coverLetter && !coverLetterLoading && !coverLetterError && (
-              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
-                {t('job_draft_hint')}
-              </p>
-            )}
-          </div>
-
-          {/* LinkedIn outreach */}
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <Linkedin size={13} style={{ color: '#0a66c2' }} />
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_linkedin_outreach')}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                {outreachMsg && (
-                  <button
-                    type="button"
-                    onClick={copyOutreach}
-                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium transition-all"
-                    style={{
-                      background: outreachCopied ? 'rgba(34,197,94,0.1)' : 'var(--surface-5)',
-                      color: outreachCopied ? '#16a34a' : 'var(--text-4)',
-                      border: `1px solid ${outreachCopied ? 'rgba(34,197,94,0.2)' : 'var(--border-2)'}`,
-                    }}
-                  >
-                    {outreachCopied ? <Check size={10} /> : <Copy size={10} />}
-                    {outreachCopied ? t('job_outreach_copied') : t('job_outreach_copy')}
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={draftOutreach}
-                  disabled={outreachLoading}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
-                  style={{ background: 'rgba(10,102,194,0.08)', color: '#0a66c2', border: '1px solid rgba(10,102,194,0.2)' }}
-                >
-                  {outreachLoading ? <Loader2 size={10} className="animate-spin" /> : <Linkedin size={10} />}
-                  {outreachLoading ? t('job_outreaching') : outreachMsg ? t('job_reoutreach_btn') : t('job_outreach_btn')}
-                </button>
-              </div>
-            </div>
-
-            {outreachError && (
-              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{outreachError}</p>
-            )}
-
-            {outreachMsg && (
+            {/* LinkedIn outreach */}
+            <AiSection
+              Icon={Linkedin}
+              color="#0a66c2"
+              label={t('job_linkedin_outreach')}
+              loading={outreachFeature.loading}
+              error={outreachFeature.error}
+              hasResult={!!outreachFeature.result}
+              emptyHint={t('job_outreach_hint')}
+              onGenerate={draftOutreach}
+              generateLabel={outreachFeature.loading ? t('job_outreaching') : outreachFeature.result ? t('job_reoutreach_btn') : t('job_outreach_btn')}
+              secondary={<CopyButton text={outreachFeature.result} copyLabel={t('job_outreach_copy')} copiedLabel={t('job_outreach_copied')} />}
+            >
               <div className="rounded-xl p-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}>
-                <p className="text-[11px] leading-relaxed whitespace-pre-wrap mb-2" style={{ color: 'var(--text-2)' }}>{outreachMsg}</p>
-                <p className="text-[10px]" style={{ color: outreachMsg.length > 300 ? '#ef4444' : 'var(--text-5)' }}>
-                  {t('job_char_count', { count: outreachMsg.length })}
+                <p className="text-[11px] leading-relaxed whitespace-pre-wrap mb-2" style={{ color: 'var(--text-2)' }}>{outreachFeature.result}</p>
+                <p className="text-[10px]" style={{ color: outreachFeature.result?.length > 300 ? '#ef4444' : 'var(--text-5)' }}>
+                  {t('job_char_count', { count: outreachFeature.result?.length ?? 0 })}
                 </p>
               </div>
-            )}
+            </AiSection>
 
-            {!outreachMsg && !outreachLoading && !outreachError && (
-              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
-                {t('job_outreach_hint')}
-              </p>
-            )}
-          </div>
-
-          {/* Interview prep */}
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2.5">
-              <div className="flex items-center gap-2">
-                <BookOpen size={13} style={{ color: '#0891b2' }} />
-                <span className="text-xs font-semibold" style={{ color: 'var(--text-2)' }}>{t('job_interview_prep')}</span>
-              </div>
-              <button
-                type="button"
-                onClick={prepInterview}
-                disabled={interviewPrepLoading}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all"
-                style={{ background: 'rgba(8,145,178,0.08)', color: '#0891b2', border: '1px solid rgba(8,145,178,0.2)' }}
-              >
-                {interviewPrepLoading ? <Loader2 size={10} className="animate-spin" /> : <BookOpen size={10} />}
-                {interviewPrepLoading ? t('job_prepping') : interviewPrep ? t('job_reprep_btn') : t('job_prep_btn')}
-              </button>
-            </div>
-
-            {interviewPrepError && (
-              <p className="text-xs mb-2" style={{ color: '#ef4444' }}>{interviewPrepError}</p>
-            )}
-
-            {interviewPrep && !interviewPrepLoading && (
+            {/* Interview prep */}
+            <AiSection
+              Icon={BookOpen}
+              color="#0891b2"
+              label={t('job_interview_prep')}
+              loading={prepFeature.loading}
+              error={prepFeature.error}
+              hasResult={!!prepFeature.result}
+              emptyHint={t('job_prep_hint')}
+              onGenerate={prepInterview}
+              generateLabel={prepFeature.loading ? t('job_prepping') : prepFeature.result ? t('job_reprep_btn') : t('job_prep_btn')}
+            >
               <div className="rounded-xl p-3 space-y-3" style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)' }}>
-                {interviewPrep.talkingPoints?.length > 0 && (
+                {prepFeature.result?.talkingPoints?.length > 0 && (
                   <div>
                     <p className="text-[10px] font-semibold mb-1.5" style={{ color: 'var(--text-4)' }}>{t('job_talking_points')}</p>
-                    {interviewPrep.talkingPoints.map((tp, i) => (
+                    {prepFeature.result.talkingPoints.map((tp, i) => (
                       <div key={i} className="flex gap-1.5 text-[11px] mb-1">
                         <span style={{ color: '#0891b2' }}>→</span>
                         <span style={{ color: 'var(--text-2)' }}>{tp}</span>
@@ -820,9 +693,8 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                     ))}
                   </div>
                 )}
-
                 {['Role fit', 'Behavioral', 'Tough'].map((cat) => {
-                  const qs = interviewPrep.questions?.filter((q) => q.category === cat) || [];
+                  const qs = prepFeature.result?.questions?.filter((q) => q.category === cat) || [];
                   if (!qs.length) return null;
                   const labelKey = cat === 'Role fit' ? 'job_role_fit_q' : cat === 'Behavioral' ? 'job_behavioral_q' : 'job_tough_q';
                   return (
@@ -840,14 +712,8 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
                   );
                 })}
               </div>
-            )}
+            </AiSection>
 
-            {!interviewPrep && !interviewPrepLoading && !interviewPrepError && (
-              <p className="text-xs text-center py-3" style={{ color: 'var(--text-5)' }}>
-                {t('job_prep_hint')}
-              </p>
-            )}
-          </div>
           </form>
         </div>
 
