@@ -40,7 +40,10 @@ function Confetti({ active }) {
 }
 
 function DraggableCard({ job, onEdit, onDelete, onMove }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: job.id });
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
+    id: job.id,
+    activationConstraint: { distance: 8 },
+  });
   return (
     <div
       ref={setNodeRef}
