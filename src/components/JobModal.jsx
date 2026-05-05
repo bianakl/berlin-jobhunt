@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { authHeader } from '../lib/authHeader';
-import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles, BookOpen, Linkedin } from 'lucide-react';
+import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles, BookOpen, Linkedin, Send } from 'lucide-react';
 import { STAGES } from '../data/seed';
 import { useT } from '../lib/LanguageContext';
 
@@ -209,6 +209,22 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
   }, outreachFeature, (data) => outreachFeature.setResult(data.message));
 
   const prepInterview = () => callAi('/api/interview-prep', {}, prepFeature, (data) => prepFeature.setResult(data));
+
+  const applyNow = () => {
+    if (!form.title.trim()) return;
+    if (clFeature.result) navigator.clipboard.writeText(clFeature.result);
+    if (form.url) window.open(form.url, '_blank', 'noreferrer');
+    onSave({
+      ...form,
+      stage: 'applied',
+      tags: form.tags.split(',').map((tag) => tag.trim()).filter(Boolean),
+      followUpDate: form.followUpDate ? new Date(form.followUpDate).toISOString() : null,
+      appliedDate: form.appliedDate ? new Date(form.appliedDate).toISOString() : new Date().toISOString(),
+      activityLog: form.activityLog,
+      fitAnalysis: fitFeature.result || undefined,
+      interviewPrep: prepFeature.result || undefined,
+    });
+  };
 
   // ── Activity log ──────────────────────────────────────────────────────────
 
@@ -638,14 +654,45 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
               emptyHint={t('job_draft_hint')}
               onGenerate={draftCoverLetter}
               generateLabel={clFeature.loading ? t('job_drafting') : clFeature.result ? t('job_redraft') : t('job_draft_letter')}
-              secondary={<CopyButton text={clFeature.result} copyLabel={t('job_copy')} copiedLabel={t('job_copied')} />}
+              secondary={
+                <>
+                  {clFeature.result && (
+                    <button
+                      type="button"
+                      onClick={applyNow}
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all"
+                      style={{
+                        background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                        color: '#fff',
+                        border: 'none',
+                      }}
+                    >
+                      <Send size={10} />
+                      {t('job_apply_now')}
+                    </button>
+                  )}
+                  <CopyButton text={clFeature.result} copyLabel={t('job_copy')} copiedLabel={t('job_copied')} />
+                </>
+              }
             >
-              <div
-                className="text-xs leading-relaxed whitespace-pre-wrap rounded-xl p-4 max-h-64 overflow-y-auto"
-                style={{ background: 'var(--surface-2)', border: '1px solid var(--border-2)', color: 'var(--text-2)' }}
-              >
-                {clFeature.result}
-              </div>
+              <textarea
+                value={clFeature.result}
+                onChange={(e) => clFeature.setResult(e.target.value)}
+                rows={10}
+                className="text-xs leading-relaxed rounded-xl p-4 w-full"
+                style={{
+                  background: 'var(--surface-2)',
+                  border: '1px solid var(--border-2)',
+                  color: 'var(--text-2)',
+                  resize: 'vertical',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  lineHeight: 1.6,
+                  maxHeight: 320,
+                }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = '#7c3aed')}
+                onBlur={(e) => (e.currentTarget.style.borderColor = 'var(--border-2)')}
+              />
             </AiSection>
 
             {/* LinkedIn outreach */}
