@@ -42,8 +42,10 @@ export default async function handler(req, res) {
 
   const client = new Anthropic({ apiKey });
 
-  const jobContext = jobSnippet
-    ? `Role: ${jobTitle} at ${companyName}\nJob description:\n${jobSnippet}`
+  const cv = cvText.slice(0, 6000);
+  const snippet = (jobSnippet || '').slice(0, 1500);
+  const jobContext = snippet
+    ? `Role: ${jobTitle} at ${companyName}\nJob description:\n${snippet}`
     : `Role: ${jobTitle} at ${companyName}`;
   const skillsContext = skills?.length ? `\nCandidate's key skills: ${skills.join(', ')}` : '';
 
@@ -58,7 +60,7 @@ export default async function handler(req, res) {
 ${jobContext}${skillsContext}
 
 Candidate CV:
-${cvText}
+${cv}
 
 Analyze the fit and return ONLY valid JSON (no markdown, no explanation):
 {
@@ -95,11 +97,15 @@ Scoring rules:
 - Be specific — reference actual details from their CV and the job description
 - Do not sugarcoat gaps
 - IGNORE location entirely — assume the candidate is willing to relocate to Berlin or is already there. Never mention location as a gap or concern.
+- Keep strings concise — summary ≤ 40 words, each strength/gap/highlight/watchout ≤ 15 words
 - Return ONLY the JSON`,
+      }, {
+        role: 'assistant',
+        content: '{',
       }],
     });
 
-    const raw = message.content[0].text.trim();
+    const raw = ('{' + message.content[0].text).trim();
     try {
       const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
       return res.status(200).json(JSON.parse(jsonStr));
