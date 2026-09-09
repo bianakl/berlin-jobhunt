@@ -52,7 +52,7 @@ export default async function handler(req, res) {
   try {
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 600,
+      max_tokens: 800,
       messages: [{
         role: 'user',
         content: `You are a sharp, honest career advisor helping a PM evaluate whether to pursue a specific role. Be direct, specific, and genuinely useful — not generic.
@@ -62,25 +62,16 @@ ${jobContext}${skillsContext}
 Candidate CV:
 ${cv}
 
-Analyze the fit and return ONLY valid JSON (no markdown, no explanation):
+Analyze the fit and return ONLY valid JSON with no markdown, no explanation, no code fences. Start your response with { and end with }.
+
 {
   "score": 78,
   "verdict": "strong match",
-  "summary": "2-3 sentence honest assessment — what makes this person a good or poor fit for THIS specific role",
-  "strengths": [
-    "specific, concrete strength directly relevant to this role",
-    "another specific strength with evidence from their CV"
-  ],
-  "gaps": [
-    "specific gap or missing requirement for this role"
-  ],
-  "highlights": [
-    "what to lead with in the cover letter or first conversation",
-    "specific experience or achievement to emphasize"
-  ],
-  "watchouts": [
-    "one honest concern the hiring manager might raise"
-  ],
+  "summary": "2-3 sentence honest assessment of fit for THIS specific role",
+  "strengths": ["specific strength from their CV relevant to this role", "another specific strength"],
+  "gaps": ["specific gap or missing requirement"],
+  "highlights": ["what to lead with in the cover letter", "specific achievement to emphasize"],
+  "watchouts": ["one honest concern the hiring manager might raise"],
   "compatibility": {
     "roleMatch": 4,
     "skillsMatch": 3,
@@ -90,25 +81,25 @@ Analyze the fit and return ONLY valid JSON (no markdown, no explanation):
   }
 }
 
-Scoring rules:
+Rules:
 - score: 0-100 overall fit
 - verdict: one of "strong match" | "good match" | "possible match" | "stretch" | "not a fit"
-- compatibility values: 1-5 stars
-- Be specific — reference actual details from their CV and the job description
+- compatibility values: 1-5
+- Be specific — reference actual CV details and job description
 - Do not sugarcoat gaps
-- IGNORE location entirely — assume the candidate is willing to relocate to Berlin or is already there. Never mention location as a gap or concern.
-- Keep strings concise — summary ≤ 40 words, each strength/gap/highlight/watchout ≤ 15 words
-- Return ONLY the JSON`,
-      }, {
-        role: 'assistant',
-        content: '{',
+- IGNORE location entirely — candidate is in or moving to Berlin
+- summary ≤ 40 words, each array item ≤ 15 words
+- Return ONLY the JSON object, nothing else`,
       }],
     });
 
-    const raw = ('{' + message.content[0].text).trim();
+    const raw = message.content[0].text.trim();
     try {
       const jsonStr = raw.replace(/^```json?\n?/, '').replace(/\n?```$/, '').trim();
-      return res.status(200).json(JSON.parse(jsonStr));
+      const start = jsonStr.indexOf('{');
+      const end = jsonStr.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error('No JSON object found');
+      return res.status(200).json(JSON.parse(jsonStr.slice(start, end + 1)));
     } catch {
       return res.status(500).json({ error: 'Failed to parse analysis response.' });
     }
