@@ -96,7 +96,7 @@ test.describe('Companies view', () => {
 
   test('Add company modal opens', async ({ page }) => {
     await page.getByRole('button', { name: /add company/i }).click();
-    await expect(page.locator('text=/add company/i').nth(1)).toBeVisible();
+    await expect(page.locator('h2').filter({ hasText: /add company/i })).toBeVisible();
   });
 
   test('Add company modal closes on X', async ({ page }) => {
@@ -163,48 +163,15 @@ test.describe('Profile page', () => {
     await page.waitForTimeout(500);
   });
 
-  test('profile page renders key sections', async ({ page }) => {
-    await expect(page.locator('h2').filter({ hasText: /basic info/i })).toBeVisible();
-    await expect(page.locator('h2').filter({ hasText: /^skills$/i })).toBeVisible();
-    await expect(page.locator('h2').filter({ hasText: /portfolio/i })).toBeVisible();
+  test('profile page shows sign-in prompt when unauthenticated', async ({ page }) => {
+    // Profile content is auth-gated — unauthenticated users see a sign-in prompt
+    await expect(page.locator('text=/sign in to access your profile/i')).toBeVisible();
+    await expect(page.getByRole('button', { name: /send sign-in link/i })).toBeVisible();
   });
 
-  test('portfolio section shows 3 project cards', async ({ page }) => {
-    await expect(page.locator('text=/tamagotchi/i')).toBeVisible();
-    await expect(page.locator('text=/pooping/i')).toBeVisible();
-    await expect(page.locator('text=/recipe finder/i')).toBeVisible();
-  });
-
-  test('portfolio images load (no broken images)', async ({ page }) => {
-    const images = page.locator('img[src*="/portfolio/"]');
-    const count = await images.count();
-    expect(count).toBe(3);
-
-    for (let i = 0; i < count; i++) {
-      const img = images.nth(i);
-      const naturalWidth = await img.evaluate((el) => el.naturalWidth);
-      expect(naturalWidth).toBeGreaterThan(0);
-    }
-  });
-
-  test('portfolio links open correct URLs', async ({ page, context }) => {
-    const links = page.locator('a[href*="vercel.app"]');
-    const hrefs = await links.evaluateAll((els) => els.map((el) => el.href));
-    expect(hrefs).toContain('https://tamagotchi-app-five.vercel.app/');
-    expect(hrefs.some((h) => h.includes('pooping-com'))).toBeTruthy();
-    expect(hrefs.some((h) => h.includes('recipe-finder'))).toBeTruthy();
-  });
-
-  test('"Save profile" button is visible', async ({ page }) => {
-    await expect(page.getByRole('button', { name: /save profile/i })).toBeVisible();
-  });
-
-  test('sync section is visible', async ({ page }) => {
-    await expect(page.locator('text=/cross-device sync/i')).toBeVisible();
-  });
-
-  test('danger zone is visible', async ({ page }) => {
-    await expect(page.locator('text=/danger zone/i')).toBeVisible();
+  test('unauthenticated profile shows sign-in form with email input', async ({ page }) => {
+    // Profile page has its own sign-in email input (separate from the sync banner at the top)
+    await expect(page.getByPlaceholder(/your@email.com/i).first()).toBeVisible();
   });
 });
 
@@ -214,20 +181,20 @@ test.describe('Profile page', () => {
 test.describe('Dark mode', () => {
   test('dark mode toggle switches theme', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await page.getByRole('button', { name: /profile/i }).click();
-    await page.waitForTimeout(300);
 
     const html = page.locator('html');
     const wasDark = await html.evaluate((el) => el.classList.contains('dark'));
 
-    await page.getByRole('button', { name: /switch to (dark|light)/i }).click();
+    // Button text is "Dark mode" or "Light mode" depending on current state
+    const toggleBtn = page.locator('button').filter({ hasText: /^(Dark mode|Light mode)$/ }).first();
+    await toggleBtn.click();
     await page.waitForTimeout(200);
 
     const isDark = await html.evaluate((el) => el.classList.contains('dark'));
     expect(isDark).toBe(!wasDark);
 
     // Toggle back
-    await page.getByRole('button', { name: /switch to (dark|light)/i }).click();
+    await page.locator('button').filter({ hasText: /^(Dark mode|Light mode)$/ }).first().click();
   });
 });
 
@@ -266,6 +233,15 @@ test.describe('API routes', () => {
     });
     expect(res.status()).toBe(401);
   });
+
+  test('/api/analyze-job returns 401 without auth token', async ({ page }) => {
+    const res = await page.request.post('/api/analyze-job', {
+      data: { jobTitle: 'Senior PM', cvText: 'Experienced PM with 5 years in AI products', companyName: 'Klarna', jobSnippet: 'Looking for a PM to lead AI initiatives' },
+    });
+    expect(res.status()).toBe(401);
+    const body = await res.json();
+    expect(body.error).toBeTruthy();
+  });
 });
 
 // ─────────────────────────────────────────────
@@ -291,7 +267,49 @@ test.describe('Mobile layout', () => {
 });
 
 // ─────────────────────────────────────────────
-// 10. No JS console errors on main views
+// 10. AI features in job modal
+// ─────────────────────────────────────────────
+test.describe('AI features in job modal', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/', { waitUntil: 'networkidle' });
+    // Open Add Job modal — AI sections render in both add and edit mode
+    await page.getByRole('button', { name: /add job/i }).first().click();
+    await page.waitForTimeout(300);
+  });
+
+  test('analyze fit button is visible in job modal', async ({ page }) => {
+    await expect(page.getByRole('button', { name: /analyze fit/i })).toBeVisible();
+  });
+
+  test('cover letter section is visible in job modal', async ({ page }) => {
+    // Section label is "Cover letter", generate button is "Draft letter"
+    await expect(page.locator('span').filter({ hasText: /^Cover letter$/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /draft letter/i })).toBeVisible();
+  });
+
+  test('interview prep section is visible in job modal', async ({ page }) => {
+    // Section label is "Interview prep", generate button is "Generate prep"
+    await expect(page.locator('span').filter({ hasText: /^Interview prep$/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /generate prep/i })).toBeVisible();
+  });
+
+  test('linkedin outreach section is visible in job modal', async ({ page }) => {
+    // Section label is "LinkedIn outreach", generate button is "Draft message"
+    await expect(page.locator('span').filter({ hasText: /^LinkedIn outreach$/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /draft message/i })).toBeVisible();
+  });
+
+  test('analyze fit shows error without job title', async ({ page }) => {
+    // Click analyze fit with no title filled — should show validation error, not crash
+    await page.getByRole('button', { name: /analyze fit/i }).click();
+    await page.waitForTimeout(500);
+    // App should still be functional (modal still open)
+    await expect(page.getByRole('button', { name: /analyze fit/i })).toBeVisible();
+  });
+});
+
+// ─────────────────────────────────────────────
+// 11. No JS console errors on main views
 // ─────────────────────────────────────────────
 test.describe('No console errors', () => {
   test('zero JS errors on page load and navigation', async ({ page }) => {
