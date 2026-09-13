@@ -6,6 +6,7 @@ import { seedJobs, starterPackCompanies, ROLES } from './data/seed';
 import Dashboard from './components/Dashboard';
 import Pipeline from './components/Pipeline';
 import Companies from './components/Companies';
+import Relocation from './components/Relocation';
 import Profile from './components/Profile';
 import Sidebar from './components/Sidebar';
 import JobModal from './components/JobModal';
@@ -372,6 +373,9 @@ export default function App() {
               localStorage.getItem('scout-starter-pack-offered') ? null : handleImportStarterPack
             }
           />
+        )}
+        {activeView === 'relocation' && (
+          <Relocation />
         )}
         {activeView === 'profile' && !syncUser && (
           <ProfileSignInGate onSyncRequest={handleSyncRequest} />

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { LayoutDashboard, Kanban, Building2, User, Plus, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, Kanban, Building2, Compass, User, Plus, Sun, Moon } from 'lucide-react';
 import { STAGES } from '../data/seed';
 import { useT } from '../lib/LanguageContext';
 
@@ -17,6 +17,7 @@ const NAV = [
   { id: 'dashboard', labelKey: 'nav_overview', Icon: LayoutDashboard },
   { id: 'pipeline',  labelKey: 'nav_pipeline', Icon: Kanban },
   { id: 'companies', labelKey: 'nav_companies', Icon: Building2 },
+  { id: 'relocation', labelKey: 'nav_relocation', Icon: Compass },
   { id: 'profile',   labelKey: 'nav_profile',  Icon: User },
 ];
 

@@ -5,6 +5,12 @@ export const translations = {
     nav_pipeline: 'Pipeline',
     nav_companies: 'Companies',
     nav_profile: 'Profile',
+    nav_relocation: 'Relocation',
+    // ── Relocation guide ──────────────────────────────────────
+    relo_title: 'Moving to Berlin',
+    relo_subtitle: 'The relocation playbook: visas, registration, insurance and everything else — checked against official sources.',
+    relo_sources: 'Sources & further reading',
+    relo_disclaimer: 'Checked against official sources in September 2026. Rules and thresholds change — always confirm on the linked official pages before acting.',
     nav_add_job: 'Add Job',
     nav_light_mode: 'Light mode',
     nav_dark_mode: 'Dark mode',
@@ -284,12 +290,19 @@ export const translations = {
     profile_salary_placeholder: '80000',
   },
 
+
   de: {
     // ── Nav ──────────────────────────────────────────────────────
     nav_overview: 'Übersicht',
     nav_pipeline: 'Pipeline',
     nav_companies: 'Unternehmen',
     nav_profile: 'Profil',
+    nav_relocation: 'Umzug',
+    // ── Relocation guide ──────────────────────────────────────
+    relo_title: 'Umzug nach Berlin',
+    relo_subtitle: 'Der Umzugs-Guide: Visa, Anmeldung, Versicherung und alles Weitere — geprüft gegen offizielle Quellen.',
+    relo_sources: 'Quellen & weiterführende Links',
+    relo_disclaimer: 'Geprüft gegen offizielle Quellen im September 2026. Regeln und Grenzen ändern sich — vor dem Handeln immer auf den verlinkten offiziellen Seiten bestätigen.',
     nav_add_job: 'Job hinzufügen',
     nav_light_mode: 'Heller Modus',
     nav_dark_mode: 'Dunkler Modus',
