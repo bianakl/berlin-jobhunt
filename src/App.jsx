@@ -3,6 +3,7 @@ import SyncBanner from './components/SyncBanner';
 import ProfileSignInGate from './components/ProfileSignInGate';
 import useLocalStorage from './hooks/useLocalStorage';
 import { seedJobs, starterPackCompanies, ROLES } from './data/seed';
+import market from './config/market';
 import Dashboard from './components/Dashboard';
 import Pipeline from './components/Pipeline';
 import Companies from './components/Companies';
@@ -31,7 +32,7 @@ const defaultProfile = {
   preferredIndustries: [],
   salaryMin: '',
   salaryMax: '',
-  preferredLocations: 'Berlin',
+  preferredLocations: market.defaultLocation,
   bio: '',
 };
 
@@ -328,7 +329,7 @@ export default function App() {
               style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}
             >S</div>
             <span className="font-semibold text-sm" style={{ color: 'var(--text-1)' }}>Scout</span>
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}>Berlin</span>
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}>{market.cityLabel}</span>
           </div>
           <a href="/hire" target="_blank" rel="noreferrer" className="text-[10px] hover:underline" style={{ color: 'var(--text-4)', textDecoration: 'none' }}>made with ❤️ by Biana</a>
         </div>

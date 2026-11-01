@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
+import { getMarket } from './_markets.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -36,9 +37,11 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API not configured.' });
 
-  const { cvText, cvBase64, mode } = req.body || {};
+  const { cvText, cvBase64, mode, market } = req.body || {};
   if (!cvText && !cvBase64) return res.status(400).json({ error: 'No CV content provided.' });
   if (cvBase64 && cvBase64.length > 10 * 1024 * 1024) return res.status(400).json({ error: 'PDF too large.' });
+
+  const { exampleLocation } = getMarket(market);
 
   const client = new Anthropic({ apiKey });
 
@@ -76,7 +79,7 @@ export default async function handler(req, res) {
   "preferredIndustries": [],
   "salaryMin": "",
   "salaryMax": "",
-  "preferredLocations": "Berlin",
+  "preferredLocations": "${exampleLocation}",
   "bio": "2-3 sentence professional summary"
 }
 

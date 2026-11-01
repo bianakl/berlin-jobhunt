@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
+import { getMarket } from './_markets.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -36,9 +37,11 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API not configured.' });
 
-  const { cvText, jobTitle, companyName, jobSnippet, skills } = req.body || {};
+  const { cvText, jobTitle, companyName, jobSnippet, skills, market } = req.body || {};
   if (!cvText || !jobTitle) return res.status(400).json({ error: 'Missing cvText or jobTitle.' });
   if (cvText.length > 50000) return res.status(400).json({ error: 'CV text too large.' });
+
+  const { locationRule } = getMarket(market);
 
   const client = new Anthropic({ apiKey });
 
@@ -87,7 +90,7 @@ Rules:
 - compatibility values: 1-5
 - Be specific — reference actual CV details and job description
 - Do not sugarcoat gaps
-- IGNORE location entirely — candidate is in or moving to Berlin
+- ${locationRule}
 - summary ≤ 40 words, each array item ≤ 15 words
 - Return ONLY the JSON object, nothing else`,
       }],

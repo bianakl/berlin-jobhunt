@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createClient } from '@supabase/supabase-js';
+import { getMarket } from './_markets.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -36,11 +37,12 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API not configured.' });
 
-  const { cvText, jobTitle, companyName, jobSnippet, candidateName, skills } = req.body || {};
+  const { cvText, jobTitle, companyName, jobSnippet, candidateName, skills, market } = req.body || {};
   if (!cvText || !jobTitle) return res.status(400).json({ error: 'Missing cvText or jobTitle.' });
 
   const cv = cvText.slice(0, 6000);
   const snippet = (jobSnippet || '').slice(0, 1500);
+  const { personaLocation } = getMarket(market);
 
   const client = new Anthropic({ apiKey });
 
@@ -48,7 +50,7 @@ export default async function handler(req, res) {
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
       max_tokens: 500,
-      system: `You are a senior product leader in Berlin who occasionally helps colleagues write job applications. You write the way you speak: clear, specific, grounded. You never write anything you wouldn't say in a real conversation, and you never claim experience that isn't backed by what's on the candidate's CV. Your letters are 200–250 words, three paragraphs, no greeting line, signed off with "Kind regards,".`,
+      system: `You are a senior product leader ${personaLocation} who occasionally helps colleagues write job applications. You write the way you speak: clear, specific, grounded. You never write anything you wouldn't say in a real conversation, and you never claim experience that isn't backed by what's on the candidate's CV. Your letters are 200–250 words, three paragraphs, no greeting line, signed off with "Kind regards,".`,
       messages: [{
         role: 'user',
         content: `Write a cover letter for this application.

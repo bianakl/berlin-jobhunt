@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { LayoutDashboard, Kanban, Building2, Compass, User, Plus, Sun, Moon } from 'lucide-react';
 import { STAGES } from '../data/seed';
+import market from '../config/market';
 import { useT } from '../lib/LanguageContext';
 
 const MILESTONES = [5, 10, 20, 50];
@@ -55,7 +56,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
               className="text-[10px] font-medium px-1.5 py-0.5 rounded"
               style={{ background: 'var(--accent-faint)', color: 'var(--accent)', border: '1px solid var(--accent-muted)' }}
             >
-              Berlin
+              {market.cityLabel}
             </span>
           </div>
           <a href="/hire" target="_blank" rel="noreferrer" className="text-[10px] mt-1 ml-9 hover:underline" style={{ color: 'var(--text-4)', textDecoration: 'none' }}>made with ❤️ by Biana</a>
@@ -105,7 +106,7 @@ export default function Sidebar({ activeView, onNavigate, onAddJob, streak, achi
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-sm">{level.emoji}</span>
-              <span className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{t(level.key)}</span>
+              <span className="text-xs font-semibold" style={{ color: 'var(--accent)' }}>{t(level.key, { name: market.levelBossName })}</span>
             </div>
           </div>
           <div className="mb-1.5">

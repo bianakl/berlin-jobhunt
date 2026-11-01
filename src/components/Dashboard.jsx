@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { STAGES } from '../data/seed';
 import { CalendarClock, TrendingUp, Briefcase, Star, AlertCircle } from 'lucide-react';
 import Gamification from './Gamification';
+import market from '../config/market';
 import { useT } from '../lib/LanguageContext';
 
 function compatScore(compatibility) {
@@ -93,7 +94,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
     },
   ];
 
-  const motivateLines = t('dash_motivate').split('\n');
+  const motivateLines = t('dash_motivate', { city: market.cityLabel }).split('\n');
 
   const stableUnlock = useCallback(onUnlockAchievement, [onUnlockAchievement]);
 
@@ -101,7 +102,7 @@ export default function Dashboard({ jobs, companies, onEditJob, onAddJob, streak
     <div className="max-w-5xl mx-auto px-4 md:px-6 py-4 md:py-8 fade-in">
       {/* Greeting */}
       <div className="mb-4 md:mb-8">
-        <h1 className="text-xl md:text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>{t('dash_title')}</h1>
+        <h1 className="text-xl md:text-2xl font-semibold mb-1" style={{ color: 'var(--text-1)' }}>{t('dash_title', { city: market.cityLabel })}</h1>
         <p className="text-sm" style={{ color: 'var(--text-4)' }}>
           {activeJobs.length === 0
             ? t('dash_empty')

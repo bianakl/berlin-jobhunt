@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { authHeader } from '../lib/authHeader';
 import { X, ExternalLink, ChevronDown, Plus, Trash2, MessageSquare, FileText, Copy, Check, Loader2, Sparkles, BookOpen, Linkedin, Send } from 'lucide-react';
 import { STAGES } from '../data/seed';
+import market from '../config/market';
 import { useT } from '../lib/LanguageContext';
 
 // ── Shared hooks ──────────────────────────────────────────────────────────────
@@ -143,7 +144,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
     title: job?.title || '',
     company: job?.company || defaults.company || '',
     companyId: job?.companyId || defaults.companyId || '',
-    location: job?.location || 'Berlin',
+    location: job?.location || market.defaultLocation,
     url: job?.url || '',
     stage: job?.stage || defaults.stage || 'saved',
     salary: job?.salary || '',
@@ -183,6 +184,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
           companyName: form.company,
           jobSnippet: form.notes || '',
           skills: profile?.skills || [],
+          market: market.id,
           ...extraBody,
         }),
       });
@@ -410,7 +412,7 @@ export default function JobModal({ job, defaults = {}, companies, profile, onNee
 
                   <Field label={t('job_location_label')}>
                     <input
-                      placeholder={t('job_location_placeholder')}
+                      placeholder={market.locationPlaceholder}
                       value={form.location}
                       onChange={(e) => set('location', e.target.value)}
                       style={inputStyle}

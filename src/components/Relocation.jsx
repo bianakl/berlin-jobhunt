@@ -1,9 +1,12 @@
 import { useState, useContext } from 'react';
-import { Stamp, MapPin, HeartPulse, Landmark, KeyRound, Receipt, GraduationCap, ExternalLink, Check } from 'lucide-react';
-import { relocationTopics } from '../data/relocation';
+import { Stamp, MapPin, HeartPulse, Landmark, KeyRound, Receipt, GraduationCap, Fingerprint, ExternalLink, Check } from 'lucide-react';
+import berlinRelocationTopics from '../data/relocation/berlin';
+import usRelocationTopics from '../data/relocation/us';
+import market from '../config/market';
 import { LanguageContext, useT } from '../lib/LanguageContext';
 
-const ICONS = { Stamp, MapPin, HeartPulse, Landmark, KeyRound, Receipt, GraduationCap };
+const ICONS = { Stamp, MapPin, HeartPulse, Landmark, KeyRound, Receipt, GraduationCap, Fingerprint };
+const relocationTopics = market.id === 'us' ? usRelocationTopics : berlinRelocationTopics;
 
 export default function Relocation() {
   const t = useT();
@@ -18,7 +21,7 @@ export default function Relocation() {
       {/* Header */}
       <div className="mb-5">
         <h1 className="text-xl md:text-2xl font-bold tracking-tight" style={{ color: 'var(--text-1)' }}>
-          {t('relo_title')}
+          {t('relo_title', { city: market.cityLabel })}
         </h1>
         <p className="text-sm mt-1" style={{ color: 'var(--text-3)' }}>
           {t('relo_subtitle')}

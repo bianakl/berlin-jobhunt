@@ -1,40 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
-
-// Verified from Glassdoor, Levels.fyi, Handpickedberlin (2025–2026)
-const MARKET_CONTEXT = `
-Berlin / European PM Salary Market Data (2026, verified):
-
-By seniority (Berlin, gross annual EUR):
-- Junior PM (0-3 yrs): €43,000–€58,000 (Glassdoor avg €48,500)
-- Mid PM (3-6 yrs): €58,000–€85,000 (Glassdoor avg €65,500; market median €85,000)
-- Senior PM (6-10 yrs): €80,000–€102,000 (Glassdoor avg €90,000; Levels.fyi avg €95,000)
-- Lead / Principal PM (8-12 yrs): €100,000–€140,000 (Glassdoor avg €114,500)
-- Head of Product (10+ yrs): €115,000–€165,000
-- VP Product: €140,000–€185,000
-- CPO: €160,000–€220,000+
-
-Company type adjustments:
-- Early startup (<50 employees): -10% to -15% base, equity upside
-- Growth startup (50-200 employees, Series A-B): -5% to 0%
-- Scale-up (200-1000 employees, Series C-D): 0% to +5%
-- Enterprise (1000+ employees): +5% to +15%
-- Top tech (e.g. Amazon Berlin): +40% to +80% total comp
-
-Industry premiums over baseline:
-- AI-native companies: +15% to +25%
-- Fintech / crypto: +10% to +20%
-- B2B SaaS: +5% to +15%
-- E-commerce: 0% to +5%
-- General tech: baseline
-
-Confirmed data points:
-- Levels.fyi Berlin PM median range: €79,808–€112,934
-- Glassdoor Berlin Senior PM avg: €90,000
-- Handpickedberlin 2025 Berlin PM median: €85,000, avg: €92,807
-- Startup avg: €88,272 vs non-startup avg: €94,779
-`.trim();
-
 import { createClient } from '@supabase/supabase-js';
+import { getMarket } from './_markets.js';
 
 const supabase = createClient(
   process.env.VITE_SUPABASE_URL,
@@ -71,9 +37,11 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'API not configured.' });
 
-  const { cvText, jobTitle, companyName, companyIndustry, mode } = req.body || {};
+  const { cvText, jobTitle, companyName, companyIndustry, mode, market } = req.body || {};
   if (!cvText) return res.status(400).json({ error: 'Missing cvText.' });
   if (cvText.length > 50000) return res.status(400).json({ error: 'CV text too large.' });
+
+  const { salaryContext, label: marketLabel, advisorFraming, currencySymbol } = getMarket(market);
 
   const client = new Anthropic({ apiKey });
 
@@ -81,11 +49,11 @@ export default async function handler(req, res) {
 
   if (mode === 'profile') {
     const cvSummary = cvText.slice(0, 4000);
-    prompt = `You are a senior talent advisor specializing in European tech product management. You give honest, calibrated assessments — not inflated ones.
+    prompt = `You are a senior talent advisor specializing in ${advisorFraming}. You give honest, calibrated assessments — not inflated ones.
 
-${MARKET_CONTEXT}
+${salaryContext}
 
-Analyze this candidate's CV/profile and give them a realistic, specific picture of their market value for PM roles in Berlin / Europe.
+Analyze this candidate's CV/profile and give them a realistic, specific picture of their market value for PM roles in ${marketLabel}.
 
 CV / Profile:
 ${cvSummary}
@@ -100,12 +68,12 @@ Return ONLY valid JSON (no markdown, no explanation):
   "headline": "One punchy sentence on their positioning",
   "strengths": ["strength 1", "strength 2", "strength 3"],
   "limitingFactors": ["one honest limiting factor"],
-  "positioning": "2-3 sentences on best-fit companies and roles in Berlin",
+  "positioning": "2-3 sentences on best-fit companies and roles in ${marketLabel}",
   "tip": "One specific, actionable negotiation tip"
 }
 
 Rules:
-- Be calibrated to real Berlin market data above
+- Be calibrated to the real market data above
 - Do not inflate numbers
 - Reference specific details from their CV
 - Keep strings concise — headline ≤ 15 words, each strength/factor ≤ 15 words, tip ≤ 20 words
@@ -113,9 +81,9 @@ Rules:
   } else {
     // Per-role estimate
     const cvSummary = cvText.slice(0, 2000);
-    prompt = `You are a senior talent advisor specializing in European tech product management.
+    prompt = `You are a senior talent advisor specializing in ${advisorFraming}.
 
-${MARKET_CONTEXT}
+${salaryContext}
 
 Given this candidate profile and a specific open role, estimate the realistic salary range this company would offer.
 
@@ -131,7 +99,7 @@ Return ONLY valid JSON (no markdown):
   "min": 85000,
   "mid": 95000,
   "max": 112000,
-  "label": "€85k–€112k",
+  "label": "${currencySymbol}85k–${currencySymbol}112k",
   "note": "Scale-up fintech, Senior PM band"
 }
 

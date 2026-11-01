@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import berlinMarket from './src/config/markets/berlin.js';
+import usMarket from './src/config/markets/us.js';
+
+const market = (process.env.VITE_MARKET || 'berlin').toLowerCase() === 'us' ? usMarket : berlinMarket;
 
 export default defineConfig({
   plugins: [
@@ -10,9 +14,9 @@ export default defineConfig({
       injectRegister: false,
       includeAssets: ['scout-icon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Scout Berlin',
-        short_name: 'Scout',
-        description: 'Your Berlin job hunt headquarters',
+        name: market.brandName,
+        short_name: market.shortName,
+        description: market.pwaDescription,
         theme_color: '#0d9488',
         background_color: '#0a1f1e',
         display: 'standalone',

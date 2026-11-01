@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { authHeader } from '../lib/authHeader';
 import { MoreHorizontal, ExternalLink, Pencil, Clock, CalendarClock, AlertCircle, Banknote, ChevronRight, TrendingUp, Loader2, MessageSquare } from 'lucide-react';
 import { STAGES } from '../data/seed';
+import market from '../config/market';
 import { CompatRing } from './Dashboard';
 
 function compatScore(compatibility) {
@@ -37,7 +38,7 @@ async function fetchSalaryEst(title, company) {
   const res = await fetch('/api/salary-estimate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-    body: JSON.stringify({ cvText, jobTitle: title, companyName: company }),
+    body: JSON.stringify({ cvText, jobTitle: title, companyName: company, market: market.id }),
   });
   if (!res.ok) return null;
   return await res.json();
@@ -266,7 +267,7 @@ export default function JobCard({ job, onEdit, onDelete, onMove, stages }) {
                 title="Get salary estimate for this role"
               >
                 {salaryLoading ? <Loader2 size={9} className="animate-spin" /> : <TrendingUp size={9} />}
-                {salaryLoading ? '' : '€?'}
+                {salaryLoading ? '' : `${market.currencySymbol}?`}
               </button>
             )}
           </div>

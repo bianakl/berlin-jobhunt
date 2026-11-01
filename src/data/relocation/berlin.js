@@ -1,7 +1,7 @@
 // Relocation guide content for English-speaking tech job seekers moving to Berlin.
 // Facts checked against official sources in September 2026 — see `sources` on each topic.
 
-export const relocationTopics = [
+const relocationTopics = [
   {
     id: 'visas',
     icon: 'Stamp',
@@ -515,3 +515,5 @@ export const relocationTopics = [
     },
   },
 ];
+
+export default relocationTopics;
