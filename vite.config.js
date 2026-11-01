@@ -7,6 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: false,
       includeAssets: ['scout-icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Scout Berlin',
