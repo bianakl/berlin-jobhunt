@@ -6,6 +6,7 @@ import {
   FileText, Copy, Check,
 } from 'lucide-react';
 import { STAGES, ROLES } from '../data/seed';
+import market from '../config/market';
 import { useT } from '../lib/LanguageContext';
 
 const DEFAULT_ROLE = ROLES[0];
@@ -353,7 +354,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
             <>
               <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-2)' }}>{t('companies_empty_title')}</p>
               <p className="text-xs mb-5 max-w-xs mx-auto" style={{ color: 'var(--text-4)' }}>
-                {t('companies_empty_desc')}
+                {t('companies_empty_desc', { city: market.cityLabel })}
               </p>
               {onImportStarterPack && (
                 <div className="flex flex-col items-center gap-3 mb-3">
@@ -385,7 +386,7 @@ export default function Companies({ companies, jobs, onAddCompany, onEditCompany
                     }}
                   >
                     <Sparkles size={14} />
-                    {syncStatus === 'syncing' ? 'Syncing…' : t('companies_import_btn')}
+                    {syncStatus === 'syncing' ? 'Syncing…' : t('companies_import_btn', { city: market.cityLabel })}
                   </button>
                 </div>
               )}
@@ -444,7 +445,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       url: pos.url || '',
       stage: 'saved',
       notes: pos.snippet || '',
-      location: 'Berlin',
+      location: pos.location || market.defaultLocation,
       remote: true,
       tags: [],
       salary: '',
@@ -555,7 +556,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
         const res = await fetch('/api/salary-estimate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-          body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name }),
+          body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name, market: market.id }),
         });
         const data = await res.json();
         setSalaryEstimates((prev) => ({ ...prev, [pos.id]: data.error ? null : data }));
@@ -594,7 +595,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
       const res = await fetch('/api/analyze-job', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-        body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name, jobSnippet: pos.snippet || '', skills }),
+        body: JSON.stringify({ cvText, jobTitle: pos.title, companyName: company.name, jobSnippet: pos.snippet || '', skills, market: market.id }),
       });
       const data = await res.json();
       if (data.error) setAnalyses((a) => ({ ...a, [pos.id]: { error: data.error } }));
@@ -620,6 +621,7 @@ function CompanyRow({ company, companyJobs, isExpanded, onToggle, onEdit, onDele
           jobSnippet: pos.snippet || '',
           candidateName: profile.name || '',
           skills: profile.skills || [],
+          market: market.id,
         }),
       });
       const data = await res.json();

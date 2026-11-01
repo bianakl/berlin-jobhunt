@@ -2,7 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import App from './App.jsx';
+import market from './config/market';
 import './index.css';
+
+document.title = market.pageTitle;
 
 // Keep long-lived tabs (desktop especially) from drifting out of sync with
 // mobile installs: poll hourly for a new build and reload as soon as one

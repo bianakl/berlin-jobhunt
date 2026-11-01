@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
+import market from '../config/market';
 
 const MILESTONES = [5, 10, 20, 50];
 
 function getLevel(count) {
-  if (count >= 50) return { name: 'Berlin Boss', emoji: '🏆', min: 50, max: Infinity };
+  if (count >= 50) return { name: market.levelBossName, emoji: '🏆', min: 50, max: Infinity };
   if (count >= 30) return { name: 'Pro', emoji: '💎', min: 30, max: 50 };
   if (count >= 15) return { name: 'Hunter', emoji: '🎯', min: 15, max: 30 };
   if (count >= 5) return { name: 'Networker', emoji: '🤝', min: 5, max: 15 };

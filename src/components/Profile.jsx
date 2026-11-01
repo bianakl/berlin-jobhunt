@@ -2,6 +2,7 @@ import { useState, useRef, useContext } from 'react';
 import { authHeader } from '../lib/authHeader';
 import { User, Plus, X, Save, Upload, Key, Sparkles, Loader2, CheckCircle, TrendingUp, RefreshCw, Trash2, Sun, Moon, Cloud, LogOut } from 'lucide-react';
 import { INDUSTRIES } from '../data/seed';
+import market from '../config/market';
 import { LanguageContext, useT } from '../lib/LanguageContext';
 
 const inputStyle = {
@@ -75,7 +76,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
     setSkillExtracting(true);
     setSkillExtractMsg('');
     try {
-      const body = cvB64 ? { cvBase64: cvB64, mode: 'skills' } : { cvText, mode: 'skills' };
+      const body = cvB64 ? { cvBase64: cvB64, mode: 'skills', market: market.id } : { cvText, mode: 'skills', market: market.id };
       const res = await fetch('/api/extract-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
@@ -114,7 +115,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
       const res = await fetch('/api/salary-estimate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
-        body: JSON.stringify({ cvText, mode: 'profile' }),
+        body: JSON.stringify({ cvText, mode: 'profile', market: market.id }),
       });
       const data = await res.json();
       if (data.error) { setMarketError(data.error); }
@@ -171,6 +172,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
         // Also try to extract as text for analyze-job (send plain text separately)
         body = { cvBase64: b64 };
       }
+      body.market = market.id;
 
       setExtractMsg('Extracting profile with AI...');
       const res = await fetch('/api/extract-profile', {
@@ -232,7 +234,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
     setExtracting(true);
     setExtractMsg('Extracting profile with AI...');
     try {
-      const body = b64 ? { cvBase64: b64 } : { cvText: text };
+      const body = b64 ? { cvBase64: b64, market: market.id } : { cvText: text, market: market.id };
       const res = await fetch('/api/extract-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(await authHeader()) },
@@ -399,7 +401,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
             </Field>
             <Field label={t('profile_locations')} hint={t('profile_locations_hint')}>
               <input
-                placeholder="Berlin, Remote"
+                placeholder={market.preferredLocationsPlaceholder}
                 value={form.preferredLocations}
                 onChange={(e) => set('preferredLocations', e.target.value)}
                 style={inputStyle}
@@ -506,7 +508,7 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
             </button>
           </div>
           <p className="text-xs mb-4" style={{ color: 'var(--text-4)' }}>
-            {t('profile_market_desc')}
+            {t('profile_market_desc', { city: market.cityLabel })}
           </p>
 
           {marketError && <p className="text-xs mb-3" style={{ color: '#ef4444' }}>{marketError}</p>}
@@ -517,9 +519,9 @@ export default function Profile({ profile, onUpdate, dark, onToggleDark, syncUse
               <div className="flex items-end justify-between mb-3">
                 <div>
                   <div className="text-2xl font-bold" style={{ color: 'var(--text-1)' }}>
-                    €{Math.round(marketValue.rangeMin / 1000)}k–€{Math.round(marketValue.rangeMax / 1000)}k
+                    {market.currencySymbol}{Math.round(marketValue.rangeMin / 1000)}k–{market.currencySymbol}{Math.round(marketValue.rangeMax / 1000)}k
                   </div>
-                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>gross annual · Berlin market</div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--text-3)' }}>gross annual · {market.cityLabel} market</div>
                 </div>
                 <div className="text-right">
                   <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(99,102,241,0.12)', color: '#6366f1' }}>

@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { Upload, X, Loader2, CheckCircle } from 'lucide-react';
 import { authHeader } from '../lib/authHeader';
+import market from '../config/market';
 
 export default function CvUploadModal({ profile, onUpdateProfile, onSuccess, onClose }) {
   const [dragging, setDragging] = useState(false);
@@ -31,6 +32,7 @@ export default function CvUploadModal({ profile, onUpdateProfile, onSuccess, onC
         });
         body = { cvBase64: b64 };
       }
+      body.market = market.id;
 
       localStorage.setItem('scout-cv-name', file.name);
 
